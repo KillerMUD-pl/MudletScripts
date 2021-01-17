@@ -1,6 +1,7 @@
 {
   "killermud": {
     "version": 1,
-    "url": ""
+    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/modules/killermud/killermud.xml",
+    "commands": [ "install", "update", "remove" ]
   }
 }

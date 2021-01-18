@@ -6,5 +6,5 @@ Na razie tyle, później to będzie instalowalne przez `kinstall` i będzie poka
 
 Pobierz plik `kmap.mpackage` i zainstaluj go w mudlecie za pomocą Package Managera
 
-[Link do ściągnięcia](https://github.com/ktunkiewicz/KillerMUDScripts/raw/main/kmap/kmap.mpackage)
+[Link do pliku](https://github.com/ktunkiewicz/KillerMUDScripts/raw/main/kmap/kmap.mpackage)
 

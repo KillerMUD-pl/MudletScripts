@@ -1,7 +1,0 @@
-{
-  "kinstall": {
-    "version": 1,
-    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/modules/kinstall/kinstall.xml",
-    "commands": [ "install", "update", "remove" ]
-  }
-}

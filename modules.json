@@ -8,4 +8,5 @@
     "version": 1,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kmap/kmap.zip",
     "commands": [ "map" ]
+  }
 }

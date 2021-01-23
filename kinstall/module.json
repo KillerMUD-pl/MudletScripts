@@ -1,0 +1,5 @@
+{
+  "name": "kinstall",
+  "version": 0,
+  "commands": [ "enable", "disable", "update" ]
+}

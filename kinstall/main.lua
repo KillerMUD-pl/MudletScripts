@@ -84,11 +84,12 @@ function kinstall:checkVersions(filename)
       local desc = data.shortDesc or '(brak opisu)'
       cecho('- ' .. moduleName .. ': ' .. desc .. ' <DimGrey>(posiadasz wersję: ' .. kinstall.modules[moduleName].version .. ', nowa wersja: ' .. data.version .. ')\n')
     end
-    cecho('\n<yellow>Wpisz <cyan>+update <yellow>by zaktualizować pakiety.\n\n')
   end
   -- auto update
   if hasUpdates == true and kinstall.autoUpdate == 'y' then
     kinstall:update()
+  else
+    cecho('\n<yellow>Wpisz <cyan>+update <yellow>by zaktualizować pakiety.\n\n')
   end
 end
 
@@ -109,7 +110,7 @@ end
 function kinstall:update()
   for moduleName, data in pairs(kinstall.updateList) do
     downloadFile(
-      kinstall.tmpFolder .. '/moduleName.zip',
+      kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
       kinstall.repoPath .. moduleName .. '/' .. moduleName .. '.zip'
     )
   end
@@ -128,7 +129,7 @@ function kinstall:sysDownloadDone(_, filename)
   if string.ends(filename, '/modules.json') then
     kinstall:checkVersions(filename)
   end
-  if string.ends(filename, '.zip') and string.starts(filename, kinstall.repoPath) then
+  if string.ends(filename, '.zip') and string.starts(filename, kinstall.tmpFolder) then
     kinstall:install(filename)
   end
 end

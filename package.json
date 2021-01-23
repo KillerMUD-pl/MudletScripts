@@ -1,0 +1,29 @@
+{
+  "name": "killermudscripts",
+  "version": "1.0.0",
+  "description": "Mudlet scripts for Killer MUD text game",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "bootstrap": "node ./kinstall/utils/bootstrap.js",
+    "pack": "node ./kinstall/utils/pack.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ktunkiewicz/KillerMUDScripts.git"
+  },
+  "author": "Kamil Tunkiewicz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ktunkiewicz/KillerMUDScripts/issues"
+  },
+  "homepage": "https://github.com/ktunkiewicz/KillerMUDScripts#readme",
+  "dependencies": {
+    "copyfiles": "^2.4.1",
+    "cpy": "^8.1.1",
+    "jszip": "^3.5.0",
+    "jszip-glob": "^0.1.1",
+    "remove": "^0.1.5",
+    "replace-in-file": "^6.1.0"
+  }
+}

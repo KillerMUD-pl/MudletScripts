@@ -6,42 +6,17 @@ kinstall.modules = {}
 kinstall.updateList = {}
 kinstall.cmdCache = {}
 kinstall.autoUpdate = kinstall.autoUpdate or 'n'
+kinstall.repoName = 'https://www.mudlet.org/download';
+kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/';
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
+  lfs.mkdir(kinstall.tmpFolder)
   downloadFile(
     kinstall.tmpFolder .. '/modules.json',
-    'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/modules.json'
+    kinstall.repoPath .. 'modules.json'
   )
 end
-
--- handler eventu sysDownloadDone
-function kinstall:sysDownloadDone(_, filename)
-  if string.ends(filename, '/modules.json') then
-    kinstall:checkVersions(filename)
-  end
-end
-if kinstall.sysDownloadDoneId ~= nil then killAnonymousEventHandler(kinstall.sysDownloadDoneId) end
-kinstall.sysDownloadDoneId = registerAnonymousEventHandler("sysDownloadDone", "kinstall:sysDownloadDone", false)
-
--- handler eventu sysDownloadError
-function kinstall:sysDownloadError(_, error)
-  if error == 'failureToWriteLocalFile' then
-    cecho('<red>Mudlet nie może zapisać na dysk ściągniętego plik! Spróbuj uruchomić go ponownie.\n\n')
-    return
-  end
-  if string.find(error, '/modules.json') ~= nil then
-    cecho('<red>Mudlet nie może ściągnąć pliku z repozytorium!\nSprawdź czy repozytorium istnieje i spróbuj uruchomić Mudleta ponownie.\n')
-    cecho('<red>Link do repozytorium: ')
-    echoLink('https://github.com/ktunkiewicz/KillerMUDScripts', [[ openWebPage('https://github.com/ktunkiewicz/KillerMUDScripts') ]], 'Kliknij by otworzyć')
-    echo('\n\n')
-    return
-  end
-  cecho('<red>Nieoczekiwany błąd przy ściąganiu pliku!\n')
-  display(error)
-end
-if kinstall.sysDownloadErrorId ~= nil then killAnonymousEventHandler(kinstall.sysDownloadErrorId) end
-kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", "kinstall:sysDownloadError", false)
 
 -- sprawdzanie wersji zainstalowanych pakietów i odświeżanie informacji o pakietach
 function kinstall:checkVersions(filename)
@@ -123,7 +98,7 @@ function kinstall:checkSystem()
     cecho('<red>Twoja wersja Mudleta jest starsza niż 4.10.1.\n')
     cecho('<red>Aby używać skryptów KillerMUDScripts musz zaktualizować Mudleta.\n')
     cecho('<red>Strona z aktualną wersją Mudleta: ')
-    echoLink('https://www.mudlet.org/download', [[ openWebPage('https://www.mudlet.org/download') ]], 'Kliknij by otworzyć')
+    echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
     echo('\n\n')
     return false
   end
@@ -135,10 +110,63 @@ function kinstall:update()
   for moduleName, data in pairs(kinstall.updateList) do
     downloadFile(
       kinstall.tmpFolder .. '/moduleName.zip',
-      'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/' .. moduleName .. '/' .. moduleName .. '.zip'
+      kinstall.repoPath .. moduleName .. '/' .. moduleName .. '.zip'
     )
   end
 end
+
+-- instalowanie z repozytorium
+function kinstall:install(filename)
+  local name = filename:match("([^/]+)$")
+  unzipAsync(filename, getMudletHomeDir() .. '/' .. name)
+end
+
+-- HANDLERY
+
+-- handler eventu sysDownloadDone
+function kinstall:sysDownloadDone(_, filename)
+  if string.ends(filename, '/modules.json') then
+    kinstall:checkVersions(filename)
+  end
+  if string.ends(filename, '.zip') and string.starts(filename, kinstall.repoPath) then
+    kinstall:install(filename)
+  end
+end
+if kinstall.sysDownloadDoneId ~= nil then killAnonymousEventHandler(kinstall.sysDownloadDoneId) end
+kinstall.sysDownloadDoneId = registerAnonymousEventHandler("sysDownloadDone", "kinstall:sysDownloadDone", false)
+
+-- handler eventu sysDownloadError
+function kinstall:sysDownloadError(_, error)
+  if error == 'failureToWriteLocalFile' then
+    cecho('<red>Mudlet nie może zapisać na dysk ściągniętego plik! Spróbuj uruchomić go ponownie.\n\n')
+    return
+  end
+  if string.find(error, '/modules.json') ~= nil then
+    cecho('<red>Mudlet nie może ściągnąć pliku z repozytorium!\nSprawdź czy repozytorium istnieje i spróbuj uruchomić Mudleta ponownie.\n')
+    cecho('<red>Link do repozytorium: ')
+    echoLink('https://github.com/ktunkiewicz/KillerMUDScripts', [[ openWebPage('https://github.com/ktunkiewicz/KillerMUDScripts') ]], 'Kliknij by otworzyć')
+    echo('\n\n')
+    return
+  end
+  cecho('<red>Nieoczekiwany błąd przy ściąganiu pliku!\n')
+  display(error)
+end
+if kinstall.sysDownloadErrorId ~= nil then killAnonymousEventHandler(kinstall.sysDownloadErrorId) end
+kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", "kinstall:sysDownloadError", false)
+
+-- handler eventu sysLuaInstallModule
+function kinstall:sysLuaInstallModule(_, module)
+  display(module)
+end
+if kinstall.sysLuaInstallModuleId ~= nil then killAnonymousEventHandler(kinstall.sysLuaInstallModuleId) end
+kinstall.sysLuaInstallModuleId = registerAnonymousEventHandler("sysLuaInstallModule", "kinstall:sysLuaInstallModule", false)
+
+-- handler eventu sysLuaInstallModule
+function kinstall:sysLuaUninstallModule(_, module)
+  display(module)
+end
+if kinstall.sysLuaUninstallModuleId ~= nil then killAnonymousEventHandler(kinstall.sysLuaUninstallModuleId) end
+kinstall.sysLuaUninstallModuleId = registerAnonymousEventHandler("sysLuaUninstallModule", "kinstall:sysLuaUninstallModule", false)
 
 -- NARZĘDZIA
 

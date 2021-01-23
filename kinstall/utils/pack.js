@@ -24,7 +24,7 @@ zipFiles('**/*.*', {
 }).then(function(zip) {
   zip
     .generateNodeStream({ type:'nodebuffer', streamFiles:true })
-    .pipe(fs.createWriteStream(path.join(baseDir, name, name + '.zip')))
+    .pipe(fs.createWriteStream(path.join(baseDir, 'dist', name + '.zip')))
     .on('finish', function () {
         console.log('Spakowano moduł ' + name + '\n')
     });

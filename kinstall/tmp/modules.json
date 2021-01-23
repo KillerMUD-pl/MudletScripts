@@ -1,0 +1,14 @@
+{
+  "kinstall": {
+    "version": 1,
+    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinstall/kinstall.zip",
+    "commands": [ "enable", "disable", "update" ],
+    "shortDesc": "Instalator modułów KillerMUDScripts"
+  },
+  "kmap": {
+    "version": 1,
+    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kmap/kmap.zip",
+    "commands": [ "map" ],
+    "shortDesc": "Moduł mapy"
+  }
+}

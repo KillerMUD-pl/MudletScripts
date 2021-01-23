@@ -118,7 +118,7 @@ end
 
 -- instalowanie z repozytorium
 function kinstall:install(filename)
-  local name = filename:match("([^/]+)$")
+  local name = filename:match("([^/]+).zip$")
   unzipAsync(filename, getMudletHomeDir() .. '/' .. name)
 end
 

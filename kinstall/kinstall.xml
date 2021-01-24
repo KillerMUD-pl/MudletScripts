@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<ScriptPackage>
+		<Script isActive="yes" isFolder="no">
+			<name>kinstall</name>
+			<packageName></packageName>
+			<script>if kinstallEvent ~= nil then killAnonymousEventHandler(kinstallEvent) end
+kinstallEvent = registerAnonymousEventHandler("kinstallInit", function()
+  dofile(getMudletHomeDir():gsub("\\", "/") .. "/kinstall/main.lua")
+  tempTimer(0, function() raiseEvent("kinstallLoaded") end)
+end)
+raiseEvent('kinstallInit')</script>
+			<eventHandlerList />
+		</Script>
+	</ScriptPackage>
+</MudletPackage>

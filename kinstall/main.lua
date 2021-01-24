@@ -78,7 +78,7 @@ function kinstall:checkVersions(filename)
   -- jesli są jakieś pakiety do zainstalowania, pokaż listę i odnośniki
   local hasUpdates = false
   if next(kinstall.updateList) ~= nil then
-    cecho('\n<yellow>Znaleziono aktualizacje pakietów!\n')
+    cecho('\n<gold>Znaleziono aktualizacje pakietów!\n')
     for moduleName, data in pairs(kinstall.updateList) do
       hasUpdates = true
       local desc = data.shortDesc or '(brak opisu)'
@@ -87,9 +87,10 @@ function kinstall:checkVersions(filename)
   end
   -- auto update
   if hasUpdates == true and kinstall.autoUpdate == 'y' then
+    echo('\n')
     kinstall:update()
   else
-    cecho('\n<yellow>Wpisz <cyan>+update <yellow>by zaktualizować pakiety.\n\n')
+    cecho('\n<gold>Wpisz <cyan>+update <gold>by zaktualizować pakiety.\n\n')
   end
 end
 
@@ -109,7 +110,6 @@ end
 -- update z repozytorium
 function kinstall:update()
   for moduleName, data in pairs(kinstall.updateList) do
-    display(data)
     downloadFile(
       kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
       data.url
@@ -120,7 +120,21 @@ end
 -- instalowanie z repozytorium
 function kinstall:install(filename)
   local name = filename:match("([^/]+).zip$")
-  unzipAsync(filename, getMudletHomeDir() .. '/' .. name)
+  cecho('<gold>Instalowanie pakietu ' .. name .. ' w wersji ' .. kinstall.versions[name].version .. ' ... ')
+  unzipAsync(filename, getMudletHomeDir() .. '/' .. name .. '2')
+end
+
+-- uruchamianie pakietu
+function kinstall:initPackage(name)
+  if name == 'kinstall' then
+    return
+  end
+  local _, err = pcall(function()
+    dofile(getMudletHomeDir():gsub("\\", "/") .. '/' .. name .. '/main.lua')
+  end)
+  if err ~= nil then
+    display(err)
+  end
 end
 
 -- HANDLERY
@@ -130,7 +144,8 @@ function kinstall:sysDownloadDone(_, filename)
   if string.ends(filename, '/modules.json') then
     kinstall:checkVersions(filename)
   end
-  if string.ends(filename, '.zip') and string.starts(filename, kinstall.tmpFolder) then
+  local name = filename:match("([^/]+).zip$")
+  if kinstall.versions[name] ~= nil then
     kinstall:install(filename)
   end
 end
@@ -156,19 +171,22 @@ end
 if kinstall.sysDownloadErrorId ~= nil then killAnonymousEventHandler(kinstall.sysDownloadErrorId) end
 kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", "kinstall:sysDownloadError", false)
 
--- handler eventu sysLuaInstallModule
-function kinstall:sysLuaInstallModule(_, module)
-  display(module)
+-- handler eventu sysUnzipDone
+function kinstall:sysUnzipDone(_, filename)
+  local name = filename:match("([^/]+).zip$")
+  cecho('<green>zainstalowano.\n')
+  kinstall:initPackage(name)
 end
-if kinstall.sysLuaInstallModuleId ~= nil then killAnonymousEventHandler(kinstall.sysLuaInstallModuleId) end
-kinstall.sysLuaInstallModuleId = registerAnonymousEventHandler("sysLuaInstallModule", "kinstall:sysLuaInstallModule", false)
+if kinstall.sysUnzipDoneId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipDoneId) end
+kinstall.sysUnzipDoneId = registerAnonymousEventHandler("sysUnzipDone", "kinstall:sysUnzipDone", false)
 
--- handler eventu sysLuaInstallModule
-function kinstall:sysLuaUninstallModule(_, module)
-  display(module)
+-- handler eventu sysUnzipDone
+function kinstall:sysUnzipError(_, filename)
+  local name = filename:match("([^/]+).zip$")
+  cecho('<red>Nie udało się rozpakować modułu ' .. name .. '!\n')
 end
-if kinstall.sysLuaUninstallModuleId ~= nil then killAnonymousEventHandler(kinstall.sysLuaUninstallModuleId) end
-kinstall.sysLuaUninstallModuleId = registerAnonymousEventHandler("sysLuaUninstallModule", "kinstall:sysLuaUninstallModule", false)
+if kinstall.sysUnzipErrorId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipErrorId) end
+kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinstall:sysUnzipError", false)
 
 -- NARZĘDZIA
 

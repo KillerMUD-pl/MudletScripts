@@ -32,8 +32,12 @@ fs.readdir(baseDir, function (err, files) {
           zip
             .generateNodeStream({ type:'nodebuffer', streamFiles:true })
             .pipe(fs.createWriteStream(path.join(baseDir, 'dist', file + '.zip')))
-            .on('finish', function () {
-                console.log('Spakowano moduł ' + file + '\n')
+            .on('finish', function (err) {
+                if (err) {
+                  console.err(err);
+                  process.exit();
+                }
+                console.log('Spakowano moduł ' + file + '\n');
             });
         }).catch(function(err) {
           console.error(err);

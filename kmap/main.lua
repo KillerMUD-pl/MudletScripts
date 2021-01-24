@@ -1,13 +1,16 @@
 module("kmap", package.seeall)
 
 kmap = kmap or {}
-kmap.version = 2
 
 kmap.doMap = function(params)
   kmap:register()
 end
 
 kmap.dontMap = function(params)
+  kmap:unregister()
+end
+
+kmap.doUninstall = function()
   kmap:unregister()
 end
 

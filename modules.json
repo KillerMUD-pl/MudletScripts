@@ -2,7 +2,7 @@
   "kinstall": {
     "version": 2,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinstall.zip",
-    "commands": [ "enable", "disable", "update" ],
+    "commands": [ "install", "remove", "update" ],
     "shortDesc": "Instalator modułów KillerMUDScripts"
   }
 }

@@ -1,5 +1,6 @@
 {
   "name": "kinstall",
   "version": 3,
-  "commands": [ "enable", "disable", "update" ]
+  "commands": [ "install", "remove", "update" ],
+  "shortDesc": "Instalator modułów KillerMUDScripts"
 }

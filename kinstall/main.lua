@@ -121,7 +121,7 @@ end
 function kinstall:install(filename)
   local name = filename:match("([^/]+).zip$")
   cecho('<gold>Instalowanie pakietu ' .. name .. ' w wersji ' .. kinstall.versions[name].version .. ' ... ')
-  unzipAsync(filename, getMudletHomeDir() .. '/' .. name .. '2')
+  unzipAsync(filename, getMudletHomeDir() .. '/' .. name)
 end
 
 -- uruchamianie pakietu

@@ -1,0 +1,5 @@
+{
+  "name": "kmap",
+  "version": 0,
+  "commands": [ "map" ]
+}

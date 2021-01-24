@@ -8,16 +8,26 @@ var modules = require('../../modules.json')
 
 fs.readdir(baseDir, function (err, files) {
   if (err) {
-    console.error("Could not list the directory.", err);
+    console.error("Nie udało się odczytać folderów.", err);
     process.exit(1);
   }
   files.forEach(function (file, index) {
     fs.stat(path.join(baseDir, file), function (error, stat) {
       if (error) {
-        console.error("Error stating file.", error);
+        console.error("Nie udało się odczytać danych pliku/folderu.", error);
         return;
       }
       if (stat.isDirectory() && modules[file]) {
+        try {
+          var module = JSON.parse(fs.readFileSync(path.join(baseDir, file, 'module.json')));
+        } catch (err) {
+          console.error("Nie udało się odczytać pliku module.json w katalogu " + file + ".", err);
+          process.exit(1);      
+        }
+        if (module.version != modules[file].version) {
+          console.log("Pakiet " + file + " istnieje w repozytorium w wersji rozwojowej, nie buduję nowej paczki w dist.")
+          continue;
+        }
         zipFiles('**/*.*', {
           cwd: path.join(baseDir, file),
           dot: false,

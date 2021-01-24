@@ -6,5 +6,8 @@
     "tools/mudlet-defs" : true
   },
   "Lua.runtime.version": "Lua 5.1",
-  "Lua.workspace.preloadFileSize": 500
+  "Lua.workspace.preloadFileSize": 500,
+  "Lua.diagnostics.globals": [
+    "Adjustable"
+  ]
 }

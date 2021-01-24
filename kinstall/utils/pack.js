@@ -26,7 +26,7 @@ fs.readdir(baseDir, function (err, files) {
         }
         if (module.version != modules[file].version) {
           console.log("Pakiet " + file + " istnieje w repozytorium w wersji rozwojowej, nie buduję nowej paczki w dist.")
-          continue;
+          return;
         }
         zipFiles('**/*.*', {
           cwd: path.join(baseDir, file),

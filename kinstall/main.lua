@@ -8,6 +8,7 @@ kinstall.cmdCache = {}
 kinstall.autoUpdate = kinstall.autoUpdate or 'n'
 kinstall.repoName = 'https://www.mudlet.org/download';
 kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/';
+kinstall.seenWelcome = kinstall.seenWelcome or false
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
@@ -25,7 +26,9 @@ function kinstall:welcomeScreen()
   cecho('<gold>----------------------------------------\n')
   cecho('Skrypty do Killer MUD rozwijane na:\n')
   echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
-  echo('\n')
+  echo('\n\n')
+  cecho('Wpisz <cyan>+install <grey>by zobaczyć dostępne moduły.\n')
+  echo('\n\n')
 end
 
 -- sprawdzanie wersji zainstalowanych pakietów i odświeżanie informacji o pakietach
@@ -103,18 +106,50 @@ function kinstall:checkVersions(filename)
 end
 
 -- listowanie zainstalowanych pakietow
-function kinstall:showModules()
-  cecho('<gold>Lista włączonych modułów:\n')
+function kinstall:installedModules()
+  cecho('\n<gold>Lista włączonych modułów:\n')
   for moduleName, data in pairs(kinstall.modules) do
     moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
-    cecho('- <gold>' .. moduleFile.name .. ' - ' .. moduleFile.shortDesc .. ' ')
-    cecho('<DimGrey>wersja: ' .. moduleFile.version .. ', komendy: ')
+    cecho('- <gold>' .. moduleFile.name .. ' - <gray>' .. moduleFile.shortDesc)
+    cecho('<DimGrey>, wersja: ' .. moduleFile.version .. ', komendy:')
     local cmds = '';
     for _, cmd in ipairs(moduleFile.commands) do
-      cmds = cmds .. ' ' .. cmd
+      cmds = cmds .. ', ' .. cmd
     end
     cecho('<DimGrey>' .. string.sub(cmds, 2) .. '\n')
   end
+end
+
+-- listowanie możliwych do zainstalowanie modułów
+function kinstall:availableModules()
+  cecho('\n<gold>Dostępne do zainstalowania moduły:\n')
+  local count = 0
+  for moduleName, data in pairs(kinstall.versions) do
+    if kinstall.modules[moduleName] == nil then
+      count = count + 1
+      cecho('- <gold>' .. moduleName .. ' - <gray>' .. data.shortDesc .. ' ')
+      cecho('<DimGrey>wersja: ' .. data.version .. ', komendy:')
+      local cmds = '';
+      for _, cmd in ipairs(data.commands) do
+        cmds = cmds .. ', ' .. cmd
+      end
+      cecho('<DimGrey>' .. string.sub(cmds, 2) .. '\n')
+    end
+  end
+  if count == 0 then
+    cecho('<DimGrey>Brak dostępnych modułów\n')
+  end
+end
+
+-- help do kinstall
+function kinstall:usageHelp()
+  cecho('\n<gold>Komendy:\n')
+  cecho('<cyan>+install <grey>- pokazuje zainstalowane i dostępne moduły.\n')
+  cecho('<cyan>+install <nazwa_modułu> <grey>- instaluje/uaktualnia moduł.\n')
+  cecho('<cyan>+update <grey>- włącza/wyłącza auto-aktualizację modułów.\n')
+  cecho('<cyan>+remove <nazwa modułu> - <grey>wyłącza wybrany moduł.\n\n')
+  cecho('<gray>Pro-tip: wystarczy wydać komendę jednego z dostepnych modułów, np. +map\n')
+  cecho('<gray>a odpowiedni moduł zostanie zainstalowany i uruchomiony automatycznie.\n\n')
 end
 
 -- sprawdzanie systemu
@@ -132,15 +167,25 @@ end
 
 -- update z repozytorium
 function kinstall:update()
-  for moduleName, data in pairs(kinstall.updateList) do
-    downloadFile(
-      kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
-      data.url
-    )
+  for moduleName, _ in pairs(kinstall.updateList) do
+    kinstall:fetchAndInstall(moduleName)
   end
 end
 
 -- instalowanie z repozytorium
+function kinstall:fetchAndInstall(moduleName)
+  if kinstall.versions[moduleName] == nil then
+    cecho('<red>Nie znaleziono modułu ' .. moduleName .. '\n\n')
+    return
+  end
+  data = kinstall.versions[moduleName]
+  downloadFile(
+    kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
+    data.url
+  )
+end
+
+-- instalowanie z pliku zip
 function kinstall:install(filename)
   local name = filename:match("([^/]+).zip$")
   cecho('<gold>Instalowanie pakietu ' .. name .. ' w wersji ' .. kinstall.versions[name].version .. ' ... ')
@@ -174,12 +219,64 @@ function kinstall:initModule(moduleName)
   end
 end
 
+-- KOMENDY
+
+kinstall.doInstall = function(param)
+  if param == nil or string.trim(param) == '' then
+    kinstall:installedModules()
+    kinstall:availableModules()
+    kinstall:usageHelp()
+    return
+  end
+  kinstall:fetchAndInstall(param)
+end
+
+kinstall.doUpdate = function(param)
+  if kinstall.autoUpdate == 'n' then
+    kinstall.autoUpdate = 'y'
+    cecho('<gold>Włączono auto-aktualizację\n\n')
+  else
+    kinstall.autoUpdate = 'n'
+    cecho('<gold>Wyłączono auto-aktualizację\n\n')
+  end
+end
+
+kinstall.doRemove = function(param)
+  if param == nil or string.trim(param) == '' then
+    cecho('<red>Podaj nazwę moduł do wyłączenia.\n\n')
+    return
+  end
+  if kinstall.modules[param] == nil then
+    cecho('<red>Moduł ' .. param .. ' nie jest zainstalowany.\n\n')
+    return
+  end  
+  if _G[param] ~= nil and _G[param]['doUninstall'] ~= nil then
+    local func = _G[param]['doUninstall']
+    local _, err = pcall(func)
+    if err ~= nil then
+      cecho('<red>Wystąpił błąd przy wyłączaniu modułu ' .. param .. '.\n\n')
+      display(err)
+      return
+    end
+  end
+  _G[param] = nil
+  kinstall:removeDir(getMudletHomeDir() .. '/' .. param)
+end
+
 -- HANDLERY
 
 -- handler eventu kinstallLoaded
 function kinstall:kinstallLoaded(_, filename)
   if kinstall:checkSystem() == true then
-    kinstall:welcomeScreen()
+    moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/kinstall/module.json')
+    kinstall.modules[moduleFile.name] = moduleFile
+    for _, cmd in ipairs(moduleFile.commands) do
+      kinstall.cmdCache[cmd] = moduleFile.name
+    end
+    if kinstall.seenWelcome == false then
+      kinstall.seenWelcome = true
+      kinstall:welcomeScreen()
+    end
     kinstall:fetchVersions()
   end
 end
@@ -274,4 +371,20 @@ function kinstall:loadJsonFile(filename)
     lines = lines .. line .. '\n'
   end
   return yajl.to_value(lines)
+end
+
+function kinstall:removeDir(dir)
+  for file in lfs.dir(dir) do
+    local file_path = dir..'/'..file
+    if file ~= "." and file ~= ".." then
+        if lfs.attributes(file_path, 'mode') == 'file' then
+            os.remove(file_path)
+            print('remove file',file_path)
+        elseif lfs.attributes(file_path, 'mode') == 'directory' then
+            print('dir', file_path)
+            kinstall:removeDir(file_path)
+        end
+    end
+  end
+  lfs.rmdir(dir)
 end

@@ -10,7 +10,7 @@ jobs:
       with:
         node-version: 12.x
     - run: npm ci
-    - run: npm run pack kinstall
+    - run: npm run pack
     - name: Commit files
       run: |
         git config --local user.email "bot@users.noreply.github.com"

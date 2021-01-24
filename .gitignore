@@ -1,11 +1,13 @@
 /*
-!.gitignore
-!/kinstall/
-/kinstall/tmp
 !LICENCE
 !README.md
 !modules.json
 !package.json
 !package-lock.json
+!/.vscode/
+!.gitignore
+!/tools
+!/kinstall/
+/kinstall/tmp
 !/dist/
 !/kmap/

@@ -5,8 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "bootstrap": "node ./kinstall/utils/bootstrap.js",
-    "pack": "node ./kinstall/utils/pack.js"
+    "bootstrap": "node ./tools/utils/bootstrap.js",
+    "pack": "node ./tools/utils/pack.js"
   },
   "repository": {
     "type": "git",

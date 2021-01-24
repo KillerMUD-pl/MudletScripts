@@ -8,7 +8,6 @@ kinstall.cmdCache = {}
 kinstall.autoUpdate = kinstall.autoUpdate or 'n'
 kinstall.repoName = 'https://www.mudlet.org/download';
 kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/';
-kinstall.seenWelcome = 'n'
 
 -- załącza kod od gui
 package.loaded['kinstall/gui'] = nil
@@ -283,8 +282,10 @@ function kinstall:kinstallLoaded(_, filename)
     for _, cmd in ipairs(moduleFile.commands) do
       kinstall.cmdCache[cmd] = moduleFile.name
     end
-    if kinstall.seenWelcome == 'n' then
-      kinstall.seenWelcome = 'y'
+    if kinstall:fileExists(getMudletHomeDir() .. "/kinstallInstalled.txt") == false then
+      file = io.open(getMudletHomeDir() .. "/kinstallInstalled.txt", "w")
+      file:write('1')
+      file:close()
       kinstall:welcomeScreen()
     end
     kinstall:fetchVersions()

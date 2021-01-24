@@ -1,6 +1,7 @@
 module("kmap", package.seeall)
 
 kmap = kmap or {}
+kmap.version = 1
 
 kmap.doMap = function(params)
   kmap:register()

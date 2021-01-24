@@ -1,0 +1,10 @@
+/*
+!.gitignore
+!/kinstall/
+/kinstall/tmp
+!LICENCE
+!README.md
+!modules.json
+!package.json
+!package-lock.json
+!/kmap/

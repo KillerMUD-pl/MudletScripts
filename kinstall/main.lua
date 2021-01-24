@@ -1,3 +1,5 @@
+require('kinstall/gui')
+
 kinstall = kinstall or {}
 kinstall.version = 1
 kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
@@ -147,7 +149,7 @@ function kinstall:usageHelp()
   cecho('<cyan>+install <grey>- pokazuje zainstalowane i dostępne moduły.\n')
   cecho('<cyan>+install <nazwa_modułu> <grey>- instaluje/uaktualnia moduł.\n')
   cecho('<cyan>+update <grey>- włącza/wyłącza auto-aktualizację modułów.\n')
-  cecho('<cyan>+remove <nazwa modułu> - <grey>wyłącza wybrany moduł.\n\n')
+  cecho('<cyan>+remove <nazwa modułu> - <grey>usuwa wybrany moduł.\n\n')
   cecho('<gray>Pro-tip: wystarczy wydać komendę jednego z dostepnych modułów, np. +map\n')
   cecho('<gray>a odpowiedni moduł zostanie zainstalowany i uruchomiony automatycznie.\n\n')
 end
@@ -179,6 +181,7 @@ function kinstall:fetchAndInstall(moduleName)
     return
   end
   data = kinstall.versions[moduleName]
+  cecho('<gold>Instalowanie pakietu ' .. moduleName .. ' w wersji ' .. kinstall.versions[moduleName].version .. ' ... ')
   downloadFile(
     kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
     data.url
@@ -188,7 +191,6 @@ end
 -- instalowanie z pliku zip
 function kinstall:install(filename)
   local name = filename:match("([^/]+).zip$")
-  cecho('<gold>Instalowanie pakietu ' .. name .. ' w wersji ' .. kinstall.versions[name].version .. ' ... ')
   unzipAsync(filename, getMudletHomeDir() .. '/' .. name)
 end
 
@@ -243,24 +245,30 @@ end
 
 kinstall.doRemove = function(param)
   if param == nil or string.trim(param) == '' then
-    cecho('<red>Podaj nazwę moduł do wyłączenia.\n\n')
+    cecho('<red>Podaj nazwę moduł do usunięcia.\n\n')
+    return
+  end
+  if string.trim(param) == 'kinstall' then
+    cecho('<red>Nie możesz odinstalować instalatora...\n\n')
     return
   end
   if kinstall.modules[param] == nil then
     cecho('<red>Moduł ' .. param .. ' nie jest zainstalowany.\n\n')
     return
-  end  
+  end
   if _G[param] ~= nil and _G[param]['doUninstall'] ~= nil then
     local func = _G[param]['doUninstall']
     local _, err = pcall(func)
     if err ~= nil then
-      cecho('<red>Wystąpił błąd przy wyłączaniu modułu ' .. param .. '.\n\n')
+      cecho('<red>Wystąpił błąd przy usuwaniu modułu ' .. param .. '.\n\n')
       display(err)
       return
     end
   end
   _G[param] = nil
+  kinstall.modules[param] = nil
   kinstall:removeDir(getMudletHomeDir() .. '/' .. param)
+  cecho('<gold>Usunięto moduł ' .. param .. '.\n\n')
 end
 
 -- HANDLERY
@@ -318,7 +326,7 @@ kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", 
 -- handler eventu sysUnzipDone
 function kinstall:sysUnzipDone(_, filename)
   local name = filename:match("([^/]+).zip$")
-  cecho('<green>zainstalowano.\n')
+  cecho('<green>zainstalowano.\n\n')
   kinstall:initModule(name)
 end
 if kinstall.sysUnzipDoneId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipDoneId) end
@@ -336,7 +344,8 @@ kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinst
 
 -- przechwytywanie komend "+" i "-"
 function kinstall:catchAlias()
-  local cmd = matches[2]
+  local mode = matches[2]
+  local cmd = matches[3]
   local params = {}
   params[1], params[2] = cmd:match("(%w+)(.*)")
   -- sprawdzanie czy plus-komenda nalezy do modulu
@@ -346,15 +355,23 @@ function kinstall:catchAlias()
       cecho('<red>Coś jest nie tak z listą załadowanych mudułów... Uruchom Mudleta ponownie.')
       return
     end
-    local func = _G[moduleName]['do' .. string.title(params[1])]
+    local funcName = string.title(params[1])
+    local prefix = mode == '-' and 'undo' or 'do'
+    if (_G[moduleName] == nil or _G[moduleName][prefix .. funcName] == nil) then
+      cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n;')
+      return
+    end
+    local func = _G[moduleName][prefix .. funcName]
     local _, err = pcall(func, string.trim(params[2]))
     if err ~= nil then
       display(err)
     end
+  else
+    cecho('<yellow>Nie zaimplementowane.\n')
   end
 end
 if kinstall.catchAliasId ~= nil then killAlias(kinstall.catchAliasId) end
-kinstall.catchAliasId = tempAlias("^\\+(.+)$", [[ kinstall:catchAlias() ]])
+kinstall.catchAliasId = tempAlias("^(\\+|-)(.+)$", [[ kinstall:catchAlias() ]])
 
 -- NARZĘDZIA
 
@@ -379,9 +396,7 @@ function kinstall:removeDir(dir)
     if file ~= "." and file ~= ".." then
         if lfs.attributes(file_path, 'mode') == 'file' then
             os.remove(file_path)
-            print('remove file',file_path)
         elseif lfs.attributes(file_path, 'mode') == 'directory' then
-            print('dir', file_path)
             kinstall:removeDir(file_path)
         end
     end

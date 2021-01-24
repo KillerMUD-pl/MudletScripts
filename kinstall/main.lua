@@ -18,6 +18,16 @@ function kinstall:fetchVersions()
   )
 end
 
+function kinstall:welcomeScreen()
+  cecho('\n')
+  cecho('<gold>----------------------------------------\n')
+  cecho('<gold>KillerMUDScripts <DimGrey>(v.' .. kinstall.version .. ')\n')
+  cecho('<gold>----------------------------------------\n')
+  cecho('Skrypty do Killer MUD rozwijane na:\n')
+  echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
+  echo('\n')
+end
+
 -- sprawdzanie wersji zainstalowanych pakietów i odświeżanie informacji o pakietach
 function kinstall:checkVersions(filename)
   -- ładowanie pliku modules.json
@@ -113,7 +123,7 @@ function kinstall:checkSystem()
     cecho('<red>Twoja wersja Mudleta jest starsza niż 4.10.1.\n')
     cecho('<red>Aby używać skryptów KillerMUDScripts musz zaktualizować Mudleta.\n')
     cecho('<red>Strona z aktualną wersją Mudleta: ')
-    echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
+    echoLink('https://www.mudlet.org/download/', [[ openWebPage('https://www.mudlet.org/download/') ]], 'Kliknij by otworzyć')
     echo('\n\n')
     return false
   end
@@ -169,7 +179,8 @@ end
 -- handler eventu kinstallLoaded
 function kinstall:kinstallLoaded(_, filename)
   if kinstall:checkSystem() == true then
-    kinstall:checkVersions()
+    kinstall:welcomeScreen()
+    kinstall:fetchVersions()
   end
 end
 if kinstall.kinstallLoadedId ~= nil then killAnonymousEventHandler(kinstall.kinstallLoadedId) end
@@ -197,7 +208,7 @@ function kinstall:sysDownloadError(_, error)
   if string.find(error, '/modules.json') ~= nil then
     cecho('<red>Mudlet nie może ściągnąć pliku z repozytorium!\nSprawdź czy repozytorium istnieje i spróbuj uruchomić Mudleta ponownie.\n')
     cecho('<red>Link do repozytorium: ')
-    echoLink('https://github.com/ktunkiewicz/KillerMUDScripts', [[ openWebPage('https://github.com/ktunkiewicz/KillerMUDScripts') ]], 'Kliknij by otworzyć')
+    echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
     echo('\n\n')
     return
   end

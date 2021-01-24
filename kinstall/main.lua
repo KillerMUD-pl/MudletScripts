@@ -60,16 +60,12 @@ function kinstall:checkVersions(filename)
       moduleFile = kinstall:loadJsonFile(path .. '/' .. name .. '/module.json')
       if moduleFile.version ~= nil and moduleFile.name ~= nil then
         local moduleName = moduleFile.name
-        -- dodawanie do listy włączonych modułow i uzupełnienie cache komend
-        kinstall.modules[moduleName] = moduleFile
-        if type(moduleFile.commands) == 'table' then
-          for _, cmd in ipairs(moduleFile.commands) do
-            kinstall.cmdCache[cmd] = moduleName
-          end
-        end
+        -- uruchamianie modulu
+        kinstall:initModule(moduleName)
         -- sprawdzanie wersji modułu
         if kinstall.versions[moduleName] ~= nil
         and kinstall.versions[moduleName].version > moduleFile.version then
+          -- dodanie do listy modulow do aktualizacji
           kinstall.updateList[moduleName] = kinstall.versions[moduleName]
         end
       end
@@ -86,11 +82,28 @@ function kinstall:checkVersions(filename)
     end
   end
   -- auto update
-  if hasUpdates == true and kinstall.autoUpdate == 'y' then
-    echo('\n')
-    kinstall:update()
-  else
-    cecho('\n<gold>Wpisz <cyan>+update <gold>by zaktualizować pakiety.\n\n')
+  if hasUpdates == true then
+    if kinstall.autoUpdate == 'y' then
+      echo('\n')
+      kinstall:update()
+    else
+      cecho('\n<gold>Wpisz <cyan>+update <gold>by zaktualizować pakiety.\n\n')
+    end
+  end
+end
+
+-- listowanie zainstalowanych pakietow
+function kinstall:showModules()
+  cecho('<gold>Lista włączonych modułów:\n')
+  for moduleName, data in pairs(kinstall.modules) do
+    moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
+    cecho('- <gold>' .. moduleFile.name .. ' - ' .. moduleFile.shortDesc .. ' ')
+    cecho('<DimGrey>wersja: ' .. moduleFile.version .. ', komendy: ')
+    local cmds = '';
+    for _, cmd in ipairs(moduleFile.commands) do
+      cmds = cmds .. ' ' .. cmd
+    end
+    cecho('<DimGrey>' .. string.sub(cmds, 2) .. '\n')
   end
 end
 
@@ -125,12 +138,26 @@ function kinstall:install(filename)
 end
 
 -- uruchamianie pakietu
-function kinstall:initPackage(name)
-  if name == 'kinstall' then
+function kinstall:initModule(moduleName)
+  if moduleName == 'kinstall' then
     return
   end
+  moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
+  if moduleFile.name == nil then
+    cecho('<red>Nie udało się załadować modułu ' .. moduleName .. '. Brak pliku lub niepoprawny module.json w module.\n')
+    return
+  end
+  kinstall.modules[moduleFile.name] = moduleFile
+  -- cache komend
+  if type(moduleFile.commands) == 'table' then
+    for _, cmd in ipairs(moduleFile.commands) do
+      kinstall.cmdCache[cmd] = moduleFile.name
+    end
+  end
+  -- uruchamianie skryptu
   local _, err = pcall(function()
-    dofile(getMudletHomeDir():gsub("\\", "/") .. '/' .. name .. '/main.lua')
+    package.loaded[moduleFile.name .. '/main'] = nil
+    require(moduleFile.name .. '/main')
   end)
   if err ~= nil then
     display(err)
@@ -138,6 +165,15 @@ function kinstall:initPackage(name)
 end
 
 -- HANDLERY
+
+-- handler eventu kinstallLoaded
+function kinstall:kinstallLoaded(_, filename)
+  if kinstall:checkSystem() == true then
+    kinstall:checkVersions()
+  end
+end
+if kinstall.kinstallLoadedId ~= nil then killAnonymousEventHandler(kinstall.kinstallLoadedId) end
+kinstall.kinstallLoadedId = registerAnonymousEventHandler("kinstallLoaded", "kinstall:kinstallLoaded", false)
 
 -- handler eventu sysDownloadDone
 function kinstall:sysDownloadDone(_, filename)
@@ -175,7 +211,7 @@ kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", 
 function kinstall:sysUnzipDone(_, filename)
   local name = filename:match("([^/]+).zip$")
   cecho('<green>zainstalowano.\n')
-  kinstall:initPackage(name)
+  kinstall:initModule(name)
 end
 if kinstall.sysUnzipDoneId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipDoneId) end
 kinstall.sysUnzipDoneId = registerAnonymousEventHandler("sysUnzipDone", "kinstall:sysUnzipDone", false)
@@ -187,6 +223,30 @@ function kinstall:sysUnzipError(_, filename)
 end
 if kinstall.sysUnzipErrorId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipErrorId) end
 kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinstall:sysUnzipError", false)
+
+-- ALIASY
+
+-- przechwytywanie komend "+" i "-"
+function kinstall:catchAlias()
+  local cmd = matches[2]
+  local params = {}
+  params[1], params[2] = cmd:match("(%w+)(.*)")
+  -- sprawdzanie czy plus-komenda nalezy do modulu
+  local moduleName = kinstall.cmdCache[params[1]]
+  if moduleName ~= nil then
+    if kinstall.modules[moduleName] == nil then
+      cecho('<red>Coś jest nie tak z listą załadowanych mudułów... Uruchom Mudleta ponownie.')
+      return
+    end
+    local func = _G[moduleName]['do' .. string.title(params[1])]
+    local _, err = pcall(func, string.trim(params[2]))
+    if err ~= nil then
+      display(err)
+    end
+  end
+end
+if kinstall.catchAliasId ~= nil then killAlias(kinstall.catchAliasId) end
+kinstall.catchAliasId = tempAlias("^\\+(.+)$", [[ kinstall:catchAlias() ]])
 
 -- NARZĘDZIA
 

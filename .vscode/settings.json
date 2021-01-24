@@ -1,0 +1,10 @@
+{
+  "Lua.diagnostics.disable": [
+    "lowercase-global"
+  ],
+  "Lua.workspace.library": {
+    "tools/mudlet-defs" : true
+  },
+  "Lua.runtime.version": "Lua 5.1",
+  "Lua.workspace.preloadFileSize": 500
+}

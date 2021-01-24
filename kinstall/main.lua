@@ -109,9 +109,10 @@ end
 -- update z repozytorium
 function kinstall:update()
   for moduleName, data in pairs(kinstall.updateList) do
+    display(data)
     downloadFile(
       kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
-      kinstall.repoPath .. moduleName .. '/' .. moduleName .. '.zip'
+      data.url
     )
   end
 end

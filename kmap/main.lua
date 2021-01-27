@@ -23,6 +23,7 @@ end
 kmap.doInstall = function()
   cecho('<gold>Odinstalowywanie domyślnego skryptu mappera... ')
   uninstallPackage('generic_mapper')
+  uninstallModule('generic_mapper')
   cecho('<green>gotowe.\n\n')
 end
 

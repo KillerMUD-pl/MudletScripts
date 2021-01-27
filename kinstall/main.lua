@@ -4,6 +4,7 @@ kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
 kinstall.versions = {}
 kinstall.modules = {}
 kinstall.updateList = {}
+kinstall.runList = {}
 kinstall.cmdCache = {}
 kinstall.autoUpdate = kinstall.autoUpdate or 'n'
 kinstall.repoName = 'https://www.mudlet.org/download'
@@ -226,6 +227,12 @@ function kinstall:initModule(moduleName)
   if err ~= nil then
     display(err)
   end
+  -- sprawdzanie czy komenda ze skryptu powinna byc natychmiast odpalona
+  if kinstall.runList[moduleFile.name] ~= nil then
+    tempTimer(0, function() 
+      kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd)
+    end)
+  end
 end
 
 -- KOMENDY
@@ -276,6 +283,45 @@ kinstall.doRemove = function(param)
   kinstall.modules[param] = nil
   kinstall:removeDir(getMudletHomeDir() .. '/' .. param)
   cecho('<gold>Usunięto moduł ' .. param .. '.\n\n')
+end
+
+function kinstall:runCmd(mode, cmd, isAutoRun)
+  display(mode)
+  display(cmd)
+  local params = {}
+  params[1], params[2] = cmd:match("(%w+)(.*)")
+  -- sprawdzanie czy plus-komenda nalezy do modulu
+  local moduleName = kinstall.cmdCache[params[1]]
+  if moduleName ~= nil then
+    if kinstall.modules[moduleName] == nil then
+      cecho('<red>Coś jest nie tak z listą załadowanych mudułów... Uruchom Mudleta ponownie.')
+      return
+    end
+    local funcName = string.title(params[1])
+    local prefix = mode == '-' and 'undo' or 'do'
+    if (_G[moduleName] == nil or _G[moduleName][prefix .. funcName] == nil) then
+      cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n;')
+      return
+    end
+    local func = _G[moduleName][prefix .. funcName]
+    local _, err = pcall(func, string.trim(params[2]))
+    if err ~= nil then
+      display(err)
+    end
+  else
+    local foundModule = nil
+    for name, data in pairs(kinstall.versions) do
+      if table.contains(data.commands, params[1]) then
+        foundModule = name
+      end
+    end
+    if foundModule and isAutoRun ~= true then
+      kinstall.runList[foundModule] = {mode = mode, cmd = cmd }
+      kinstall:fetchAndInstall(foundModule)
+    else
+      cecho('<gold>Nie znam takiej komendy.\n')
+    end
+  end
 end
 
 -- HANDLERY
@@ -364,29 +410,7 @@ kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinst
 function kinstall:catchAlias()
   local mode = matches[2]
   local cmd = matches[3]
-  local params = {}
-  params[1], params[2] = cmd:match("(%w+)(.*)")
-  -- sprawdzanie czy plus-komenda nalezy do modulu
-  local moduleName = kinstall.cmdCache[params[1]]
-  if moduleName ~= nil then
-    if kinstall.modules[moduleName] == nil then
-      cecho('<red>Coś jest nie tak z listą załadowanych mudułów... Uruchom Mudleta ponownie.')
-      return
-    end
-    local funcName = string.title(params[1])
-    local prefix = mode == '-' and 'undo' or 'do'
-    if (_G[moduleName] == nil or _G[moduleName][prefix .. funcName] == nil) then
-      cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n;')
-      return
-    end
-    local func = _G[moduleName][prefix .. funcName]
-    local _, err = pcall(func, string.trim(params[2]))
-    if err ~= nil then
-      display(err)
-    end
-  else
-    cecho('<yellow>Nie zaimplementowane.\n')
-  end
+  kinstall:runCmd(mode, cmd, false)
 end
 if kinstall.catchAliasId ~= nil then killAlias(kinstall.catchAliasId) end
 kinstall.catchAliasId = tempAlias("^(\\+|-)(.+)$", [[ kinstall:catchAlias() ]])

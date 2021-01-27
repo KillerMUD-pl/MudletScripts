@@ -1,5 +1,5 @@
 kinstall = kinstall or {}
-kinstall.version = 1
+kinstall.version = 5
 kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
 kinstall.versions = {}
 kinstall.modules = {}
@@ -331,6 +331,15 @@ function kinstall:sysUnzipDone(_, filename)
   local name = filename:match("([^/]+).zip$")
   cecho('<green>zainstalowano.\n\n')
   kinstall:initModule(name)
+  if _G[name] ~= nil and _G[name]['doInstall'] ~= nil then
+    local func = _G[name]['doUninstall']
+    local _, err = pcall(func)
+    if err ~= nil then
+      cecho('<red>Wystąpił błąd przy instalowaniu modułu ' .. name .. '.\n\n')
+      display(err)
+      return
+    end
+  end
 end
 if kinstall.sysUnzipDoneId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipDoneId) end
 kinstall.sysUnzipDoneId = registerAnonymousEventHandler("sysUnzipDone", "kinstall:sysUnzipDone", false)

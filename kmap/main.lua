@@ -1,23 +1,29 @@
 module("kmap", package.seeall)
 
+mudlet.mapper_script = true
+
 kmap = kmap or {}
-kmap.version = 1
+kmap.version = 2
 
 kmap.doMap = function(params)
+  display('test1')
   kmap:register()
+  kmap:delayedEventMapLoaded();
 end
 
 kmap.dontMap = function(params)
+  display('test2')
   kmap:unregister()
 end
 
 kmap.doUninstall = function()
+  display('test3')
   kmap:unregister()
 end
 
----
----
----
+kmap.doInstall = function()
+  uninstallPackage('generic_mapper')
+end
 
 kmap.ids = kmap.ids or {}
 kmap.vnumToRoomIdCache = {}
@@ -25,15 +31,13 @@ kmap.mapLoaded = kmap.mapLoaded or false
 
 function kmap:register()
   kmap:unregister()
-  kmap.ids.roomInfoEvent = registerAnonymousEventHandler("gmcp.Room.Info", "kmap.roomInfoEventHandler")
-  kmap.ids.mapRedrawAlias = tempAlias("^map redraw$", [[ kmap.mapRedraw(true) ]])
-  kmap.ids.mapOpenEvent = registerAnonymousEventHandler("mapOpenEvent", "kmap.delayedEventMapLoaded")
+  kmap.ids.roomInfoEvent = registerAnonymousEventHandler("gmcp.Room.Info", "kmap:roomInfoEventHandler")
+  kmap.ids.mapRedrawAlias = tempAlias("^map redraw$", [[ kmap:mapRedraw(true) ]])
 end
 
 function kmap:unregister()
   if kmap.ids.roomInfoEvent then killAnonymousEventHandler(kmap.ids.roomInfoEvent) end
   if kmap.ids.mapRedrawAlias then killAlias(kmap.ids.mapRedrawAlias) end
-  if kmap.ids.mapOpenEvent then killAnonymousEventHandler(kmap.ids.mapOpenEvent) end
 end
 
 --
@@ -162,10 +166,8 @@ function kmap:mapRedraw(forceReload)
 end
 
 function kmap:eventMapLoaded()
-  openMapWidget()
   if kmap.mapLoaded == false then
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
-    uninstallPackage('generic_mapper')
   end
   kmap:vnumCacheRebuild()
   kmap:mapLocate()
@@ -173,6 +175,7 @@ function kmap:eventMapLoaded()
   updateMap()
 end
 function kmap:delayedEventMapLoaded()
+  openMapWidget()
   tempTimer(0, function()
     kmap:eventMapLoaded()
   end)

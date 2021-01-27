@@ -25,6 +25,7 @@ kmap.doInstall = function()
   uninstallPackage('generic_mapper')
   uninstallModule('generic_mapper')
   map = nil
+  _G['ma['] = nil
   cecho('<green>gotowe.\n\n')
 end
 

@@ -3,6 +3,10 @@ module("kinstall/gui", package.seeall)
 kinstall.gui = kinstall.gui or {}
 kinstall.gui.moduleContainers = kinstall.gui.moduleContainers or {}
 
+--
+-- TODO
+--
+
 function kinstall:guiInit()
   kinstall.gui.mainCointainer = kinstall.gui.mainCointainer or
     Adjustable.Container:new({
@@ -36,5 +40,4 @@ function kinstall:guiInit()
     width = "100%",
     height = "100%"
   }, kinstall.gui.moduleContainers.kmap['wrapper'])
-
 end

@@ -3,27 +3,34 @@ module("kmap", package.seeall)
 mudlet.mapper_script = true
 
 kmap = kmap or {}
-kmap.version = 2
+kmap.version = 3
 
 kmap.doMap = function(params)
-  display('test1')
-  kmap:register()
+  if params == 'redraw' then
+    kmap:mapRedraw(true)
+  end
   kmap:delayedEventMapLoaded();
 end
 
-kmap.dontMap = function(params)
-  display('test2')
-  kmap:unregister()
+kmap.undoMap = function(params)
+  closeMapWidget()
 end
 
 kmap.doUninstall = function()
-  display('test3')
   kmap:unregister()
 end
 
 kmap.doInstall = function()
   uninstallPackage('generic_mapper')
 end
+
+kmap.doInit = function()
+  kmap:register()
+end
+
+--
+--
+--
 
 kmap.ids = kmap.ids or {}
 kmap.vnumToRoomIdCache = {}
@@ -32,12 +39,14 @@ kmap.mapLoaded = kmap.mapLoaded or false
 function kmap:register()
   kmap:unregister()
   kmap.ids.roomInfoEvent = registerAnonymousEventHandler("gmcp.Room.Info", "kmap:roomInfoEventHandler")
-  kmap.ids.mapRedrawAlias = tempAlias("^map redraw$", [[ kmap:mapRedraw(true) ]])
+  kmap.ids.sysExitEvent = registerAnonymousEventHandler("sysExitEvent", "kmap:sysExitEvent")
+  kmap.ids.mapOpenEvent = registerAnonymousEventHandler("mapOpenEvent", "kmap:mapOpenEvent")
 end
 
 function kmap:unregister()
   if kmap.ids.roomInfoEvent then killAnonymousEventHandler(kmap.ids.roomInfoEvent) end
-  if kmap.ids.mapRedrawAlias then killAlias(kmap.ids.mapRedrawAlias) end
+  if kmap.ids.sysExitEvent then killAnonymousEventHandler(kmap.ids.sysExitEvent) end
+  if kmap.ids.mapOpenEvent then killAnonymousEventHandler(kmap.ids.mapOpenEvent) end
 end
 
 --
@@ -84,11 +93,19 @@ function kmap:mapLocate()
   end
 end
 
---
--- nasluchiwanie komunikatow gmcp.Room.Info
---
-function kmap:roomInfoEventHandler()
-  kmap:mapLocate()
+-- kasowanie labelek obrazkowych
+function kmap:deleteImageLabels()
+  for _, areaId in pairs(getAreaTable()) do
+    local labels = getMapLabels(areaId)
+    if type(labels) ~= 'table' then 
+      labels = {}
+    end
+    for id, text in pairs(labels) do
+      if text == 'no text' or text == '' or text == nil then
+        deleteMapLabel(areaId, id)
+      end
+    end
+  end
 end
 
 --
@@ -134,18 +151,7 @@ function kmap:mapRedraw(forceReload)
     return
   end
  
-  -- kasowanie labelek obrazkowych
-  for _, areaId in pairs(getAreaTable()) do
-    local labels = getMapLabels(areaId)
-    if type(labels) ~= 'table' then 
-      labels = {}
-    end
-    for id, text in pairs(labels) do
-      if text == 'no text' or text == '' or text == nil then
-        deleteMapLabel(areaId, id)
-      end
-    end
-  end
+  kmap:deleteImageLabels()
 
   -- rysowanie ich od nowa
   for areaId, labels in pairs(kmap.labelsMap) do
@@ -165,18 +171,44 @@ function kmap:mapRedraw(forceReload)
   end
 end
 
+--
+-- nasluchiwanie komunikatow gmcp.Room.Info
+--
+function kmap:roomInfoEventHandler()
+  kmap:mapLocate()
+end
+
+--
+-- załadowanie mapy
+--
 function kmap:eventMapLoaded()
-  if kmap.mapLoaded == false then
+  if kinstall:getConfig('mapLoaded') == false then
+    kinstall:setConfig('mapLoaded', true)
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
+  openMapWidget()
   kmap:vnumCacheRebuild()
   kmap:mapLocate()
   kmap:mapRedraw(false)
   updateMap()
 end
+
 function kmap:delayedEventMapLoaded()
-  openMapWidget()
   tempTimer(0, function()
     kmap:eventMapLoaded()
   end)
+end
+
+--
+-- usuwanie obrazkow przed zapisaniem mapy
+--
+function kmap:sysExitEvent()
+  kmap:deleteImageLabels()
+end
+
+--
+-- obsluga otwierania mapy przyciskiem z menu
+--
+function kmap:mapOpenEvent()
+  kmap.doMap()
 end

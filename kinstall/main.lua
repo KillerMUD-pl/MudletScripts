@@ -1,13 +1,14 @@
 kinstall = kinstall or {}
-kinstall.version = 5
+kinstall.version = 6
 kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
 kinstall.versions = {}
 kinstall.modules = {}
 kinstall.updateList = {}
 kinstall.cmdCache = {}
 kinstall.autoUpdate = kinstall.autoUpdate or 'n'
-kinstall.repoName = 'https://www.mudlet.org/download';
-kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/';
+kinstall.repoName = 'https://www.mudlet.org/download'
+kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/'
+kinstall.configFile = getMudletHomeDir() .. '/kinstall.config.json'
 
 -- załącza kod od gui
 package.loaded['kinstall/gui'] = nil
@@ -15,6 +16,7 @@ require('kinstall/gui')
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
+  cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
   lfs.mkdir(kinstall.tmpFolder)
   downloadFile(
     kinstall.tmpFolder .. '/modules.json',
@@ -90,7 +92,7 @@ function kinstall:checkVersions(filename)
   -- jesli są jakieś pakiety do zainstalowania, pokaż listę i odnośniki
   local hasUpdates = false
   if next(kinstall.updateList) ~= nil then
-    cecho('\n<gold>Znaleziono aktualizacje pakietów!\n')
+    cecho('\n<gold>KILLER - Znaleziono aktualizacje pakietów!\n')
     for moduleName, data in pairs(kinstall.updateList) do
       hasUpdates = true
       local desc = data.shortDesc or '(brak opisu)'
@@ -216,6 +218,11 @@ function kinstall:initModule(moduleName)
   local _, err = pcall(function()
     package.loaded[moduleFile.name .. '/main'] = nil
     require(moduleFile.name .. '/main')
+    if _G[moduleFile.name] ~= nil and _G[moduleFile.name]['doInit'] ~= nil then
+      tempTimer(0, function()
+        _G[moduleFile.name]['doInit']()
+      end)
+    end
   end)
   if err ~= nil then
     display(err)
@@ -282,10 +289,8 @@ function kinstall:kinstallLoaded(_, filename)
     for _, cmd in ipairs(moduleFile.commands) do
       kinstall.cmdCache[cmd] = moduleFile.name
     end
-    if kinstall:fileExists(getMudletHomeDir() .. "/kinstallInstalled.txt") == false then
-      file = io.open(getMudletHomeDir() .. "/kinstallInstalled.txt", "w")
-      file:write('1')
-      file:close()
+    if kinstall:getConfig('welcomed') == false then
+      kinstall:setConfig('welcomed', true)
       kinstall:welcomeScreen()
     end
     kinstall:fetchVersions()
@@ -395,11 +400,23 @@ end
 
 function kinstall:loadJsonFile(filename)
   if not kinstall:fileExists(filename) then return {} end
-  lines = ''
+  local lines = ''
   for line in io.lines(filename) do
     lines = lines .. line .. '\n'
   end
   return yajl.to_value(lines)
+end
+
+function kinstall:saveJsonFile(filename, value)
+  local file = io.open(filename, "w")
+  if file then
+    local contents = yajl.to_string(value)
+    file:write( contents )
+    io.close( file )
+    return true
+  else
+    return false
+  end
 end
 
 function kinstall:removeDir(dir)
@@ -414,4 +431,23 @@ function kinstall:removeDir(dir)
     end
   end
   lfs.rmdir(dir)
+end
+
+function kinstall:getConfig(name, default)
+  if default == nil then
+    default = false
+  end
+  local config = kinstall:loadJsonFile(kinstall.configFile)
+  if config[name] ~= nil then
+    return config[name]
+  else
+    kinstall:setConfig(name, default)
+    return default
+  end
+end
+
+function kinstall:setConfig(name, value)
+  local config = kinstall:loadJsonFile(kinstall.configFile)
+  config[name] = value
+  kinstall:saveJsonFile(kinstall.configFile, config)
 end

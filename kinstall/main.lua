@@ -337,7 +337,7 @@ function kinstall:sysUnzipDone(_, filename)
   cecho('<green>zainstalowano.\n\n')
   kinstall:initModule(name)
   if _G[name] ~= nil and _G[name]['doInstall'] ~= nil then
-    local func = _G[name]['doUninstall']
+    local func = _G[name]['doInstall']
     local _, err = pcall(func)
     if err ~= nil then
       cecho('<red>Wystąpił błąd przy instalowaniu modułu ' .. name .. '.\n\n')

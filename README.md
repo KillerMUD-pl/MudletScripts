@@ -2,7 +2,7 @@
 
 Skrypty do Killer MUDa.
 
-Aktualna list:
+Aktualna lista:
 - kmap - moduł mapy
 
 Wpisz tą komendę do Mudleta aby zainstalować:

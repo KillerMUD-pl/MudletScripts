@@ -3,7 +3,7 @@ module("kmap", package.seeall)
 mudlet.mapper_script = true
 
 kmap = kmap or {}
-kmap.version = 3
+kmap.version = 4
 
 kmap.doMap = function(params)
   if params == 'redraw' then

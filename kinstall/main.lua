@@ -1,12 +1,12 @@
 kinstall = kinstall or {}
-kinstall.version = 7
+kinstall.version = 8
 kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
 kinstall.versions = {}
 kinstall.modules = {}
 kinstall.updateList = {}
 kinstall.runList = {}
 kinstall.cmdCache = {}
-kinstall.autoUpdate = kinstall.autoUpdate or 'n'
+kinstall.autoUpdate = kinstall.autoUpdate or 'y'
 kinstall.repoName = 'https://www.mudlet.org/download'
 kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/'
 kinstall.configFile = getMudletHomeDir() .. '/kinstall.config.json'

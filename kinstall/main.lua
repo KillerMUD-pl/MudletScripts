@@ -1,5 +1,5 @@
 kinstall = kinstall or {}
-kinstall.version = 6
+kinstall.version = 7
 kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
 kinstall.versions = {}
 kinstall.modules = {}

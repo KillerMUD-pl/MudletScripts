@@ -1,5 +1,9 @@
 # KillerMUDScripts
-Mudlet scripts for Killer MUD text game
+
+Skrypty do Killer MUDa.
+
+Aktualna list:
+- kmap - moduł mapy
 
 Wpisz tą komendę do Mudleta aby zainstalować:
 

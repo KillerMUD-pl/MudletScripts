@@ -12,3 +12,7 @@ Wpisz tą komendę do Mudleta aby zainstalować:
 Wygląda to tak:
 
 ![Screenshot](https://github.com/ktunkiewicz/KillerMUDScripts/blob/master/screenshot.png?raw=true)
+
+Jeżeli masz wyłączone/usunięte alias "run lua code", i powyższy kod nic nie robi, ściągnij tą paczkę: 
+https://github.com/ktunkiewicz/KillerMUDScripts/raw/master/dist/kinstall.zip
+i zainstaluj ją "tradycyjnie" (czyli albo przeciągając na okno mudleta, albo przez ikonkę "Import" w skryptach)

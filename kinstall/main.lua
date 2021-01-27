@@ -227,12 +227,6 @@ function kinstall:initModule(moduleName)
   if err ~= nil then
     display(err)
   end
-  -- sprawdzanie czy komenda ze skryptu powinna byc natychmiast odpalona
-  if kinstall.runList[moduleFile.name] ~= nil then
-    tempTimer(0, function() 
-      kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd)
-    end)
-  end
 end
 
 -- KOMENDY
@@ -286,8 +280,6 @@ kinstall.doRemove = function(param)
 end
 
 function kinstall:runCmd(mode, cmd, isAutoRun)
-  display(mode)
-  display(cmd)
   local params = {}
   params[1], params[2] = cmd:match("(%w+)(.*)")
   -- sprawdzanie czy plus-komenda nalezy do modulu
@@ -391,6 +383,12 @@ function kinstall:sysUnzipDone(_, filename)
       display(err)
       return
     end
+  end
+  -- sprawdzanie czy komenda ze skryptu powinna byc natychmiast odpalona
+  if kinstall.runList[moduleFile.name] ~= nil then
+    tempTimer(0, function() 
+      kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd)
+    end)
   end
 end
 if kinstall.sysUnzipDoneId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipDoneId) end

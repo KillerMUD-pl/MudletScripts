@@ -3,7 +3,7 @@ module("kmap", package.seeall)
 mudlet.mapper_script = true
 
 kmap = kmap or {}
-kmap.version = 4
+kmap.version = 5
 
 kmap.doMap = function(params)
   if params == 'redraw' then
@@ -24,6 +24,7 @@ kmap.doInstall = function()
   cecho('<gold>Odinstalowywanie domyślnego skryptu mappera... ')
   uninstallPackage('generic_mapper')
   uninstallModule('generic_mapper')
+  map = nil
   cecho('<green>gotowe.\n\n')
 end
 

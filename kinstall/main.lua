@@ -16,7 +16,6 @@ require('kinstall/gui')
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
-  cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
   lfs.mkdir(kinstall.tmpFolder)
   downloadFile(
     kinstall.tmpFolder .. '/modules.json',
@@ -292,6 +291,8 @@ function kinstall:kinstallLoaded(_, filename)
     if kinstall:getConfig('welcomed') == false then
       kinstall:setConfig('welcomed', true)
       kinstall:welcomeScreen()
+    else
+      cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
     end
     kinstall:fetchVersions()
   end

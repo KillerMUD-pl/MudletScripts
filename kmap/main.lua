@@ -3,13 +3,17 @@ module("kmap", package.seeall)
 mudlet.mapper_script = true
 
 kmap = kmap or {}
-kmap.version = 5
+kmap.version = 6
 
 kmap.doMap = function(params)
+  if params == 'reload' then
+    kmap:mapLoad(true)
+    return
+  end
   if params == 'redraw' then
     kmap:mapRedraw(true)
   end
-  kmap:delayedEventMapLoaded();
+  kmap:delayedmapLoad();
 end
 
 kmap.undoMap = function(params)
@@ -135,7 +139,9 @@ function kmap:mapRedraw(forceReload)
   end
   local usedLabelsFromJsonCount = 0
   for areaId, labels in pairs(kmap.labelsMap) do
-    for id, _ in pairs(getMapLabels(areaId)) do
+    local areaLabels = pairs(getMapLabels(areaId))
+    if areaLabels == nil then areaLabels = {} end
+    for id, _ in areaLabels do
       local existing = getMapLabel(areaId, id)
       local label = imageHashes[string.format("%.3f", existing.Width) .. string.format("%.3f", existing.Height)]
       if label ~= nil then
@@ -185,8 +191,8 @@ end
 --
 -- załadowanie mapy
 --
-function kmap:eventMapLoaded()
-  if kinstall:getConfig('mapLoaded') == false then
+function kmap:mapLoad(forceReload)
+  if kinstall:getConfig('mapLoaded') == false or forceReload then
     kinstall:setConfig('mapLoaded', true)
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
@@ -197,9 +203,9 @@ function kmap:eventMapLoaded()
   updateMap()
 end
 
-function kmap:delayedEventMapLoaded()
+function kmap:delayedmapLoad()
   tempTimer(0, function()
-    kmap:eventMapLoaded()
+    kmap:mapLoad(false)
   end)
 end
 

@@ -3,7 +3,7 @@ module("kmap", package.seeall)
 mudlet.mapper_script = true
 
 kmap = kmap or {}
-kmap.version = 8
+kmap.version = 9
 
 kmap.doMap = function(params)
   if params == 'reload' then

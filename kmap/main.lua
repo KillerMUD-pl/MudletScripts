@@ -28,7 +28,9 @@ kmap.doInstall = function()
   cecho('<gold>Odinstalowywanie domyślnego skryptu mappera... ')
   uninstallPackage('generic_mapper')
   uninstallModule('generic_mapper')
-  map.eventHandler = function() end
+  if map ~= nil then
+    map.eventHandler = function() end
+  end
   cecho('<green>gotowe.\n\n')
 end
 

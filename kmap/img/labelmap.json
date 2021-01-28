@@ -134,6 +134,13 @@
       "Height": 43.862274169922,
       "Width": 23.952102661133,
       "File": "tlo_wieza"
+    },
+    {
+      "Y": -450,
+      "X": 300,
+      "Height": 81,
+      "Width": 199,
+      "File": "legenda"
     }
   ]
 }

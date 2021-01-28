@@ -1,6 +1,6 @@
 {
   "name": "kmap",
-  "version": 6,
+  "version": 7,
   "commands": [ "map" ],
   "shortDesc": "Moduł mapy"
 }

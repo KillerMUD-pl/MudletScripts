@@ -24,7 +24,7 @@ fs.readdir(baseDir, function (err, files) {
           console.error("Nie udało się odczytać pliku module.json w katalogu " + file + ".", err);
           process.exit(1);      
         }
-        if (module.version != modules[file].version) {
+        if (modules[file].version == 0) {
           console.log("Pakiet " + file + " istnieje w repozytorium w wersji rozwojowej, nie buduję nowej paczki w dist.")
           return;
         }

@@ -3,7 +3,7 @@ module("kmap", package.seeall)
 mudlet.mapper_script = true
 
 kmap = kmap or {}
-kmap.version = 9
+kmap.version = 10
 
 kmap.doMap = function(params)
   if params == 'reload' then
@@ -142,7 +142,7 @@ function kmap:mapRedraw(forceReload)
   local usedLabelsFromJsonCount = 0
   for areaId, labels in pairs(kmap.labelsMap) do
     local areaLabels = getMapLabels(areaId)
-    if areaLabels == nil then areaLabels = {} end
+    if areaLabels == nil or type(areaLabels) ~= 'table' then areaLabels = {} end
     for id, _ in pairs(areaLabels) do
       local existing = getMapLabel(areaId, id)
       local label = imageHashes[string.format("%.3f", existing.Width) .. string.format("%.3f", existing.Height)]

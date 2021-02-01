@@ -179,12 +179,22 @@ end
 
 -- instalowanie z repozytorium
 function kinstall:fetchAndInstall(moduleName)
-  if kinstall.versions[moduleName] == nil then
-    cecho('<red>Nie znaleziono modułu ' .. moduleName .. '\n\n')
+  local beta = false
+  if string.ends(moduleName, '-beta') then
+    beta = true
+  end
+  local shortModuleName = moduleName
+  if beta == true then
+    shortModuleName = string.gsub(moduleName, '-beta', '')
+  end
+  if kinstall.versions[shortModuleName] == nil then
+    cecho('<red>Nie znaleziono modułu ' .. shortModuleName .. '\n\n')
     return
   end
-  data = kinstall.versions[moduleName]
-  cecho('<gold>Instalowanie pakietu ' .. moduleName .. ' w wersji ' .. kinstall.versions[moduleName].version .. ' ... ')
+  local data = kinstall.versions[shortModuleName]
+  local version = data.version
+  if beta == true then version = 'beta' end
+  cecho('<gold>Instalowanie pakietu ' .. shortModuleName .. ' w wersji ' .. version .. ' ... ')
   downloadFile(
     kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
     data.url
@@ -375,6 +385,13 @@ function kinstall:sysUnzipDone(_, filename)
   local name = filename:match("([^/]+).zip$")
   cecho('<green>zainstalowano.\n\n')
   kinstall:initModule(name)
+  if name == 'kinstall' then
+    raiseEvent('kinstallInit')
+    tempTimer(0, function()
+      kinstall.doInstall()
+    end)
+    return
+  end
   if _G[name] ~= nil and _G[name]['doInstall'] ~= nil then
     local func = _G[name]['doInstall']
     local _, err = pcall(func)
@@ -386,7 +403,7 @@ function kinstall:sysUnzipDone(_, filename)
   end
   -- sprawdzanie czy komenda ze skryptu powinna byc natychmiast odpalona
   if kinstall.runList[moduleFile.name] ~= nil then
-    tempTimer(0, function() 
+    tempTimer(0, function()
       kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd)
     end)
   end

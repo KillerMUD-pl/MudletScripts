@@ -24,9 +24,10 @@ fs.readdir(baseDir, function (err, files) {
           console.error("Nie udało się odczytać pliku module.json w katalogu " + file + ".", err);
           process.exit(1);      
         }
-        if (modules[file].version == 0) {
-          console.log("Pakiet " + file + " istnieje w repozytorium w wersji rozwojowej, nie buduję nowej paczki w dist.")
-          return;
+        var outFileName = file;
+        if (modules[file].version != module.version) {
+          console.log("Pakiet " + file + " istnieje w repozytorium w wersji rozwojowej, buduję paczkę beta.")
+          outFileName = file + '-beta';
         }
         zipFiles('**/*.*', {
           cwd: path.join(baseDir, file),
@@ -41,13 +42,13 @@ fs.readdir(baseDir, function (err, files) {
         }).then(function(zip) {
           zip
             .generateNodeStream({ type:'nodebuffer', streamFiles:true })
-            .pipe(fs.createWriteStream(path.join(baseDir, 'dist', file + '.zip')))
+            .pipe(fs.createWriteStream(path.join(baseDir, 'dist', outFileName + '.zip')))
             .on('finish', function (err) {
                 if (err) {
                   console.err(err);
                   process.exit();
                 }
-                console.log('Spakowano moduł ' + file + '\n');
+                console.log('Spakowano moduł ' + outFileName + '\n');
             });
         }).catch(function(err) {
           console.error(err);

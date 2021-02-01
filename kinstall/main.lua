@@ -24,9 +24,10 @@ function kinstall:fetchVersions()
 end
 
 function kinstall:welcomeScreen()
+  moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/kinstall/module.json')
   cecho('\n')
   cecho('<gold>----------------------------------------\n')
-  cecho('<gold>KillerMUDScripts <DimGrey>(v.' .. kinstall.version .. ')\n')
+  cecho('<gold>KillerMUDScripts <DimGrey>(v.' .. moduleFile.version .. ')\n')
   cecho('<gold>----------------------------------------\n')
   cecho('Skrypty do Killer MUD rozwijane na:\n')
   echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
@@ -392,7 +393,7 @@ end
 if kinstall.sysUnzipDoneId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipDoneId) end
 kinstall.sysUnzipDoneId = registerAnonymousEventHandler("sysUnzipDone", "kinstall:sysUnzipDone", false)
 
--- handler eventu sysUnzipDone
+-- handler eventu sysUnzipError
 function kinstall:sysUnzipError(_, filename)
   local name = filename:match("([^/]+).zip$")
   cecho('<red>Nie udało się rozpakować modułu ' .. name .. '!\n')

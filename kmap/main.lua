@@ -44,7 +44,6 @@ end
 
 kmap.ids = kmap.ids or {}
 kmap.vnumToRoomIdCache = {}
-kmap.mapLoaded = kmap.mapLoaded or false
 
 function kmap:register()
   kmap:unregister()
@@ -194,8 +193,7 @@ end
 -- załadowanie mapy
 --
 function kmap:mapLoad(forceReload)
-  if kinstall:getConfig('mapLoaded') == false or forceReload then
-    kinstall:setConfig('mapLoaded', true)
+  if getMapUserData("type") ~= 'killermud' or forceReload then
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
   openMapWidget()

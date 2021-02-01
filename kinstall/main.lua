@@ -1,5 +1,4 @@
 kinstall = kinstall or {}
-kinstall.version = 8
 kinstall.tmpFolder = getMudletHomeDir() .. '/kinstall/tmp'
 kinstall.versions = {}
 kinstall.modules = {}
@@ -47,28 +46,6 @@ function kinstall:checkVersions(filename)
     return
   end
   kinstall.versions = kinstall:loadJsonFile(filename)
-  -- sprawdzanie zmiennych globalnych
-  for moduleName, data in pairs(kinstall.versions) do
-    local checkedMod = _G[moduleName];
-    if checkedMod ~= nil then
-      if checkedMod.version == nil or not tonumber(checkedMod.version) then
-        -- UWAGA! zmienna globalna o nazwie takiej jak w versions jest używana
-        -- co najprawdopodobniej oznacza stary skrypt mappera
-        -- Wywalamy fatal error!
-        kinstall.state = 'error'
-        cecho('<red>\nUWAGA! Pakiet kinstall wykrył że zmienna globalna "' .. moduleName .. '" już istnieje,\n')
-        cecho('<red>i nie jest ona modułem zgodnym z kinstall. Najprawdopodobniej masz\n')
-        cecho('<red>zainstalowany stary skrypt mappera, bądź inny skrypt który używa\n')
-        cecho('<red>takiej zmiennej.\n\n')
-        cecho('<red>Zalecam usunięcie wszystkich skryptów które używają zmiennych globalnych\n')
-        cecho('<red>zaczynających się na małe "k", typu "kmap" itd.\n\n')
-        cecho('<red>NIE KORZYSTAJ z komend +<tekst> do czasu usunięcia tych skryptów.\n\n')
-        cecho('<red>Stary pakiet "kmap" jest teraz częścią kinstall, instaluje się go wydając \n')
-        cecho('<red>komendę "+map".\n\n')
-        _G[moduleName] = nil
-      end
-    end
-  end
   -- sprawdzanie systemu plikow w poszukiwaniu pakietów i sprawdzanie ich wersji
   local path = getMudletHomeDir()
   for name in lfs.dir(path) do

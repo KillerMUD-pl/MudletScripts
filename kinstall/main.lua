@@ -193,11 +193,15 @@ function kinstall:fetchAndInstall(moduleName)
   end
   local data = kinstall.versions[shortModuleName]
   local version = data.version
-  if beta == true then version = 'beta' end
+  local url = data.url
+  if beta == true then
+    version = 'beta'
+    url = string.gsub(url, shortModuleName, moduleName)
+  end
   cecho('<gold>Instalowanie pakietu ' .. shortModuleName .. ' w wersji ' .. version .. ' ... ')
   downloadFile(
-    kinstall.tmpFolder .. '/' .. moduleName .. '.zip',
-    data.url
+    kinstall.tmpFolder .. '/' .. shortModuleName .. '.zip',
+    url
   )
 end
 

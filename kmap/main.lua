@@ -13,10 +13,12 @@ kmap.doMap = function(params)
   if params == 'redraw' then
     kmap:mapRedraw(true)
   end
+  cecho('<gold>Włączam mapę\n')
   kmap:delayedmapLoad();
 end
 
 kmap.undoMap = function(params)
+  cecho('<gold>Wyłączam mapę\n')
   closeMapWidget()
 end
 
@@ -162,6 +164,7 @@ function kmap:mapRedraw(forceReload)
     return
   end
  
+  cecho('<gold>Przerysowuje obrazki na mapie\n')
   kmap:deleteImageLabels()
 
   -- rysowanie ich od nowa
@@ -194,12 +197,14 @@ end
 --
 function kmap:mapLoad(forceReload)
   if getMapUserData("type") ~= 'killermud' or forceReload then
+    cecho('<gold>Ładuje mapę z dysku\n')
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
   openMapWidget()
   kmap:vnumCacheRebuild()
   kmap:mapLocate()
   kmap:mapRedraw(false)
+  echo('\n')
   updateMap()
 end
 

@@ -17,7 +17,7 @@ fs.readdir(baseDir, function (err, files) {
         console.error("Nie udało się odczytać danych pliku/folderu.", error);
         return;
       }
-      if (stat.isDirectory()) {
+      if (stat.isDirectory() && fs.existsSync(path.join(baseDir, file, 'module.json'))) {
         try {
           var module = JSON.parse(fs.readFileSync(path.join(baseDir, file, 'module.json')));
         } catch (err) {

@@ -17,7 +17,7 @@ fs.readdir(baseDir, function (err, files) {
         console.error("Nie udało się odczytać danych pliku/folderu.", error);
         return;
       }
-      if (stat.isDirectory() && modules[file]) {
+      if (stat.isDirectory()) {
         try {
           var module = JSON.parse(fs.readFileSync(path.join(baseDir, file, 'module.json')));
         } catch (err) {
@@ -25,7 +25,7 @@ fs.readdir(baseDir, function (err, files) {
           process.exit(1);      
         }
         var outFileName = file;
-        if (modules[file].version != module.version) {
+        if (!modules[file] || modules[file].version != module.version) {
           console.log("Pakiet " + file + " istnieje w repozytorium w wersji rozwojowej, buduję paczkę beta.")
           outFileName = file + '-beta';
         }

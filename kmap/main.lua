@@ -14,11 +14,13 @@ kmap.doMap = function(params)
   end
   cecho('<gold>Włączam mapę\n')
   kmap:delayedmapLoad();
+  kinstall:setConfig('mapa', 't')
 end
 
 kmap.undoMap = function(params)
   cecho('<gold>Wyłączam mapę\n')
-  closeMapWidget()
+  kmap:removeBox()
+  kinstall:setConfig('mapa', 'n')
 end
 
 kmap.doUninstall = function()
@@ -37,6 +39,9 @@ end
 
 kmap.doInit = function()
   kmap:register()
+  if kinstall:getConfig('mapa') == 't' then
+    kmap.doMap()
+  end
 end
 
 --
@@ -57,6 +62,32 @@ function kmap:unregister()
   if kmap.ids.roomInfoEvent then killAnonymousEventHandler(kmap.ids.roomInfoEvent) end
   if kmap.ids.sysExitEvent then killAnonymousEventHandler(kmap.ids.sysExitEvent) end
   if kmap.ids.mapOpenEvent then killAnonymousEventHandler(kmap.ids.mapOpenEvent) end
+end
+
+--
+-- Wyswietla mape w okienku
+--
+function kmap:addBox()
+  closeMapWidget()
+  local wrapper = kgui:addBox('mapper', 300, "Mapa", 1, kmap.undoMap)
+  Geyser.Mapper:new({
+    embedded = true,
+    name = 'mapper',
+    width = "100%-4px",
+    height = "100%-22px",
+    x = "2px",
+    y = "20px"
+  }, wrapper)
+  kgui:update()
+end
+
+--
+-- Usuwa mape z okienka
+--
+function kmap:removeBox()
+  closeMapWidget()
+  kgui:removeBox('mapper')
+  kgui:update()
 end
 
 --
@@ -199,7 +230,7 @@ function kmap:mapLoad(forceReload)
     cecho('<gold>Ładuje mapę z dysku\n')
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
-  openMapWidget()
+  kmap:addBox()
   kmap:vnumCacheRebuild()
   kmap:mapLocate()
   kmap:mapRedraw(false)

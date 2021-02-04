@@ -10,10 +10,6 @@ kinstall.repoName = 'https://www.mudlet.org/download'
 kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/'
 kinstall.configFile = getMudletHomeDir() .. '/kinstall.config.json'
 
--- załącza kod od gui
-package.loaded['kinstall/gui'] = nil
-require('kinstall/gui')
-
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
   lfs.mkdir(kinstall.tmpFolder)
@@ -194,7 +190,7 @@ function kinstall:initModule(moduleName)
   if moduleName == 'kinstall' then
     return
   end
-  moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
+  local moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
   if moduleFile.name == nil then
     cecho('<red>Nie udało się załadować modułu ' .. moduleName .. '. Brak pliku lub niepoprawny module.json w module.\n')
     return
@@ -261,7 +257,6 @@ kinstall.doRemove = function(param)
     local _, err = pcall(func)
     if err ~= nil then
       cecho('<red>Wystąpił błąd przy usuwaniu modułu ' .. param .. '.\n\n')
-      display(err)
       return
     end
   end
@@ -284,7 +279,7 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
     local funcName = string.title(params[1])
     local prefix = mode == '-' and 'undo' or 'do'
     if (_G[moduleName] == nil or _G[moduleName][prefix .. funcName] == nil) then
-      cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n;')
+      cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n')
       return
     end
     local func = _G[moduleName][prefix .. funcName]
@@ -325,6 +320,10 @@ function kinstall:kinstallLoaded(_, filename)
       cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
     end
     kinstall:fetchVersions()
+    -- załącza kod od gui
+    package.loaded['kinstall/gui'] = nil
+    require('kinstall/gui')
+    kgui:init()
   end
 end
 if kinstall.kinstallLoadedId ~= nil then killAnonymousEventHandler(kinstall.kinstallLoadedId) end

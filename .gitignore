@@ -11,3 +11,4 @@
 /kinstall/tmp
 !/dist/
 !/kmap/
+!/kinfo/

@@ -9,6 +9,11 @@
   "Lua.workspace.preloadFileSize": 500,
   "Lua.diagnostics.globals": [
     "Adjustable",
-    "mudlet"
+    "mudlet",
+    "kinstall",
+    "kinstall",
+    "map",
+    "map",
+    "kgui"
   ]
 }

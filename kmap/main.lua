@@ -1,10 +1,11 @@
 module("kmap", package.seeall)
+setfenv(1, getfenv(2));
 
 mudlet.mapper_script = true
 
 kmap = kmap or {}
 
-kmap.doMap = function(params)
+function kmap:doMap(params)
   if params == 'reload' then
     kmap:mapLoad(true)
     return
@@ -17,17 +18,17 @@ kmap.doMap = function(params)
   kinstall:setConfig('mapa', 't')
 end
 
-kmap.undoMap = function(params)
+function kmap:undoMap(params)
   cecho('<gold>Wyłączam mapę\n')
   kmap:removeBox()
   kinstall:setConfig('mapa', 'n')
 end
 
-kmap.doUninstall = function()
+function kmap:doUninstall()
   kmap:unregister()
 end
 
-kmap.doInstall = function()
+function kmap:doInstall()
   cecho('<gold>Odinstalowywanie domyślnego skryptu mappera... ')
   uninstallPackage('generic_mapper')
   uninstallModule('generic_mapper')
@@ -37,10 +38,10 @@ kmap.doInstall = function()
   cecho('<green>gotowe.\n\n')
 end
 
-kmap.doInit = function()
+function kmap:doInit()
   kmap:register()
   if kinstall:getConfig('mapa') == 't' then
-    kmap.doMap()
+    kmap:doMap()
   end
 end
 
@@ -69,7 +70,7 @@ end
 --
 function kmap:addBox()
   closeMapWidget()
-  local wrapper = kgui:addBox('mapper', 300, "Mapa", 1, kmap.undoMap)
+  local wrapper = kgui:addBox('mapper', 300, "Mapa", 1, function() kmap:undoMap() end)
   Geyser.Mapper:new({
     embedded = true,
     name = 'mapper',
@@ -157,6 +158,7 @@ function kmap:mapRedraw(forceReload)
     local f = assert(io.open(getMudletHomeDir() .. '/kmap/img/labelmap.json', "r"))
     local labelsFile = f:read("*all")
     f:close()
+    display('test')
     kmap.labelsMap = yajl.to_value(labelsFile)
   end
 
@@ -255,5 +257,5 @@ end
 -- obsluga otwierania mapy przyciskiem z menu
 --
 function kmap:mapOpenEvent()
-  kmap.doMap()
+  kmap:doMap()
 end

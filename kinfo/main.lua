@@ -1,31 +1,32 @@
 module("kinfo", package.seeall)
+setfenv(1, getfenv(2));
 
 kinfo = kinfo or {}
 kinfo.info_box = nil
 kinfo.enabled = false
 
-kinfo.doInfo = function(params)
+function kinfo:doInfo(params)
   cecho('<gold>Włączam panel postaci\n')
   kinfo:addBox()
   kinstall:setConfig('info', 't')
   kinfo.enabled = true
 end
 
-kinfo.undoInfo = function(params)
+function kinfo:undoInfo(params)
   cecho('<gold>Wyłączam panel postaci\n')
   kinfo:removeBox()
   kinstall:setConfig('mapa', 'n')
   kinfo.enabled = false
 end
 
-kinfo.doUninstall = function()
+function kinfo:doUninstall()
   kinfo:unregister()
 end
 
-kinfo.doInit = function()
+function kinfo:doInit()
   kinfo:register()
   if kinstall:getConfig('info') == 't' then
-    kinfo.doInfo()
+    kinfo:doInfo()
   end
 end
 
@@ -46,7 +47,7 @@ end
 -- Wyswietla informacje o graczy i grupie w okienku
 --
 function kinfo:addBox()
-  kgui:addBox('info', 0,"Gracz", 2, kinfo.undoInfo)
+  kgui:addBox('info', 0, "Gracz", 2, function() kinfo:undoInfo() end)
   kinfo.info_box = kgui:setBoxContent('info', '<center><b>Zaloguj się do gry.</b><br>Oczekiwanie na informacje z GMCP...</center>')
 end
 

@@ -189,15 +189,11 @@ function kgui:updateWrapperSize(name)
   and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'] ~= nil
   and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name] ~= nil
   and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].hidden == false then
-    if kgui.uiState[name].height ~= nil then
-      height = kgui.uiState[name].height
-    else
-      return
-    end
+    height = kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name];
   else
-  if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
-      height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
-  end
+    if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
+        height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
+    end
   end
   kgui.ui[name]['wrapper']:resize('100%', height + 22)
 end
@@ -273,4 +269,17 @@ function kgui:onHDragRelease()
   disableTimer("kguiHdragTimer")
   kgui.uiState.main.width = kgui.main.get_width()
   kgui:saveState()
+end
+
+--
+-- Uproszczone przesylanie tekstu do okienek
+--
+
+function kgui:toWindow(name, title, content)
+  kgui.boxes = kgui.boxes or {}
+  if kgui.boxes[name] == nil then
+    kgui.boxes[name] = kgui:addBox(name, 0, title, 99, function() kgui.boxes[name]:hide() end)
+  end
+  kgui.boxes[name]:show()
+  kgui:setBoxContent(name, content)
 end

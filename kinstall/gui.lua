@@ -4,6 +4,9 @@ setfenv(1, getfenv(2));
 kgui = kgui or {}
 kgui.ui = {}
 kgui.uiState = kinstall:loadJsonFile(getMudletHomeDir() .. '/kguiSettings.json')
+kgui.resizingEventHandler = kgui.resizingEventHandler or nil
+kgui.resizingFinishEventHandler = kgui.resizingFinishEventHandler or nil
+kgui.resizedElement = nil
 
 --
 -- TODO
@@ -51,23 +54,40 @@ function kgui:init()
   kgui.mainDrag:setCursor("ResizeHorizontal")
   setLabelClickCallback("KGuiMainDrag", 'kgui:onHDragClick')
   setLabelReleaseCallback("KGuiMainDrag", 'kgui:onHDragRelease')
+
+  kinstall:restartGmcpWatch()
+
+  if kgui.resizingEventHandler ~= nil then killAnonymousEventHandler(kgui.resizingEventHandler) end
+  kgui.resizingEventHandler = registerAnonymousEventHandler(
+    'AdjustableContainerReposition',
+    function(_, _, _, _, _, _, labelName )
+      if kgui.resizedElement == nil and labelName ~= nil then
+        kgui.resizedElement = labelName:gsub("WrapperadjLabel", "")
+      end
+    end
+  )
+  if kgui.resizingFinishEventHandler ~= nil then killAnonymousEventHandler(kgui.resizingFinishEventHandler) end
+  kgui.resizingFinishEventHandler = registerAnonymousEventHandler(
+    'AdjustableContainerRepositionFinish',
+    function(_, _, _, _, _, _, labelName )
+      kgui.resizedElement = nil
+      kgui:update()
+    end
+  )
 end
 
-function kgui:addBox(name, height, title, order, closeCallback)
+function kgui:addBox(name, height, title, closeCallback)
   kgui.ui[name] = {}
   kgui.uiState[name] = kgui.uiState[name] or {}
-  kgui.uiState[name].minimized = kgui.uiState[name].minimized or false
   local wrapperHeight = kgui.uiState[name].height or height;
-  kgui.uiState[name].height = wrapperHeight
-  kgui.uiState[name].y = kgui.uiState[name].y or kgui:findBottom()
-  kgui.uiState[name].order = kgui.uiState[name].order or order
+  local y = kgui.uiState[name].y or kgui:findBottom()
 
   -- tworzenie glownego kontenera boxa
-  kgui.ui[name]['wrapper'] = kgui.ui[name]['wrapper'] or Adjustable.Container:new({
+  kgui.ui[name]['wrapper'] = kgui.ui[name]['wrapper'] or Adjustable2.Container:new({
     name = name .. 'Wrapper',
     titleText = "",
     x = "0px",
-    y = kgui.uiState[name].y,
+    y = y,
     width = "100%",
     height = wrapperHeight .. "px",
     buttonsize = 0,
@@ -80,6 +100,15 @@ function kgui:addBox(name, height, title, order, closeCallback)
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperminimizeLabel']:hide()
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperadjLabel']:setStyleSheet('border: 2px solid #555555')
   kgui.ui[name]['wrapper']:show()
+
+  -- minimalizowanie tresci ktora dopiero bedzie dodana do okienka
+  if kgui.uiState[name] and kgui.uiState[name].minimized == true then
+    tempTimer(0, function()
+      if kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name] then
+        kgui:minimize(name)
+      end
+    end)
+  end
 
   -- pasek okienka
   kgui.ui[name]['title'] = kgui.ui[name]['title'] or Geyser.Label:new({
@@ -127,24 +156,34 @@ function kgui:addBox(name, height, title, order, closeCallback)
   kgui.ui[name]['min']:setCursor("PointingHand")
   kgui.ui[name]['min']:setClickCallback(function()
     if kgui.uiState[name].minimized == true then
-      kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:show()
-      kgui.uiState[name].minimized = false
-      kgui:update()
+      kgui:unminimize(name)
     else
-      kgui.uiState[name].minimized = true
-      kgui.uiState[name].height = kgui.ui[name]['wrapper']:get_height()
-      kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:hide()
-      kgui:update()
+      kgui:minimize(name)
     end
   end)
 
   return kgui.ui[name]['wrapper']
 end
 
+function kgui:minimize(name)
+  kgui.uiState[name].minimized = true
+  kgui.uiState[name].height = kgui.ui[name]['wrapper']:get_height()
+  kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:hide()
+  kgui:update()
+end
+
+function kgui:unminimize(name)
+  kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:show()
+  kgui.ui[name]['wrapper']:resize('100%', kgui.uiState[name].height)
+  kgui.uiState[name].minimized = false
+  kgui:update()
+end
+
 function kgui:removeBox(name)
   if kgui.ui[name]['wrapper'] ~= nil then
     kgui.ui[name]['wrapper']:hide()
     kgui.uiState[name] = nil
+    kgui.update()
   end
 end
 
@@ -183,42 +222,71 @@ function kgui:calculateBoxSize(name, content)
   return height * ( 1 + count ) + 20
 end
 
-function kgui:updateWrapperSize(name)
-  local height = 0
+function kgui:isMinimized(name)
   if kgui.ui[name]['content'] == nil
   and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'] ~= nil
   and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name] ~= nil
-  and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].hidden == false then
-    height = kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name];
+  and kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].hidden == true then
+    return true
   else
-    if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
-        height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
+    if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == true then
+      return true
     end
   end
-  kgui.ui[name]['wrapper']:resize('100%', height + 22)
+  return false
 end
 
+function kgui:updateWrapperSize(name)
+  local height = 0
+  if kgui:isMinimized(name) == false then
+    if kgui.ui[name]['content'] == nil then
+      height = kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].get_height();
+    end
+    if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
+      height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
+    end    
+  end
+  if height ~= nil then
+    kgui.ui[name]['wrapper']:resize('100%', height + 22)
+  end
+end
+
+function kgui:updateState()
+  kgui.uiState.main.width = kgui.main.get_width()
+  for name, _ in pairs(kgui.ui) do
+    if kgui.uiState[name] == nil then kgui.uiState[name] = {} end
+    kgui.uiState[name].y = kgui.ui[name].wrapper.get_y()
+    local minimized = kgui:isMinimized(name)
+    if minimized == false then
+      kgui.uiState[name].height = kgui.ui[name].wrapper.get_height()
+    end
+    kgui.uiState[name].minimized = minimized
+  end
+end
 function kgui:saveState()
   kinstall:saveJsonFile(getMudletHomeDir() .. '/kguiSettings.json', kgui.uiState)
 end
 
 function kgui:update()
+  kgui:updateState()
   local boxes = {}
   for name, data in pairs(kgui.uiState) do
     if kgui.ui[name] ~= nil and kgui.ui[name]['wrapper'] ~= nil then
-      local order = data.order or 0
-      table.insert(boxes, { ["name"] = name, ["order"] = order })
+      local y = data.y or kgui:findBottom()
+      table.insert(boxes, { ["name"] = name, ["y"] = y })
     end
   end
   table.sort(boxes, function(a,b)
-    local orderA = a.order or 0
-    local orderB = b.order or 0
-    return orderA < orderB
+    local yA = a.y or 0
+    local yB = b.y or 0
+    return yA < yB
   end)
   local currentY = 0
   for _, data in pairs(boxes) do
-    kgui:updateWrapperSize(data.name)
-    kgui.ui[data.name]['wrapper']:move(0, currentY)
+    if data.name ~= kgui.resizedElement then
+      kgui:updateWrapperSize(data.name)
+      kgui.ui[data.name]['wrapper']:move(0, currentY)
+    end
     currentY = currentY + 10 + kgui.ui[data.name]['wrapper']:get_height()
   end
   kgui:saveState()
@@ -241,11 +309,6 @@ function kgui:findBottom()
   end
   return lastBottom
 end
-
-function kgui:findOrder()
-  local order = 0
-end
-
 --
 -- Przeciaganie glownego kontenera
 --
@@ -267,8 +330,7 @@ end
 
 function kgui:onHDragRelease()
   disableTimer("kguiHdragTimer")
-  kgui.uiState.main.width = kgui.main.get_width()
-  kgui:saveState()
+  kgui:update()
 end
 
 --
@@ -278,7 +340,7 @@ end
 function kgui:toWindow(name, title, content)
   kgui.boxes = kgui.boxes or {}
   if kgui.boxes[name] == nil then
-    kgui.boxes[name] = kgui:addBox(name, 0, title, 99, function() kgui.boxes[name]:hide() end)
+    kgui.boxes[name] = kgui:addBox(name, 0, title, function() kgui.boxes[name]:hide() end)
   end
   kgui.boxes[name]:show()
   kgui:setBoxContent(name, content)

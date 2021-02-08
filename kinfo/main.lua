@@ -47,7 +47,7 @@ end
 -- Wyswietla informacje o graczy i grupie w okienku
 --
 function kinfo:addBox()
-  kgui:addBox('info', 0, "Gracz", 2, function() kinfo:undoInfo() end)
+  kgui:addBox('info', 0, "Gracz", function() kinfo:undoInfo() end)
   kinfo.info_box = kgui:setBoxContent('info', '<center><b>Zaloguj się do gry.</b><br>Oczekiwanie na informacje z GMCP...</center>')
 end
 

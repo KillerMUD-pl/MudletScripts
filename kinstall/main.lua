@@ -9,6 +9,9 @@ kinstall.autoUpdate = kinstall.autoUpdate or 'y'
 kinstall.repoName = 'https://www.mudlet.org/download'
 kinstall.repoPath = 'https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/'
 kinstall.configFile = getMudletHomeDir() .. '/kinstall.config.json'
+kinstall.receivingGmcpTimer = kinstall.receivingGmcpTimer or nil
+kinstall.receivingGmcp = false
+kinstall.gmcpHandler = kinstall.gmcpHandler or nil
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
@@ -323,6 +326,15 @@ function kinstall:kinstallLoaded(_, filename)
     -- załącza kod od gui
     package.loaded['kinstall/gui'] = nil
     require('kinstall/gui')
+    package.loaded['kinstall/adjustable2'] = nil
+    require('kinstall/adjustable2')
+
+    if kinstall.gmcpHandler then killAnonymousEventHandler(kinstall.gmcpHandler) end
+    kinstall.gmcpHandler = registerAnonymousEventHandler("gmcp.Char", function()
+      kinstall.receivingGmcp = true
+      kinstall:restartGmcpWatch()
+    end)
+  
     kgui:init()
   end
 end
@@ -399,6 +411,14 @@ function kinstall:sysUnzipError(_, filename)
 end
 if kinstall.sysUnzipErrorId ~= nil then killAnonymousEventHandler(kinstall.sysUnzipErrorId) end
 kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinstall:sysUnzipError", false)
+
+-- odświeżanie timera pilnującego GMCP
+function kinstall:restartGmcpWatch()
+  if kinstall.receivingGmcpTimer ~= nil then killTimer(kinstall.receivingGmcpTimer) end
+  kinstall.receivingGmcpTimer = tempTimer(5, function()
+    kinstall.receivingGmcp = false;
+  end)
+end
 
 -- ALIASY
 

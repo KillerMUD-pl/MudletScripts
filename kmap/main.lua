@@ -36,6 +36,15 @@ function kmap:doInstall()
     map.eventHandler = function() end
   end
   cecho('<green>gotowe.\n\n')
+  cecho('<orange>=========================\n')
+  cecho('<orange>==     PRZECZYTAJ!     ==\n')
+  cecho('<orange>=========================\n\n')
+  cecho('<orange>Od teraz mapę włącza się komendą <cyan>+map <orange>a wyłącza komendą <cyan>-map\n\n')
+  cecho('<orange>Przycisk Map na pasku narzędzi mudleta <red>nie będzie działał<orange>.\n\n')
+  cecho('<orange>Postaram się to zmienić w przyszłości, ale w tej chwili nie ma sposobu na przechwycenie faktu\n')
+  cecho('<orange>kliknięcia w ten przycisk, być może za jakiś czas się to zmieni.\n\n')
+  cecho('<orange>W przypadku problemów z załadowaniem się, lub działaniem mapy spróbuj wpisać\n')
+  cecho('<orange><cyan>+map redraw <orange>(przerysowanie obrazków/etykiet) lub <cyan>+map reload <orange>(ponownie załadowanie mapy z dysku)\n\n')
 end
 
 function kmap:doInit()
@@ -55,14 +64,16 @@ kmap.vnumToRoomIdCache = {}
 function kmap:register()
   kmap:unregister()
   kmap.ids.roomInfoEvent = registerAnonymousEventHandler("gmcp.Room.Info", "kmap:roomInfoEventHandler")
+  kmap.ids.charGroupEvent = registerAnonymousEventHandler("gmcp.Char.Group", "kmap:charGroupEventHandler")
   kmap.ids.sysExitEvent = registerAnonymousEventHandler("sysExitEvent", "kmap:sysExitEvent")
-  kmap.ids.mapOpenEvent = registerAnonymousEventHandler("mapOpenEvent", "kmap:mapOpenEvent")
+  kmap.ids.receivingGmcpTimer = tempTimer(2, [[ kmap:checkGmcp() ]], true)
 end
 
 function kmap:unregister()
   if kmap.ids.roomInfoEvent then killAnonymousEventHandler(kmap.ids.roomInfoEvent) end
+  if kmap.ids.charGroupEvent then killAnonymousEventHandler(kmap.ids.charGroupEvent) end
   if kmap.ids.sysExitEvent then killAnonymousEventHandler(kmap.ids.sysExitEvent) end
-  if kmap.ids.mapOpenEvent then killAnonymousEventHandler(kmap.ids.mapOpenEvent) end
+  if kmap.ids.receivingGmcpTimer then killTimer(kmap.ids.receivingGmcpTimer) end
 end
 
 --
@@ -70,7 +81,7 @@ end
 --
 function kmap:addBox()
   closeMapWidget()
-  local wrapper = kgui:addBox('mapper', 300, "Mapa", 1, function() kmap:undoMap() end)
+  local wrapper = kgui:addBox('mapper', 300, "Mapa", function() kmap:undoMap() end)
   Geyser.Mapper:new({
     embedded = true,
     name = 'mapper',
@@ -79,6 +90,16 @@ function kmap:addBox()
     x = "2px",
     y = "20px"
   }, wrapper)
+  kmap.messageBox = Geyser.Label:new({
+    name = 'mapperMessage',
+    width = "100%-4px",
+    height = "80",
+    x = "2px",
+    y = "20px"
+  }, wrapper)
+  kmap.messageBox:setStyleSheet([[ background: rgba(0,0,0,0.8); color: #e0e0e0; ]])
+  kmap.messageBox:enableClickthrough()
+  kmap.messageBox:hide()
   kgui:update()
 end
 
@@ -143,7 +164,8 @@ function kmap:deleteImageLabels()
       labels = {}
     end
     for id, text in pairs(labels) do
-      if text == 'no text' or text == '' or text == nil then
+      -- nie kasujemy laabelek "?" w Default Area
+      if id ~= -1 and text ~= "?" then
         deleteMapLabel(areaId, id)
       end
     end
@@ -158,7 +180,6 @@ function kmap:mapRedraw(forceReload)
     local f = assert(io.open(getMudletHomeDir() .. '/kmap/img/labelmap.json', "r"))
     local labelsFile = f:read("*all")
     f:close()
-    display('test')
     kmap.labelsMap = yajl.to_value(labelsFile)
   end
 
@@ -176,14 +197,17 @@ function kmap:mapRedraw(forceReload)
   for areaId, labels in pairs(kmap.labelsMap) do
     local areaLabels = getMapLabels(areaId)
     if areaLabels == nil or type(areaLabels) ~= 'table' then areaLabels = {} end
-    for id, _ in pairs(areaLabels) do
-      local existing = getMapLabel(areaId, id)
-      local label = imageHashes[string.format("%.3f", existing.Width) .. string.format("%.3f", existing.Height)]
-      if label ~= nil then
-        usedLabelsFromJsonCount = usedLabelsFromJsonCount + 1
-      end
-      if label == nil or label.X ~= existing.X or label.Y ~= existing.Y then
-        shouldRepaint = 1
+    for id, txt in pairs(areaLabels) do
+      -- specjalny przypadek dla labelek "?" w Default Area
+      if id ~= -1 and txt ~= "?" then
+        local existing = getMapLabel(areaId, id)
+        local label = imageHashes[string.format("%.3f", existing.Width) .. string.format("%.3f", existing.Height)]
+        if label ~= nil then
+          usedLabelsFromJsonCount = usedLabelsFromJsonCount + 1
+        end
+        if label == nil or label.X ~= existing.X or label.Y ~= existing.Y then
+          shouldRepaint = 1
+        end
       end
     end
   end
@@ -221,6 +245,13 @@ end
 -- nasluchiwanie komunikatow gmcp.Room.Info
 --
 function kmap:roomInfoEventHandler()
+  -- przeniesione do group event, poniewaz nastepuje on nieco pozniej, i chcemy uniknac podwojnego odswiezania mappera
+end
+--
+-- nasluchiwanie komunikatow gmcp.Char.Group
+--
+function kmap:charGroupEventHandler()
+  kmap:drawGroup()
   kmap:mapLocate()
 end
 
@@ -236,6 +267,7 @@ function kmap:mapLoad(forceReload)
   kmap:vnumCacheRebuild()
   kmap:mapLocate()
   kmap:mapRedraw(false)
+  kmap:removeGroup()
   echo('\n')
   updateMap()
 end
@@ -254,8 +286,92 @@ function kmap:sysExitEvent()
 end
 
 --
--- obsluga otwierania mapy przyciskiem z menu
+-- Usuwanie grupki z mapy
 --
-function kmap:mapOpenEvent()
-  kmap:doMap()
+function kmap:removeGroup()
+    -- usuwanie znaczkow grupy z mapy
+    for _, areaId in pairs(getAreaTable()) do
+      local labels = getMapLabels(areaId)
+      if labels ~= nil and type(labels) == "table" then
+        for id, text in ipairs(getMapLabels(areaId)) do
+          -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
+          if text:starts("​") then
+            display({ areaId, id })
+            deleteMapLabel(areaId, id)
+          end
+        end
+      end
+    end
+end
+
+--
+-- Rysowanie grupki na mapie
+--
+function kmap:drawGroup()
+  kmap:removeGroup()
+
+  -- sprawdzamy czy mamy informacje o lokalizacji
+  if gmcp.Room.Info[1] ~= nil and gmcp.Room.Info[1].unavailable ~= nil then
+    kmap.messageBox:show()
+    kmap.messageBox:rawEcho('<center>' .. gmcp.Room.Info[1].unavailable .. '</center>')
+    return
+  end
+
+  -- sprawdzamy czy mamy informacje o grupie
+  local group = gmcp.Char.Group
+  if group[1] ~= nil and group[1].unavailable ~= nil then
+    kmap.messageBox:show()
+    kmap.messageBox:rawEcho('<center>' .. group[1].unavailable .. '</center>')
+    return
+  end
+
+  if group.members == nil then
+    kmap.messageBox:show()
+    kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
+    return
+  end
+
+  kmap.messageBox:hide()
+
+  -- grupowanie ludzi wedlug lokalizacji
+  local unicodeNumbers = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳", "Ⓖ", "Ⓜ"}
+  local labelForRoom = {}
+  local labelCharCountForRoom = {}
+  local no = 1
+  for _, player in pairs(group.members) do
+    if no > 20 then no = 21 end
+    local roomLabel = labelForRoom[player.room]
+    local playerChar = unicodeNumbers[no]
+    -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
+    if roomLabel == nil then roomLabel = "​" end
+    if player.is_npc == true then
+      playerChar = unicodeNumbers[22]
+    else
+      no = no + 1
+    end
+    labelForRoom[player.room] = roomLabel .. playerChar
+    if labelCharCountForRoom[player.room] == nil then labelCharCountForRoom[player.room] = 0 end
+    labelCharCountForRoom[player.room] = labelCharCountForRoom[player.room] + 1
+  end
+
+  for room, label in pairs(labelForRoom) do
+    local roomId = kmap.vnumToRoomIdCache[room]
+    if roomId ~= nil then
+      local fontW, fontH = calcFontSize(14, "Marcellus SC")
+      local deltaX = fontW * labelCharCountForRoom[room] / 20
+      local roomX, roomY, roomZ = getRoomCoordinates(roomId)
+      createMapLabel(getRoomArea(roomId), label, roomX - deltaX, roomY + 1, roomZ, 240, 240, 240, 0, 0, 0, 30, 14, true, true)
+    end
+  end
+
+  if #labelCharCountForRoom then updateMap() end
+
+  return
+end
+
+function kmap:checkGmcp()
+  if kinstall.receivingGmcp == false then
+    kmap.messageBox:show()
+    kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
+  end
 end

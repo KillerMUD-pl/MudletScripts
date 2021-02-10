@@ -399,7 +399,7 @@ function kmap:drawGroup()
     end
   end
 
-  if #labelCharCountForRoom then updateMap() end
+  --if #labelCharCountForRoom then updateMap() end
 
   return
 end

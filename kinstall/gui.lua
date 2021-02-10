@@ -7,6 +7,7 @@ kgui.uiState = kinstall:loadJsonFile(getMudletHomeDir() .. '/kguiSettings.json')
 kgui.resizingEventHandler = kgui.resizingEventHandler or nil
 kgui.resizingFinishEventHandler = kgui.resizingFinishEventHandler or nil
 kgui.resizedElement = nil
+kgui.vDragTimer = kgui.vDragTimer or nil
 
 --
 -- TODO
@@ -121,7 +122,7 @@ function kgui:addBox(name, height, title, closeCallback)
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie paska okienka
-  kgui.ui[name]['title']:setStyleSheet("qproperty-alignment: 'AlignLeft | AlignTop'; padding-left: 2px; background: #666666")
+  kgui.ui[name]['title']:setStyleSheet("qproperty-alignment: 'AlignLeft | AlignTop'; padding-left: 2px; background: #666666; font-size: 12px;")
   kgui.ui[name]['title']:setFontSize(12)
   kgui.ui[name]['title']:enableClickthrough()
 
@@ -136,7 +137,7 @@ function kgui:addBox(name, height, title, closeCallback)
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie przyciski zamykania
-  kgui.ui[name]['close']:setStyleSheet("background: #888888; color: #eeeeee")
+  kgui.ui[name]['close']:setStyleSheet("background: #888888; color: #eeeeee; font-size: 12px;")
   kgui.ui[name]['close']:setFontSize(16)
   kgui.ui[name]['close']:setCursor("PointingHand")
   kgui.ui[name]['close']:setClickCallback(closeCallback)
@@ -151,7 +152,7 @@ function kgui:addBox(name, height, title, closeCallback)
     message=[[<center>-</center>]]
   }, kgui.ui[name]['wrapper'])
 
-  kgui.ui[name]['min']:setStyleSheet("background: #888888; color: #eeeeee")
+  kgui.ui[name]['min']:setStyleSheet("background: #888888; color: #eeeeee; font-size: 12px;")
   kgui.ui[name]['min']:setFontSize(16)
   kgui.ui[name]['min']:setCursor("PointingHand")
   kgui.ui[name]['min']:setClickCallback(function()
@@ -166,6 +167,7 @@ function kgui:addBox(name, height, title, closeCallback)
 end
 
 function kgui:minimize(name)
+  if kgui.uiState[name] == nil then kgui.uiState[name] = {} end
   kgui.uiState[name].minimized = true
   kgui.uiState[name].height = kgui.ui[name]['wrapper']:get_height()
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:hide()
@@ -173,6 +175,7 @@ function kgui:minimize(name)
 end
 
 function kgui:unminimize(name)
+  if kgui.uiState[name] == nil then kgui.uiState[name] = {} end
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:show()
   kgui.ui[name]['wrapper']:resize('100%', kgui.uiState[name].height)
   kgui.uiState[name].minimized = false
@@ -204,6 +207,7 @@ function formatText(content)
 end
 
 function kgui:setBoxContent(name, content)
+  if kgui.ui[name] == nil then return end
   if kgui.ui[name]['content'] == nil then
     kgui:newBoxContent(name, content)
   else
@@ -271,7 +275,7 @@ function kgui:update()
   kgui:updateState()
   local boxes = {}
   for name, data in pairs(kgui.uiState) do
-    if kgui.ui[name] ~= nil and kgui.ui[name]['wrapper'] ~= nil then
+    if kgui.ui[name] ~= nil and kgui.ui[name]['wrapper'] ~= nil and kgui.ui[name]['wrapper'].hidden == false then
       local y = data.y or kgui:findBottom()
       table.insert(boxes, { ["name"] = name, ["y"] = y })
     end
@@ -287,7 +291,11 @@ function kgui:update()
       kgui:updateWrapperSize(data.name)
       kgui.ui[data.name]['wrapper']:move(0, currentY)
     end
-    currentY = currentY + 10 + kgui.ui[data.name]['wrapper']:get_height()
+    if data.minimized == nil or data.minimized == false then
+      currentY = currentY + 10 + kgui.ui[data.name]['wrapper']:get_height()
+    else
+      currentY = currentY + 32
+    end
   end
   kgui:saveState()
 end
@@ -322,14 +330,16 @@ function kgui:onHDragTimer()
 end
 
 function kgui:onHDragClick()
-  if exists("kguiHdragTimer", "timer") == 0 then
-    vdragtimer = permTimer("kguiHdragTimer", "", .016, [[ kgui:onHDragTimer() ]])
+  if kgui.vDragTimer == nil then
+    kgui.vDragTimer = tempTimer(0.016, [[ kgui:onHDragTimer() ]], true)
   end
-  enableTimer("kguiHdragTimer")
 end
 
 function kgui:onHDragRelease()
-  disableTimer("kguiHdragTimer")
+  if kgui.vDragTimer ~= nil then
+    killTimer(kgui.vDragTimer)
+    kgui.vDragTimer = nil
+  end
   kgui:update()
 end
 

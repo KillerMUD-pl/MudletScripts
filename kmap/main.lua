@@ -4,6 +4,8 @@ setfenv(1, getfenv(2));
 mudlet.mapper_script = true
 
 kmap = kmap or {}
+kmap.mapperBox = kmap.mapperBox or {}
+kmap.messageBox = kmap.messageBox or {}
 
 function kmap:doMap(params)
   if params == 'reload' then
@@ -82,22 +84,31 @@ end
 function kmap:addBox()
   closeMapWidget()
   local wrapper = kgui:addBox('mapper', 300, "Mapa", function() kmap:undoMap() end)
-  Geyser.Mapper:new({
-    embedded = true,
+  kmap.mapperBox = Geyser.Label:new({
     name = 'mapper',
     width = "100%-4px",
     height = "100%-22px",
     x = "2px",
     y = "20px"
   }, wrapper)
+  kmap.mapperBox:setStyleSheet([[ background: rgba(0,0,0,0); ]])
+  
+  Geyser.Mapper:new({
+    embedded = true,
+    name = 'mapperElement',
+    width = "100%",
+    height = "100%",
+    x = "0px",
+    y = "0px"
+  }, kmap.mapperBox)
   kmap.messageBox = Geyser.Label:new({
     name = 'mapperMessage',
-    width = "100%-4px",
-    height = "80",
-    x = "2px",
-    y = "20px"
-  }, wrapper)
-  kmap.messageBox:setStyleSheet([[ background: rgba(0,0,0,0.8); color: #e0e0e0; ]])
+    width = "100%",
+    height = "40",
+    x = "0px",
+    y = "0px"
+  }, kmap.mapperBox)
+  kmap.messageBox:setStyleSheet([[ background: rgba(0,0,0,0.8); color: #e0e0e0; font-size: 12px; font-family: sans-serif; ]])
   kmap.messageBox:enableClickthrough()
   kmap.messageBox:hide()
   kgui:update()
@@ -251,8 +262,10 @@ end
 -- nasluchiwanie komunikatow gmcp.Char.Group
 --
 function kmap:charGroupEventHandler()
-  kmap:drawGroup()
-  kmap:mapLocate()
+  if kmap.mapperBox ~= nil and kgui.ui.mapper ~= nil and kgui.ui.mapper.wrapper.hidden ~= true then
+    kmap:drawGroup()
+    kmap:mapLocate()
+  end
 end
 
 --
@@ -296,7 +309,6 @@ function kmap:removeGroup()
         for id, text in ipairs(getMapLabels(areaId)) do
           -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
           if text:starts("​") then
-            display({ areaId, id })
             deleteMapLabel(areaId, id)
           end
         end
@@ -325,9 +337,11 @@ function kmap:drawGroup()
     return
   end
 
-  if group.members == nil then
-    kmap.messageBox:show()
-    kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
+  if group.members == nil and kgui.ui.info == nil then
+    return
+  end
+
+  if #group.members == 1 then
     return
   end
 
@@ -370,7 +384,8 @@ function kmap:drawGroup()
 end
 
 function kmap:checkGmcp()
-  if kinstall.receivingGmcp == false then
+  if kmap.messageBox == nil then return end
+  if kinstall.receivingGmcp == false and (kgui.ui.info == nil or kgui.ui.info.wrapper.hidden == true) then
     kmap.messageBox:show()
     kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
   end

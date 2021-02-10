@@ -244,11 +244,11 @@ function kgui:updateWrapperSize(name)
   local height = 0
   if kgui:isMinimized(name) == false then
     if kgui.ui[name]['content'] == nil then
-      height = kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].get_height();
+        height = kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].get_height();
     end
     if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
       height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
-    end    
+    end
   end
   if height ~= nil then
     kgui.ui[name]['wrapper']:resize('100%', height + 22)
@@ -277,7 +277,11 @@ function kgui:update()
   for name, data in pairs(kgui.uiState) do
     if kgui.ui[name] ~= nil and kgui.ui[name]['wrapper'] ~= nil and kgui.ui[name]['wrapper'].hidden == false then
       local y = data.y or kgui:findBottom()
-      table.insert(boxes, { ["name"] = name, ["y"] = y })
+      if kgui.ui[name] ~= nil then
+        table.insert(boxes, { ["name"] = name, ["y"] = y })
+      else
+        kgui.uiState[name] = nil
+      end
     end
   end
   table.sort(boxes, function(a,b)

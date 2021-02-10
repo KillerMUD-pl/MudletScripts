@@ -122,7 +122,7 @@ function kgui:addBox(name, height, title, closeCallback)
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie paska okienka
-  kgui.ui[name]['title']:setStyleSheet("qproperty-alignment: 'AlignLeft | AlignTop'; padding-left: 2px; background: #666666; font-size: 12px;")
+  kgui.ui[name]['title']:setStyleSheet("qproperty-alignment: 'AlignLeft | AlignTop'; padding-left: 2px; background: #666666; font-size: 12px; font-family: 'Marcellus SC'")
   kgui.ui[name]['title']:setFontSize(12)
   kgui.ui[name]['title']:enableClickthrough()
 
@@ -137,7 +137,7 @@ function kgui:addBox(name, height, title, closeCallback)
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie przyciski zamykania
-  kgui.ui[name]['close']:setStyleSheet("background: #888888; color: #eeeeee; font-size: 12px;")
+  kgui.ui[name]['close']:setStyleSheet("background: #888888; color: #eeeeee; font-size: 12px; font-family: 'Marcellus SC'")
   kgui.ui[name]['close']:setFontSize(16)
   kgui.ui[name]['close']:setCursor("PointingHand")
   kgui.ui[name]['close']:setClickCallback(closeCallback)
@@ -203,7 +203,7 @@ function kgui:newBoxContent(name, content)
 end
 
 function formatText(content)
-  return "<span style=\"color: #f0f0f0; font-size: " .. (getFontSize()-2)  .. "px; font-family: '" .. getFont() .. "'\">" .. content .. "</span>"
+  return "<span style=\"color: #f0f0f0; font-size: " .. (getFontSize()-2)  .. "px; font-family: 'Marcellus SC'\">" .. content .. "</span>"
 end
 
 function kgui:setBoxContent(name, content)
@@ -217,6 +217,7 @@ function kgui:setBoxContent(name, content)
   end
   kgui.ui[name]['content']:resize('100%-4px', "100%-22px")
   kgui:update()
+  return kgui.ui[name]['content']
 end
 
 function kgui:calculateBoxSize(name, content)

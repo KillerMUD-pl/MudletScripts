@@ -36,7 +36,7 @@ end
 
 function kinfo:register()
   kinfo:unregister()
-  kinfo.charInfoEvent = registerAnonymousEventHandler("gmcp.Room.Info", "kinfo:charInfoEventHandler")
+  kinfo.charInfoEvent = registerAnonymousEventHandler("gmcp.Char", "kinfo:charInfoEventHandler")
 end
 
 function kinfo:unregister()
@@ -66,8 +66,7 @@ function kinfo:charInfoEventHandler()
   if kinfo.enabled == false then
     return
   end
-  local txt = yajl.to_string(gmcp.Char);
-  txt = string.gsub(txt, ",", "<br>")
-  txt = string.gsub(txt, "}", "<br>")
+  local char = gmcp.Char
+  local txt = "Pracuję nad tym..."
   kgui:setBoxContent('info', txt)
 end

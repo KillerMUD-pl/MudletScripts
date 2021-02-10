@@ -7,13 +7,28 @@ kmap = kmap or {}
 kmap.mapperBox = kmap.mapperBox or {}
 kmap.messageBox = kmap.messageBox or {}
 
-function kmap:doMap(params)
-  if params == 'reload' then
+function kmap:doMap()
+  local param = kinstall.params[1]
+  if param == 'reload' then
     kmap:mapLoad(true)
     return
   end
-  if params == 'redraw' then
+  if param == 'redraw' then
     kmap:mapRedraw(true)
+    return
+  end
+  if param == 'immo' then
+    local immoMap = kinstall:getConfig('immoMap')
+    if immoMap == 'y' then
+      cecho('<gold>Wyłączono tryb immo mapy.\n\n')
+      kinstall:setConfig('immoMap', 'n')
+      kmap:unsetImmoMap()
+      else
+      cecho('<gold>Włączono tryb immo mapy.\n\n')
+      kinstall:setConfig('immoMap', 'y')
+      kmap:setImmoMap()
+    end
+    return
   end
   cecho('<gold>Włączam mapę\n')
   kmap:delayedmapLoad();
@@ -281,6 +296,12 @@ function kmap:mapLoad(forceReload)
   kmap:mapLocate()
   kmap:mapRedraw(false)
   kmap:removeGroup()
+  local immoMap = kinstall:getConfig('immoMap')
+  if immoMap == 'y' then
+    kmap:setImmoMap()
+  else
+    kmap:unsetImmoMap()
+  end
   echo('\n')
   updateMap()
 end
@@ -389,4 +410,26 @@ function kmap:checkGmcp()
     kmap.messageBox:show()
     kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
   end
+end
+
+--
+-- dodatki dla immo na mapie
+--
+function kmap:setImmoMap()
+  addMapEvent("🧰 Skocz do rooma", "onKMapGoto")
+  if kmap.ids.onKMapGotoEvent then killAnonymousEventHandler(kmap.ids.onKMapGotoEvent) end
+  kmap.ids.onKMapGotoEvent = registerAnonymousEventHandler("onKMapGoto", "kmap:gotoRoom")
+end
+
+function kmap:unsetImmoMap()
+  if kmap.ids.onKMapGotoEvent then killAnonymousEventHandler(kmap.ids.onKMapGotoEvent) end
+  removeMapEvent("🧰 Skocz do rooma")
+end
+
+function kmap:gotoRoom()
+  local sel = getMapSelection()["rooms"]
+  if sel == nil or #sel == 0 then
+    return
+  end
+  send("goto " .. getRoomUserData(sel[1], "vnum"))
 end

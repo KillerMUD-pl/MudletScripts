@@ -6,6 +6,7 @@ mudlet.mapper_script = true
 kmap = kmap or {}
 kmap.mapperBox = kmap.mapperBox or {}
 kmap.messageBox = kmap.messageBox or {}
+kmap.immoMap = kmap.immoMap or false
 
 function kmap:doMap()
   local param = kinstall.params[1]
@@ -18,8 +19,8 @@ function kmap:doMap()
     return
   end
   if param == 'immo' then
-    local immoMap = kinstall:getConfig('immoMap')
-    if immoMap == 'y' then
+    kmap.immoMap = kinstall:getConfig('immoMap')
+    if kmap.immoMap == 'y' then
       cecho('<gold>Wyłączono tryb immo mapy.\n\n')
       kinstall:setConfig('immoMap', 'n')
       kmap:unsetImmoMap()
@@ -296,8 +297,8 @@ function kmap:mapLoad(forceReload)
   kmap:mapLocate()
   kmap:mapRedraw(false)
   kmap:removeGroup()
-  local immoMap = kinstall:getConfig('immoMap')
-  if immoMap == 'y' then
+  kmap.immoMap = kinstall:getConfig('immoMap')
+  if kmap.deleteImageLabelsimmoMap == 'y' then
     kmap:setImmoMap()
   else
     kmap:unsetImmoMap()
@@ -363,27 +364,28 @@ function kmap:drawGroup()
   end
 
   if #group.members == 1 then
-    return
+    --return
   end
 
   kmap.messageBox:hide()
 
   -- grupowanie ludzi wedlug lokalizacji
-  local unicodeNumbers = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳", "Ⓖ", "Ⓜ"}
+  --local unicodeNumbers = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳", "Ⓖ", "Ⓜ"}
   local labelForRoom = {}
   local labelCharCountForRoom = {}
-  local no = 1
+  --local no = 1
   for _, player in pairs(group.members) do
-    if no > 20 then no = 21 end
+    --if no > 20 then no = 21 end
     local roomLabel = labelForRoom[player.room]
-    local playerChar = unicodeNumbers[no]
+    local playerChar = string.sub(player.name, 1, 3) .. '\n'
+    --local playerChar = unicodeNumbers[no]
     -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
     if roomLabel == nil then roomLabel = "​" end
-    if player.is_npc == true then
-      playerChar = unicodeNumbers[22]
-    else
-      no = no + 1
-    end
+    --if player.is_npc == true then
+    --  playerChar = unicodeNumbers[22]
+    --else
+    --  no = no + 1
+    --end
     labelForRoom[player.room] = roomLabel .. playerChar
     if labelCharCountForRoom[player.room] == nil then labelCharCountForRoom[player.room] = 0 end
     labelCharCountForRoom[player.room] = labelCharCountForRoom[player.room] + 1
@@ -393,13 +395,12 @@ function kmap:drawGroup()
     local roomId = kmap.vnumToRoomIdCache[room]
     if roomId ~= nil then
       local fontW, fontH = calcFontSize(14, "Marcellus SC")
-      local deltaX = fontW * labelCharCountForRoom[room] / 20
+      --local deltaX = fontW * labelCharCountForRoom[room] / 20
+      local deltaX = fontW * 3 / 20 / 2
       local roomX, roomY, roomZ = getRoomCoordinates(roomId)
       createMapLabel(getRoomArea(roomId), label, roomX - deltaX, roomY + 1, roomZ, 240, 240, 240, 0, 0, 0, 30, 14, true, true)
     end
   end
-
-  --if #labelCharCountForRoom then updateMap() end
 
   return
 end

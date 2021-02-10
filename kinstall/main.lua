@@ -12,6 +12,7 @@ kinstall.configFile = getMudletHomeDir() .. '/kinstall.config.json'
 kinstall.receivingGmcpTimer = kinstall.receivingGmcpTimer or nil
 kinstall.receivingGmcp = false
 kinstall.gmcpHandler = kinstall.gmcpHandler or nil
+kinstall.params = {}
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
@@ -286,7 +287,8 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
       return
     end
     local func = _G[moduleName][prefix .. funcName]
-    local _, err = pcall(func, string.trim(params[2]))
+    kinstall.params = string.trim(params[2]):split(' ')
+    local _, err = pcall(func)
     if err ~= nil then
       display(err)
     end
@@ -491,4 +493,17 @@ function kinstall:setConfig(name, value)
   local config = kinstall:loadJsonFile(kinstall.configFile)
   config[name] = value
   kinstall:saveJsonFile(kinstall.configFile, config)
+end
+
+function string:split(delimiter)
+  local result = { }
+  local from  = 1
+  local delim_from, delim_to = string.find( self, delimiter, from  )
+  while delim_from do
+    table.insert( result, string.sub( self, from , delim_from-1 ) )
+    from  = delim_to + 1
+    delim_from, delim_to = string.find( self, delimiter, from  )
+  end
+  table.insert( result, string.sub( self, from  ) )
+  return result
 end

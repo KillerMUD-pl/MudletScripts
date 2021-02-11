@@ -365,28 +365,19 @@ function kmap:drawGroup()
   end
 
   if #group.members == 1 then
-    --return
+    return
   end
 
   kmap.messageBox:hide()
 
   -- grupowanie ludzi wedlug lokalizacji
-  --local unicodeNumbers = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳", "Ⓖ", "Ⓜ"}
   local labelForRoom = {}
   local labelCharCountForRoom = {}
-  --local no = 1
   for _, player in pairs(group.members) do
-    --if no > 20 then no = 21 end
     local roomLabel = labelForRoom[player.room]
     local playerChar = string.sub(player.name, 1, 3) .. '\n'
-    --local playerChar = unicodeNumbers[no]
     -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
     if roomLabel == nil then roomLabel = "​" end
-    --if player.is_npc == true then
-    --  playerChar = unicodeNumbers[22]
-    --else
-    --  no = no + 1
-    --end
     labelForRoom[player.room] = roomLabel .. playerChar
     if labelCharCountForRoom[player.room] == nil then labelCharCountForRoom[player.room] = 0 end
     labelCharCountForRoom[player.room] = labelCharCountForRoom[player.room] + 1
@@ -408,7 +399,7 @@ end
 
 function kmap:checkGmcp()
   if kmap.messageBox == nil then return end
-  if kinstall.receivingGmcp == false and (kgui.ui.info == nil or kgui.ui.info.wrapper.hidden == true) then
+  if kinstall.receivingGmcp == false and not (kgui.ui ~= nil and kgui.ui.info ~= nil and kgui.ui.info.wrapper.hidden == false ) then
     kmap.messageBox:show()
     kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
   end

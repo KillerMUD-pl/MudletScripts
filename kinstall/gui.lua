@@ -61,17 +61,19 @@ function kgui:init()
   if kgui.resizingEventHandler ~= nil then killAnonymousEventHandler(kgui.resizingEventHandler) end
   kgui.resizingEventHandler = registerAnonymousEventHandler(
     'AdjustableContainerReposition',
-    function(_, _, _, _, _, _, labelName )
+    function(_, labelName )
       if kgui.resizedElement == nil and labelName ~= nil then
-        kgui.resizedElement = labelName:gsub("WrapperadjLabel", "")
+        kgui.resizedElement = labelName:gsub("Wrapper", "")
       end
     end
   )
   if kgui.resizingFinishEventHandler ~= nil then killAnonymousEventHandler(kgui.resizingFinishEventHandler) end
   kgui.resizingFinishEventHandler = registerAnonymousEventHandler(
     'AdjustableContainerRepositionFinish',
-    function(_, _, _, _, _, _, labelName )
+    function(_, labelName )
       kgui.resizedElement = nil
+      local name = labelName:gsub("Wrapper", "")
+      if kgui.ui[name].wrapper ~= nil then kgui.ui[name].wrapper:lowerAll() end
       kgui:update()
     end
   )
@@ -91,7 +93,7 @@ function kgui:addBox(name, height, title, closeCallback)
     y = y,
     width = "100%",
     height = wrapperHeight .. "px",
-    buttonsize = 0,
+    buttonsize = 0
   }, kgui.mainContainer)
 
   -- dostosowywanie glownego kontenera boxa

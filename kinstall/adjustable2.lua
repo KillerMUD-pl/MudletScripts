@@ -144,8 +144,7 @@ function Adjustable2.Container:onRelease (label, event)
           self.get_width(), 
           self.get_height(), 
           self.get_x(), 
-          self.get_y(), 
-          adjustInfo.name
+          self.get_y()
         )
     end
 end
@@ -855,8 +854,7 @@ function Adjustable2.Container:reposition()
       self.get_width(), 
       self.get_height(), 
       self.get_x(), 
-      self.get_y(), 
-      adjustInfo.name
+      self.get_y()
     )
     if self.titleText and not(self.locked) then
         shrink_title(self)

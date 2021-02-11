@@ -5,7 +5,8 @@ ktemplate = ktemplate or {}
 --
 -- funkcja wykonywana po wydaniu komendy +test
 --
-function ktemplate:doTest(params)
+function ktemplate:doTest()
+  local params = kinstall.params
   cecho('<gold>Włączam testowy moduł\n')
   kinstall:setConfig('template', 't')
   ktemplate:addBox(params)
@@ -14,7 +15,8 @@ end
 --
 -- funkcja wykonywana po wydaniu komendy -test
 --
-function ktemplate.undoTest(params)
+function ktemplate:undoTest()
+  local params = kinstall.params
   cecho('<gold>Wyłączam testowy moduł\n')
   kinstall:setConfig('template', 'n')
   kgui:removeBox('template')
@@ -24,7 +26,7 @@ end
 --
 -- funkcja wykonywana przy odpaleniu mudleta
 --
-function ktemplate.doInit()
+function ktemplate:doInit()
   if kinstall:getConfig('template') == 't' then
     ktemplate:addBox()
   end
@@ -33,7 +35,7 @@ end
 --
 -- funkcja wykonywana jednorazowo przed odinstalowaniem pakietu
 --
-function ktemplate.doUninstall()
+function ktemplate:doUninstall()
   ktemplate:unregister()
 end
 
@@ -41,7 +43,7 @@ end
 --
 -- funkcja wykonywana jednorazowo po zainstalowaniu pakietu
 --
-function ktemplate.doInstall()
+function ktemplate:doInstall()
   cecho("<gold>Testowy moduł jest zainstalowany, możesz edytować jego kod w katalogu twojego profilu\n\n")
 end
 
@@ -50,5 +52,5 @@ end
 --
 function ktemplate:addBox(params)
   -- przykładowy kod ktory wyswietla cos w okienku
-  kgui:toWindow('template', 'Przykładowy tytuł', 'Pzykładowa treść')
+  kgui:toWindow('template', 'Przykładowy tytuł', 'Pzykładowa treść - ' .. params)
 end

@@ -5,14 +5,14 @@ kinfo = kinfo or {}
 kinfo.info_box = nil
 kinfo.enabled = false
 
-function kinfo:doInfo(params)
+function kinfo:doInfo()
   cecho('<gold>Włączam panel postaci\n')
   kinfo:addBox()
   kinstall:setConfig('info', 't')
   kinfo.enabled = true
 end
 
-function kinfo:undoInfo(params)
+function kinfo:undoInfo()
   cecho('<gold>Wyłączam panel postaci\n')
   kinfo:removeBox()
   kinstall:setConfig('mapa', 'n')

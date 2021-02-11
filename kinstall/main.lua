@@ -223,7 +223,8 @@ end
 
 -- KOMENDY
 
-kinstall.doInstall = function(param)
+function kinstall:doInstall()
+  local param = kinstall.params[1]
   if param == nil or string.trim(param) == '' then
     kinstall:installedModules()
     kinstall:availableModules()
@@ -233,7 +234,7 @@ kinstall.doInstall = function(param)
   kinstall:fetchAndInstall(param)
 end
 
-kinstall.doUpdate = function(param)
+function kinstall:doUpdate()
   if kinstall.autoUpdate == 'n' then
     kinstall.autoUpdate = 'y'
     cecho('<gold>Włączono auto-aktualizację\n\n')
@@ -243,7 +244,8 @@ kinstall.doUpdate = function(param)
   end
 end
 
-kinstall.doRemove = function(param)
+function kinstall:doRemove()
+  local param = kinstall.params[1]
   if param == nil or string.trim(param) == '' then
     cecho('<red>Podaj nazwę moduł do usunięcia.\n\n')
     return
@@ -383,7 +385,7 @@ function kinstall:sysUnzipDone(_, filename)
   if name == 'kinstall' then
     raiseEvent('kinstallInit')
     tempTimer(0, function()
-      kinstall.doInstall()
+      kinstall:doInstall()
     end)
     return
   end

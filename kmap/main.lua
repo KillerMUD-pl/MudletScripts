@@ -43,6 +43,7 @@ function kmap:undoMap(params)
 end
 
 function kmap:doUninstall()
+  kmap:undoMap()
   kmap:unregister()
 end
 

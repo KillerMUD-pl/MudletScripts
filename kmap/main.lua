@@ -181,6 +181,10 @@ function kmap:mapLocate()
   if cachedRoomId ~= nil and roomExists(cachedRoomId) then
     local roomId = kmap.vnumToRoomIdCache[gmcp.Room.Info.num]
     kmap:centerView(roomId)
+  else
+    if kinstall.receivingGmcp == false then
+      centerview(18914)
+    end
   end
 end
 
@@ -398,7 +402,7 @@ function kmap:drawGroup()
 end
 
 function kmap:checkGmcp()
-  if kmap.messageBox == nil then return end
+  if kmap == nil or kmap.messageBox == nil or kmap.messageBox.show == nil then return end
   if kinstall.receivingGmcp == false and not (kgui.ui ~= nil and kgui.ui.info ~= nil and kgui.ui.info.wrapper.hidden == false ) then
     kmap.messageBox:show()
     kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')

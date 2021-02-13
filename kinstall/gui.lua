@@ -205,7 +205,7 @@ function kgui:newBoxContent(name, content)
 end
 
 function formatText(content)
-  return "<span style=\"color: #f0f0f0; font-size: " .. (getFontSize()-2)  .. "px; font-family: 'Marcellus SC'\">" .. content .. "</span>"
+  return "<span style=\"color: #f0f0f0; font-size: " .. 13  .. "px; font-family: 'Marcellus SC'\">" .. content .. "</span>"
 end
 
 function kgui:setBoxContent(name, content)
@@ -225,8 +225,9 @@ end
 function kgui:calculateBoxSize(name, content)
   local fontSize = kgui.ui[name]['content'].fontSize
   local _, count = string.gsub(content, "<br>", "")
-  local _, height = calcFontSize(14)
-  return height * ( 1 + count ) + 20
+  local _, count2 = string.gsub(content, "<tr>", "")
+  local _, height = calcFontSize(16)
+  return height * ( 1 + count + count2 ) + 20
 end
 
 function kgui:isMinimized(name)

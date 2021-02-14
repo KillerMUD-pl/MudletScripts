@@ -7,6 +7,7 @@ kgui.uiState = kinstall:loadJsonFile(getMudletHomeDir() .. '/kguiSettings.json')
 kgui.resizingEventHandler = kgui.resizingEventHandler or nil
 kgui.resizingFinishEventHandler = kgui.resizingFinishEventHandler or nil
 kgui.resizedElement = nil
+kgui.resizingUpdateTimer = nil
 kgui.vDragTimer = kgui.vDragTimer or nil
 
 --
@@ -15,8 +16,8 @@ kgui.vDragTimer = kgui.vDragTimer or nil
 
 function kgui:init()
   kgui.uiState.main = kgui.uiState.main or {}
-  local width = '35%-20px'
-  local x = '-35%'
+  local width = '530px'
+  local x = '-550px'
   if kgui.uiState.main.width ~= nil then
     width = (kgui.uiState.main.width-20) .. 'px'
     x = -(kgui.uiState.main.width) .. 'px'
@@ -61,20 +62,32 @@ function kgui:init()
   if kgui.resizingEventHandler ~= nil then killAnonymousEventHandler(kgui.resizingEventHandler) end
   kgui.resizingEventHandler = registerAnonymousEventHandler(
     'AdjustableContainerReposition',
-    function(_, labelName )
-      if kgui.resizedElement == nil and labelName ~= nil then
+    function(_, labelName, _, _, _, _, mouseAdjustment)
+      if mouseAdjustment == true and labelName ~= nil then        
         kgui.resizedElement = labelName:gsub("Wrapper", "")
+        kgui.resizingUpdateTimer = tempTimer(0.1, function()
+          kgui:updateState()
+          kgui:update()
+        end)
       end
     end
   )
   if kgui.resizingFinishEventHandler ~= nil then killAnonymousEventHandler(kgui.resizingFinishEventHandler) end
   kgui.resizingFinishEventHandler = registerAnonymousEventHandler(
     'AdjustableContainerRepositionFinish',
-    function(_, labelName )
+    function(_, labelName)
       kgui.resizedElement = nil
+      if kgui.resizingUpdateTimer ~= nil then killTimer(kgui.resizingUpdateTimer) end
       local name = labelName:gsub("Wrapper", "")
-      if kgui.ui[name].wrapper ~= nil then kgui.ui[name].wrapper:lowerAll() end
-      kgui:update()
+      tempTimer(0.1, function()
+        kgui:saveState()
+        kgui:update()
+      end)
+      if kgui.ui[name] ~= nil and kgui.ui[name].wrapper ~= nil then
+        tempTimer(0.2, function()
+          kgui.ui[name].wrapper:lowerAll()
+        end)
+      end
     end
   )
 end
@@ -101,7 +114,15 @@ function kgui:addBox(name, height, title, closeCallback)
   kgui.ui[name]['wrapper']:disableAutoSave()
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperexitLabel']:hide()
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperminimizeLabel']:hide()
-  kgui.ui[name]['wrapper'].windowList[name .. 'WrapperadjLabel']:setStyleSheet('border: 2px solid #555555')
+  kgui.ui[name]['wrapper'].windowList[name .. 'WrapperadjLabel']:setStyleSheet([[
+    QLabel {
+      border: 2px solid rgba(40,40,40,0);
+      background-color: rgba(0,0,0,0);
+    }
+    QLabel::hover {
+      border: 2px solid rgba(40,40,40,255);
+    }
+  ]])
   kgui.ui[name]['wrapper']:show()
 
   -- minimalizowanie tresci ktora dopiero bedzie dodana do okienka
@@ -116,15 +137,27 @@ function kgui:addBox(name, height, title, closeCallback)
   -- pasek okienka
   kgui.ui[name]['title'] = kgui.ui[name]['title'] or Geyser.Label:new({
     name = name .. 'Title',
-    x = "0px",
-    y = "0px",
-    width="100%",
+    x = "2px",
+    y = "2px",
+    width="100%-4px",
     height="20px",
     message=title
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie paska okienka
-  kgui.ui[name]['title']:setStyleSheet("qproperty-alignment: 'AlignLeft | AlignTop'; padding-left: 2px; background: #666666; font-size: 12px; font-family: 'Marcellus SC'")
+  kgui.ui[name]['title']:setStyleSheet([[
+    QLabel {
+      qproperty-alignment: 'AlignLeft | AlignTop';
+      padding-left: 2px;
+      background-color: rgba(0,0,0,230);
+      font-size: 12px;
+      font-family: 'Marcellus';
+      border-bottom: 2px solid rgb(80,80,80);
+    }
+    QLabel::hover {
+      background-color: rgba(80,80,80,255);
+    }
+  ]])
   kgui.ui[name]['title']:setFontSize(12)
   kgui.ui[name]['title']:enableClickthrough()
 
@@ -133,13 +166,23 @@ function kgui:addBox(name, height, title, closeCallback)
     name = name .. 'Close',
     x = "-22px",
     y = "0px",
-    width="22px",
+    width="20px",
     height="20px",
     message=[[<center>×</center>]]
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie przyciski zamykania
-  kgui.ui[name]['close']:setStyleSheet("background: #888888; color: #eeeeee; font-size: 12px; font-family: 'Marcellus SC'")
+  kgui.ui[name]['close']:setStyleSheet([[
+    QLabel {
+      background-color: rgba(60,60,60,0);
+      color: #eeeeee;
+      font-size: 12px;
+      border-radius: 10px;
+    }
+    QLabel::hover {
+      background-color: rgba(60,60,60,255);
+    }
+  ]])
   kgui.ui[name]['close']:setFontSize(16)
   kgui.ui[name]['close']:setCursor("PointingHand")
   kgui.ui[name]['close']:setClickCallback(closeCallback)
@@ -149,12 +192,22 @@ function kgui:addBox(name, height, title, closeCallback)
     name = name .. 'Min',
     x = "-44px",
     y = "0px",
-    width="22px",
+    width="20px",
     height="20px",
     message=[[<center>-</center>]]
   }, kgui.ui[name]['wrapper'])
 
-  kgui.ui[name]['min']:setStyleSheet("background: #888888; color: #eeeeee; font-size: 12px;")
+  kgui.ui[name]['min']:setStyleSheet([[
+    QLabel {
+      background-color: rgba(60,60,60,0);
+      color: #eeeeee;
+      font-size: 12px;
+      border-radius: 10px;
+    }
+    QLabel::hover {
+      background-color: rgba(60,60,60,255);
+    }
+  ]])
   kgui.ui[name]['min']:setFontSize(16)
   kgui.ui[name]['min']:setCursor("PointingHand")
   kgui.ui[name]['min']:setClickCallback(function()
@@ -174,6 +227,7 @@ function kgui:minimize(name)
   kgui.uiState[name].height = kgui.ui[name]['wrapper']:get_height()
   kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name]:hide()
   kgui:update()
+  kgui:saveState()
 end
 
 function kgui:unminimize(name)
@@ -182,10 +236,11 @@ function kgui:unminimize(name)
   kgui.ui[name]['wrapper']:resize('100%', kgui.uiState[name].height)
   kgui.uiState[name].minimized = false
   kgui:update()
+  kgui:saveState()
 end
 
 function kgui:removeBox(name)
-  if kgui.ui[name]['wrapper'] ~= nil then
+  if kgui.ui[name] ~= nil and kgui.ui[name]['wrapper'] ~= nil then
     kgui.ui[name]['wrapper']:hide()
     kgui.uiState[name] = nil
     kgui.update()
@@ -201,11 +256,15 @@ function kgui:newBoxContent(name, content)
     height = 0,
     message = formatText(content),
   }, kgui.ui[name]['wrapper'])
-  kgui.ui[name]['content']:setStyleSheet("padding: 10px;")
+  kgui.ui[name]['content']:setStyleSheet([[
+    padding: 10px;
+    background-color: rgba(30,30,30,230);
+    border-bottom-radius: 4px;
+  ]])
 end
 
 function formatText(content)
-  return "<span style=\"color: #f0f0f0; font-size: " .. 13  .. "px; font-family: 'Marcellus SC'\">" .. content .. "</span>"
+  return "<span style=\"color: #f0f0f0; font-size: " .. 13  .. "px; font-family: 'Marcellus'\">" .. content .. "</span>"
 end
 
 function kgui:setBoxContent(name, content)
@@ -272,11 +331,11 @@ function kgui:updateState()
   end
 end
 function kgui:saveState()
+  kgui:updateState()
   kinstall:saveJsonFile(getMudletHomeDir() .. '/kguiSettings.json', kgui.uiState)
 end
 
 function kgui:update()
-  kgui:updateState()
   local boxes = {}
   for name, data in pairs(kgui.uiState) do
     if kgui.ui[name] ~= nil and kgui.ui[name]['wrapper'] ~= nil and kgui.ui[name]['wrapper'].hidden == false then
@@ -305,7 +364,6 @@ function kgui:update()
       currentY = currentY + 32
     end
   end
-  kgui:saveState()
 end
 
 function kgui:findBottom()
@@ -349,6 +407,7 @@ function kgui:onHDragRelease()
     kgui.vDragTimer = nil
   end
   kgui:update()
+  kgui:saveState()
 end
 
 --

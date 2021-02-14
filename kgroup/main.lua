@@ -49,7 +49,7 @@ end
 -- Wyswietla informacje o graczy i grupie w okienku
 --
 function kgroup:addBox()
-  kgui:addBox('group', 0, "Grupa", function() kgroup:undoInfo() end)
+  kgui:addBox('group', 0, "Grupa", function() kgroup:undoGroup() end)
   kgroup.group_box = kgui:setBoxContent('group', '<center><b>Zaloguj się do gry.</b><br>Oczekiwanie na informacje z GMCP...</center>')
 end
 
@@ -141,25 +141,37 @@ function kgroup:charInfoEventHandler()
   local txt = '<table width="100%" align="left" cellspacing="0" cellpadding="0" border="0">'
   for _, ch in ipairs(group.members) do
     local fontSize = 16
-    local padSize = 20
+    --local padSize = 20
     local color = "#f0f0f0"
+    local name = ch.name
     if ch.is_npc == true then
-      ch.name = '-&nbsp;' .. ch.name
+      name = '&nbsp;&nbsp;' .. name
       fontSize = 14
-      padSize = 27
+      --padSize = 27
       color = "#aaaaaa"
     end
     txt = txt .. '<tr>'
     -- NAZWA
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">' .. kgroup:pad(ch.name, padSize) ..'</td>'
+    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">&nbsp;' .. name ..'&nbsp;&nbsp;</td>'
     -- HP
-    txt = txt .. '<td width="30" height="20" valign="center" style="line-height:20px;white-space:nowrap;">hp: <span style="line-height:20px;font-family:Arial">' .. kgroup:hpBar(kgroup:translateHp(kgroup:normalize(ch.hp))) .. '</span></td>'
+    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">hp: <span style="line-height:20px;font-family:Arial">&nbsp;' .. kgroup:hpBar(kgroup:translateHp(kgroup:normalize(ch.hp))) .. '</span>&nbsp;</td>'
+    -- MV
+    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">mv: <span style="line-height:20px;font-family:Arial">&nbsp;' .. kgroup:mvBar(kgroup:translateMv(kgroup:normalize(ch.mv))) .. '</span>&nbsp;</td>'
+    -- POS
+    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. ch.pos .. '</span>&nbsp;</td>'
+    -- MEM
+    if ch.mem > 0 then
+      txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">&nbsp;' .. ch.mem .. ' mem&nbsp;</td>'
+    else
+      txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">&nbsp;</td>'
+    end
     --
     txt = txt .. '</tr>'
   end
   txt = txt .. '</table>'
 
   kgui:setBoxContent('group', txt)
+  kgui:update()
 end
 
 function kgroup:pad(str, len)
@@ -236,6 +248,29 @@ function kgroup:hpBar(value)
   if fullBoxes > 13 then fullBoxes = 13 end
   local emptyBoxes = (max - value) * 2 - 1
   if emptyBoxes < 0 then emptyBoxes = 0 end
+  return '<span style="color:' .. fullColors[value+1] .. '">' .. string.rep("█", fullBoxes) .. '</span>' ..
+    '<span style="color:' .. emptyColors[value+1] .. '">' .. string.rep("█", emptyBoxes) .. '</span>'
+end
+
+function kgroup:mvBar(value)
+  local fullColors = {
+    "#9d2800", -- zameczona
+    "#ff9900", -- bardzo zmeczony
+    "#eeee00", -- zmeczony
+    "#7dcb00", -- lekko zmeczony
+    "#00ee00", -- wypoczety
+  }
+  local emptyColors = {
+    "#9d2800", -- zameczona
+    "#905600", -- bardzo zmeczony
+    "#767600", -- zmeczony
+    "#538700", -- lekko zmeczony
+    "#00ee00", -- wypoczety
+  }
+  local max = 4
+  local fullBoxes = value * 2
+  if fullBoxes > 8 then fullBoxes = 8 end
+  local emptyBoxes = (max - value) * 2
   return '<span style="color:' .. fullColors[value+1] .. '">' .. string.rep("█", fullBoxes) .. '</span>' ..
     '<span style="color:' .. emptyColors[value+1] .. '">' .. string.rep("█", emptyBoxes) .. '</span>'
 end

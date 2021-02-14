@@ -17,7 +17,7 @@
     "commands": [ "info" ],
     "shortDesc": "Moduł informacji o graczu (BETA, nie uzywac!)"
   },
-  "group": {
+  "kgroup": {
     "version": 2,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kgroup.zip",
     "commands": [ "info" ],

@@ -137,15 +137,16 @@ function Adjustable2.Container:onRelease (label, event)
         if label.cursorShape == "ClosedHand" then
             label:setCursor("OpenHand")
         end
-        adjustInfo = {}
         raiseEvent(
           "AdjustableContainerRepositionFinish", 
           self.name,
           self.get_width(), 
           self.get_height(), 
           self.get_x(), 
-          self.get_y()
+          self.get_y(),
+          adjustInfo.name == self.adjLabel.name and (adjustInfo.move or adjustInfo.right or adjustInfo.left or adjustInfo.top or adjustInfo.bottom)
         )
+        adjustInfo = {}
     end
 end
 
@@ -854,7 +855,8 @@ function Adjustable2.Container:reposition()
       self.get_width(), 
       self.get_height(), 
       self.get_x(), 
-      self.get_y()
+      self.get_y(),
+      adjustInfo.name == self.adjLabel.name and (adjustInfo.move or adjustInfo.right or adjustInfo.left or adjustInfo.top or adjustInfo.bottom)
     )
     if self.titleText and not(self.locked) then
         shrink_title(self)

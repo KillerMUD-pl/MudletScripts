@@ -294,6 +294,7 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
     if err ~= nil then
       display(err)
     end
+    kgui:saveState()
   else
     local foundModule = nil
     for name, data in pairs(kinstall.versions) do

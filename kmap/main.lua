@@ -96,7 +96,7 @@ function kmap:unregister()
 end
 
 --
--- Wyswietla mape w okienku
+-- Wyswietla okienko mapy
 --
 function kmap:addBox()
   closeMapWidget()
@@ -108,16 +108,16 @@ function kmap:addBox()
     x = "2px",
     y = "20px"
   }, wrapper)
-  kmap.mapperBox:setStyleSheet([[ background: rgba(0,0,0,0); ]])
+  wrapper.windowList.mapperWrapperadjLabel:setStyleSheet([[
+    QWidget {
+      background: rgba(0,0,0,0);
+    }
+  ]])
+  kmap.mapperBox:setStyleSheet([[
+    background: rgba(0,0,0,0);
+    border: 2px solid (30,30,30,230)
+  ]])
   
-  Geyser.Mapper:new({
-    embedded = true,
-    name = 'mapperElement',
-    width = "100%",
-    height = "100%",
-    x = "0px",
-    y = "0px"
-  }, kmap.mapperBox)
   kmap.messageBox = Geyser.Label:new({
     name = 'mapperMessage',
     width = "100%",
@@ -128,11 +128,28 @@ function kmap:addBox()
   kmap.messageBox:setStyleSheet([[ background: rgba(0,0,0,0.8); color: #e0e0e0; font-size: 12px; font-family: sans-serif; ]])
   kmap.messageBox:enableClickthrough()
   kmap.messageBox:hide()
+
   kgui:update()
 end
 
 --
--- Usuwa mape z okienka
+-- Dodaje mape do okienka
+--
+function kmap:addMapper()
+  local mapper = Geyser.Mapper:new({
+    embedded = true,
+    name = 'mapperElement',
+    width = "100%-4px",
+    height = "100%-4px",
+    x = "2px",
+    y = "2px"
+  }, kmap.mapperBox)
+  mapper.container:lowerAll()
+  kgui:update()
+end
+
+--
+-- Usuwa okienko mapy
 --
 function kmap:removeBox()
   closeMapWidget()
@@ -297,7 +314,7 @@ function kmap:mapLoad(forceReload)
     cecho('<gold>Ładuje mapę z dysku\n')
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
-  kmap:addBox()
+  kmap:addMapper()
   kmap:vnumCacheRebuild()
   kmap:mapLocate()
   kmap:mapRedraw(false)
@@ -313,6 +330,7 @@ function kmap:mapLoad(forceReload)
 end
 
 function kmap:delayedmapLoad()
+  kmap:addBox()
   tempTimer(0, function()
     kmap:mapLoad(false)
   end)
@@ -374,12 +392,25 @@ function kmap:drawGroup()
 
   kmap.messageBox:hide()
 
+  -- rysowanie playerow z kolkami zamiast charmow
+  local members = {}
+  local lastPlayerName = nil
+  for _, player in ipairs(group.members) do
+    if player.is_npc and lastPlayerName ~= nil and members[lastPlayerName] ~= nil then
+      members[lastPlayerName].name = members[lastPlayerName].name .. '•'
+    else
+      members[player.name] = player
+      lastPlayerName = player.name
+      members[lastPlayerName].name = string.sub(members[lastPlayerName].name, 1, 3)
+    end
+  end
+
   -- grupowanie ludzi wedlug lokalizacji
   local labelForRoom = {}
   local labelCharCountForRoom = {}
-  for _, player in pairs(group.members) do
+  for _, player in pairs(members) do
     local roomLabel = labelForRoom[player.room]
-    local playerChar = string.sub(player.name, 1, 3) .. '\n'
+    local playerChar =player.name .. '\n'
     -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
     if roomLabel == nil then roomLabel = "​" end
     labelForRoom[player.room] = roomLabel .. playerChar
@@ -390,9 +421,9 @@ function kmap:drawGroup()
   for room, label in pairs(labelForRoom) do
     local roomId = kmap.vnumToRoomIdCache[room]
     if roomId ~= nil then
-      local fontW, fontH = calcFontSize(14, "Marcellus SC")
+      local fontW, fontH = calcFontSize(14, "Marcellus")
       --local deltaX = fontW * labelCharCountForRoom[room] / 20
-      local deltaX = fontW * 3 / 20 / 2
+      local deltaX = fontW * 3 / 20  / 2
       local roomX, roomY, roomZ = getRoomCoordinates(roomId)
       createMapLabel(getRoomArea(roomId), label, roomX - deltaX, roomY + 1, roomZ, 240, 240, 240, 0, 0, 0, 30, 14, true, true)
     end

@@ -99,7 +99,6 @@ end
 -- Wyswietla okienko mapy
 --
 function kmap:addBox()
-  closeMapWidget()
   local wrapper = kgui:addBox('mapper', 300, "Mapa", function() kmap:undoMap() end)
   kmap.mapperBox = Geyser.Label:new({
     name = 'mapper',
@@ -310,12 +309,15 @@ end
 -- załadowanie mapy
 --
 function kmap:mapLoad(forceReload)
+  kmap:addMapper()
   if getMapUserData("type") ~= 'killermud' or forceReload then
     cecho('<gold>Ładuje mapę z dysku\n')
     loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
   end
-  kmap:addMapper()
   kmap:vnumCacheRebuild()
+  if gmcp.Room == nil then
+    centerview(18914)
+  end
   kmap:mapLocate()
   kmap:mapRedraw(false)
   kmap:removeGroup()
@@ -330,6 +332,7 @@ function kmap:mapLoad(forceReload)
 end
 
 function kmap:delayedmapLoad()
+  closeMapWidget()
   kmap:addBox()
   tempTimer(0, function()
     kmap:mapLoad(false)

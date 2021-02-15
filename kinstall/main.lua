@@ -393,7 +393,7 @@ function kinstall:sysUnzipDone(_, filename)
   cecho('<green>zainstalowano.\n\n')
   kinstall:initModule(name)
   if name == 'kinstall' then
-    raiseEvent('kinstallInit')
+    tempTimer(1, function() raiseEvent('kinstallInit') end)
     return
   end
   if _G[name] ~= nil and _G[name]['doInstall'] ~= nil then

@@ -281,7 +281,7 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
   local params = {}
   params[1], params[2] = cmd:match("(%w+)(.*)")
   if params[2] == '' and isAutoRun == true then
-    params[2] = 'postUpdate'
+    params[2] = 'silent'
   end
   -- sprawdzanie czy plus-komenda nalezy do modulu
   local moduleName = kinstall.cmdCache[params[1]]

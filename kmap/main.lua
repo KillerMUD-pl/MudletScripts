@@ -31,7 +31,7 @@ function kmap:doMap()
     end
     return
   end
-  if param ~= "postUpdate" then
+  if param ~= "silent" then
     cecho('<gold>Włączam mapę\n')
   end
   kmap:delayedmapLoad();
@@ -82,6 +82,7 @@ end
 function kmap:doInit()
   kmap:register()
   if kinstall:getConfig('mapa') == 't' then
+    kinstall.params[1] = 'silent'
     kmap:doMap()
   end
 end

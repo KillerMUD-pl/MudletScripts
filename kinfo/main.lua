@@ -7,7 +7,7 @@ kinfo.enabled = false
 
 function kinfo:doInfo()
   local param = kinstall.params[1]
-  if param ~= "postUpdate" then
+  if param ~= "silent" then
     cecho('<gold>Włączam panel postaci\n')
   end
   kinfo:addBox()
@@ -29,6 +29,7 @@ end
 function kinfo:doInit()
   kinfo:register()
   if kinstall:getConfig('info') == 't' then
+    kinstall.params[1] = 'silent'
     kinfo:doInfo()
   end
 end

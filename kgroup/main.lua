@@ -7,7 +7,7 @@ kgroup.enabled = false
 
 function kgroup:doGroup()
   local param = kinstall.params[1]
-  if param ~= "postUpdate" then
+  if param ~= "silent" then
     cecho('<gold>Włączam panel grupy\n')
   end
   kgroup:addBox()
@@ -29,6 +29,7 @@ end
 function kgroup:doInit()
   kgroup:register()
   if kinstall:getConfig('group') == 't' then
+    kinstall.params[1] = 'silent'
     kgroup:doGroup()
   end
 end

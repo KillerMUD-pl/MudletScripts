@@ -247,7 +247,7 @@ function kgui:removeBox(name)
   end
 end
 
-function kgui:newBoxContent(name, content)
+function kgui:newBoxContent(name, content, wordWrap)
   kgui.ui[name]['content'] = kgui.ui[name]['content'] or Geyser.Label:new({
     name = name,
     x = 2,
@@ -256,27 +256,25 @@ function kgui:newBoxContent(name, content)
     height = 0,
     message = formatText(content),
   }, kgui.ui[name]['wrapper'])
-  kgui.ui[name]['content']:setStyleSheet([[
-    padding: 10px;
-    background-color: rgba(30,30,30,230);
-    border-bottom-radius: 4px;
-  ]])
+  if wordWrap ~= nil then wordWrap = "true" else wordWrap = "false" end
+  kgui.ui[name]['content']:setStyleSheet("padding: 10px;background-color: rgba(30,30,30,230);border-bottom-radius: 4px;qproperty-wordWrap: ".. wordWrap ..";")
 end
 
 function formatText(content)
   return "<span style=\"color: #f0f0f0; font-size: " .. 13  .. "px; font-family: 'Marcellus'\">" .. content .. "</span>"
 end
 
-function kgui:setBoxContent(name, content)
+function kgui:setBoxContent(name, content, height)
   if kgui.ui[name] == nil then return end
   if kgui.ui[name]['content'] == nil then
-    kgui:newBoxContent(name, content)
+    kgui:newBoxContent(name, content, height ~= nil)
   else
     local formatted = formatText(content)
     kgui.ui[name]['content']:rawEcho(formatted)
     kgui.ui[name]['content'].message = formatted
   end
   kgui.ui[name]['content']:resize('100%-4px', "100%-22px")
+  kgui.ui[name]['content'].contentHeight = height
   kgui:update()
   return kgui.ui[name]['content']
 end
@@ -285,8 +283,9 @@ function kgui:calculateBoxSize(name, content)
   local fontSize = kgui.ui[name]['content'].fontSize
   local _, count = string.gsub(content, "<br>", "")
   local _, count2 = string.gsub(content, "<tr>", "")
+  local _, count3 = string.gsub(content, "<meta>", "")
   local _, height = calcFontSize(16)
-  return height * ( 1 + count + count2 ) + 20
+  return height * ( 1 + count + count2 + count3 ) + 20
 end
 
 function kgui:isMinimized(name)
@@ -310,7 +309,11 @@ function kgui:updateWrapperSize(name)
         height = kgui.ui[name]['wrapper'].windowList[name .. 'WrapperInsideContainer'].windowList[name].get_height();
     end
     if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
-      height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
+      if kgui.ui[name]['content'].contentHeight == nil then
+        height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message)
+      else
+        height = kgui.ui[name]['content'].contentHeight
+      end
     end
   end
   if height ~= nil then
@@ -405,6 +408,11 @@ function kgui:onHDragRelease()
   if kgui.vDragTimer ~= nil then
     killTimer(kgui.vDragTimer)
     kgui.vDragTimer = nil
+  end
+  if kgui.ui.mapper and kgui.ui.mapper.wrapper then
+    tempTimer(0.2, function()
+      kgui.ui.mapper.wrapper:lowerAll()
+    end)
   end
   kgui:update()
   kgui:saveState()

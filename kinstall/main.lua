@@ -114,9 +114,9 @@ function kinstall:availableModules()
       cecho('<DimGrey>wersja: ' .. data.version .. ', komendy:')
       local cmds = '';
       for _, cmd in ipairs(data.commands) do
-        cmds = cmds .. ', ' .. cmd
+        cmds = cmds .. '<gray>, <cyan>+' .. cmd
       end
-      cecho('<DimGrey>' .. string.sub(cmds, 2) .. '\n')
+      cecho(string.sub(cmds, 2) .. '\n')
     end
   end
   if count == 0 then
@@ -235,12 +235,17 @@ function kinstall:doInstall()
 end
 
 function kinstall:doUpdate()
-  if kinstall.autoUpdate == 'n' then
-    kinstall.autoUpdate = 'y'
-    cecho('<gold>Włączono auto-aktualizację\n\n')
-  else
+  local param = kinstall.params[1]
+  if param == "" then
+    kinstall:fetchVersions()
+    return
+  end
+  if param == 'off' then
     kinstall.autoUpdate = 'n'
     cecho('<gold>Wyłączono auto-aktualizację\n\n')
+  else
+    kinstall.autoUpdate = 'y'
+    cecho('<gold>Włączono auto-aktualizację\n\n')
   end
 end
 
@@ -299,13 +304,14 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
     end
     kgui:saveState()
   else
+    if isAutoRun == true then return end
     local foundModule = nil
     for name, data in pairs(kinstall.versions) do
       if table.contains(data.commands, params[1]) then
         foundModule = name
       end
     end
-    if foundModule and isAutoRun ~= true then
+    if foundModule then
       kinstall.runList[foundModule] = {mode = mode, cmd = cmd }
       kinstall:fetchAndInstall(foundModule)
     else
@@ -403,6 +409,7 @@ function kinstall:sysUnzipDone(_, filename)
   if kinstall.runList[moduleFile.name] ~= nil then
     tempTimer(0, function()
       kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd, true)
+      kinstall.runList[moduleFile.name] = nil
     end)
   end
 end

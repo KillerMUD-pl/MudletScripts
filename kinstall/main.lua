@@ -116,7 +116,7 @@ function kinstall:availableModules()
       for _, cmd in ipairs(data.commands) do
         cmds = cmds .. '<gray>, <cyan>+' .. cmd
       end
-      cecho(string.sub(cmds, 2) .. '\n')
+      cecho(string.sub(cmds, 8) .. '\n')
     end
   end
   if count == 0 then

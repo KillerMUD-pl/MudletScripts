@@ -1,6 +1,6 @@
 {
   "name": "kinfo",
-  "version": 2,
+  "version": 3,
   "commands": [ "info" ],
   "shortDesc": "Moduł informacji o graczu"
 }

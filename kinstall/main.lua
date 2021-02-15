@@ -24,7 +24,7 @@ function kinstall:fetchVersions()
 end
 
 function kinstall:welcomeScreen()
-  moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/kinstall/module.json')
+  local moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/kinstall/module.json')
   cecho('\n')
   cecho('<gold>----------------------------------------\n')
   cecho('<gold>KillerMUDScripts <DimGrey>(v.' .. moduleFile.version .. ')\n')
@@ -53,7 +53,7 @@ function kinstall:checkVersions(filename)
     if lfs.attributes(path .. '/' .. name, "mode") == "directory"
     and kinstall:fileExists(path .. '/' .. name .. '/module.json') then
       -- znaleziono moduł na dysku
-      moduleFile = kinstall:loadJsonFile(path .. '/' .. name .. '/module.json')
+      local moduleFile = kinstall:loadJsonFile(path .. '/' .. name .. '/module.json')
       if moduleFile.version ~= nil and moduleFile.name ~= nil then
         local moduleName = moduleFile.name
         -- uruchamianie modulu
@@ -92,7 +92,7 @@ end
 function kinstall:installedModules()
   cecho('\n<gold>Lista włączonych modułów:\n')
   for moduleName, data in pairs(kinstall.modules) do
-    moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
+    local moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
     cecho('- <gold>' .. moduleFile.name .. ' - <gray>' .. moduleFile.shortDesc)
     cecho('<DimGrey>, wersja: ' .. moduleFile.version .. ', komendy:')
     local cmds = '';
@@ -325,7 +325,7 @@ end
 -- handler eventu kinstallLoaded
 function kinstall:kinstallLoaded(_, filename)
   if kinstall:checkSystem() == true then
-    moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/kinstall/module.json')
+    local moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/kinstall/module.json')
     kinstall.modules[moduleFile.name] = moduleFile
     for _, cmd in ipairs(moduleFile.commands) do
       kinstall.cmdCache[cmd] = moduleFile.name
@@ -406,10 +406,10 @@ function kinstall:sysUnzipDone(_, filename)
     end
   end
   -- sprawdzanie czy komenda ze skryptu powinna byc natychmiast odpalona
-  if kinstall.runList[moduleFile.name] ~= nil then
+  if kinstall.runList[name] ~= nil then
     tempTimer(0, function()
-      kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd, true)
-      kinstall.runList[moduleFile.name] = nil
+      kinstall:runCmd(kinstall.runList[name].mode, kinstall.runList[name].cmd, true)
+      kinstall.runList[name] = nil
     end)
   end
 end

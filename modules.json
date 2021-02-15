@@ -1,6 +1,6 @@
 {
   "kinstall": {
-    "version": 14,
+    "version": 15,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinstall.zip",
     "commands": [ "install", "remove", "update" ],
     "shortDesc": "Instalator modułów"
@@ -12,7 +12,7 @@
     "shortDesc": "Moduł mapy"
   },
   "kinfo": {
-    "version": 3,
+    "version": 4,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinfo.zip",
     "commands": [ "info" ],
     "shortDesc": "Moduł informacji o graczu"

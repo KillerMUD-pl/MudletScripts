@@ -158,7 +158,6 @@ function kgui:addBox(name, height, title, closeCallback)
       background-color: rgba(80,80,80,255);
     }
   ]])
-  kgui.ui[name]['title']:setFontSize(12)
   kgui.ui[name]['title']:enableClickthrough()
 
   -- przycisk zamykania

@@ -399,7 +399,10 @@ function kmap:drawGroup()
     if player.is_npc and lastPlayerName ~= nil and members[lastPlayerName] ~= nil then
       members[lastPlayerName].name = members[lastPlayerName].name .. '•'
     else
-      members[player.name] = player
+      members[player.name] = {
+        ["name"] = player.name,
+        ["room"] = player.room,
+      }
       lastPlayerName = player.name
       members[lastPlayerName].name = string.sub(members[lastPlayerName].name, 1, 3)
     end
@@ -410,7 +413,7 @@ function kmap:drawGroup()
   local labelCharCountForRoom = {}
   for _, player in pairs(members) do
     local roomLabel = labelForRoom[player.room]
-    local playerChar =player.name .. '\n'
+    local playerChar = player.name .. '\n'
     -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
     if roomLabel == nil then roomLabel = "​" end
     labelForRoom[player.room] = roomLabel .. playerChar

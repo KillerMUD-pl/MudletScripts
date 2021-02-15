@@ -275,6 +275,9 @@ end
 function kinstall:runCmd(mode, cmd, isAutoRun)
   local params = {}
   params[1], params[2] = cmd:match("(%w+)(.*)")
+  if params[2] == '' and isAutoRun == true then
+    params[2] = 'postUpdate'
+  end
   -- sprawdzanie czy plus-komenda nalezy do modulu
   local moduleName = kinstall.cmdCache[params[1]]
   if moduleName ~= nil then
@@ -385,9 +388,6 @@ function kinstall:sysUnzipDone(_, filename)
   kinstall:initModule(name)
   if name == 'kinstall' then
     raiseEvent('kinstallInit')
-    tempTimer(0, function()
-      kinstall:doInstall()
-    end)
     return
   end
   if _G[name] ~= nil and _G[name]['doInstall'] ~= nil then
@@ -402,7 +402,7 @@ function kinstall:sysUnzipDone(_, filename)
   -- sprawdzanie czy komenda ze skryptu powinna byc natychmiast odpalona
   if kinstall.runList[moduleFile.name] ~= nil then
     tempTimer(0, function()
-      kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd)
+      kinstall:runCmd(kinstall.runList[moduleFile.name].mode, kinstall.runList[moduleFile.name].cmd, true)
     end)
   end
 end

@@ -204,7 +204,7 @@ function kinfo:charInfoEventHandler()
           color = "#dd0000"
         end
         local affName = aff.name
-        if aff.extraValue ~= nil then affName = '(' .. aff.extraValue .. ') ' .. affName end
+        if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. aff.extraValue .. ') ' .. affName end
         table.insert(blockWidths, utf8.len(affName) * fontWidth + 10)
         table.insert(list, '<span style="white-space:nowrap;font-size:'..fontSize..'px;color:'..color..'">'..affName..'</span>')
       end

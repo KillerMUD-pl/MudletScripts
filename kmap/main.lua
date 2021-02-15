@@ -76,7 +76,7 @@ function kmap:doInstall()
     cecho('<orange> - zmień cyfrę przy "Rooms" na 8\n')
     cecho('<orange> - kliknij poziomy pasek ze znaczkiem "^" żeby schować panel ustawień\n\n')
   end
-  kinstall:setConfig('mapa', 't')
+  kinstall:setConfig('mapaInfo', 't')
 end
 
 function kmap:doInit()

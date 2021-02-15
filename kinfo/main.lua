@@ -189,7 +189,7 @@ function kinfo:charInfoEventHandler()
         color = "#dd0000"
       end
       local desc = rawAff.desc
-      if rawAff.extraValue ~= nil then desc = '(' .. rawAff.extraValue .. ') ' .. desc end
+      if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. rawAff.extraValue .. ') ' .. desc end
       txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. rawAff.desc .. '</div>'
     end
     -- same nazwy afektow w formie word-wrap
@@ -226,7 +226,7 @@ function kinfo:charInfoEventHandler()
         color = "#dd0000"
       end
       local desc = aff.desc
-      if aff.extraValue ~= nil then desc = '(' .. aff.extraValue .. ') ' .. desc end
+      if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. aff.extraValue .. ') ' .. desc end
       txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. aff.desc .. '</div>'
     end
   end

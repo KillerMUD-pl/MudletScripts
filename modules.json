@@ -1,24 +1,24 @@
 {
   "kinstall": {
-    "version": 12,
+    "version": 13,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinstall.zip",
     "commands": [ "install", "remove", "update" ],
     "shortDesc": "Instalator modułów"
   },
   "kmap": {
-    "version": 16,
+    "version": 17,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kmap.zip",
     "commands": [ "map" ],
     "shortDesc": "Moduł mapy"
   },
   "kinfo": {
-    "version": 1,
+    "version": 2,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinfo.zip",
     "commands": [ "info" ],
     "shortDesc": "Moduł informacji o graczu (BETA, nie uzywac!)"
   },
-  "group": {
-    "version": 2,
+  "kgroup": {
+    "version": 3,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kgroup.zip",
     "commands": [ "info" ],
     "shortDesc": "Moduł informacji o grupie (BETA, nie uzywac!)"

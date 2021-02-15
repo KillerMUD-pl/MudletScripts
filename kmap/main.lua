@@ -132,10 +132,10 @@ function kmap:addBox()
   
   kmap.messageBox = Geyser.Label:new({
     name = 'mapperMessage',
-    width = "100%",
+    width = "100%-4px",
     height = "40",
-    x = "0px",
-    y = "0px"
+    x = "2px",
+    y = "2px"
   }, kmap.mapperBox)
   kmap.messageBox:setStyleSheet([[ background: rgba(0,0,0,0.8); color: #e0e0e0; font-size: 12px; font-family: sans-serif; ]])
   kmap.messageBox:enableClickthrough()

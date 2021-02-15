@@ -237,6 +237,7 @@ end
 function kinstall:doUpdate()
   local param = kinstall.params[1]
   if param == "" then
+    cecho('<gold>Sprawdzam aktualizacje. Jeśli coś znajdę, zainstaluje je automatycznie.\n\n')
     kinstall:fetchVersions()
     return
   end

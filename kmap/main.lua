@@ -31,7 +31,9 @@ function kmap:doMap()
     end
     return
   end
-  cecho('<gold>Włączam mapę\n')
+  if param ~= "postUpdate" then
+    cecho('<gold>Włączam mapę\n')
+  end
   kmap:delayedmapLoad();
   kinstall:setConfig('mapa', 't')
 end

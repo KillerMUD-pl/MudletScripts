@@ -6,7 +6,10 @@ kgroup.group_box = nil
 kgroup.enabled = false
 
 function kgroup:doGroup()
-  cecho('<gold>Włączam panel grupy\n')
+  local param = kinstall.params[1]
+  if param ~= "postUpdate" then
+    cecho('<gold>Włączam panel grupy\n')
+  end
   kgroup:addBox()
   kinstall:setConfig('group', 't')
   kgroup.enabled = true

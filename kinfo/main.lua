@@ -6,7 +6,10 @@ kinfo.info_box = nil
 kinfo.enabled = false
 
 function kinfo:doInfo()
-  cecho('<gold>Włączam panel postaci\n')
+  local param = kinstall.params[1]
+  if param ~= "postUpdate" then
+    cecho('<gold>Włączam panel postaci\n')
+  end
   kinfo:addBox()
   kinstall:setConfig('info', 't')
   kinfo.enabled = true

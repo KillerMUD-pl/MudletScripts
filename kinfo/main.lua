@@ -155,6 +155,19 @@ function kinfo:charInfoEventHandler()
   txt = txt .. '<div style="height:5px;font-size:5px;line-height:5px">&nbsp;</div>'
   height = height + 5
 
+  -- AFEKTY
+
+  local fontSize = 14
+  local fontWidth, fontHeight = calcFontSize(fontSize, 'Marcellus')
+
+  -- sprawdzamy czy mamy informacje o grupie
+  if affs[1] ~= nil and affs[1].unavailable ~= nil then
+    height = height + (fontHeight + 2)
+    kgui:setBoxContent('info', txt .. '<center>' .. affs[1].unavailable .. '</center>', height)
+    kgui:update()
+    return
+  end
+
   -- wykrywamy czy postac jest czarujaca
   isMage = false
   for _, aff in ipairs(affs) do
@@ -164,8 +177,6 @@ function kinfo:charInfoEventHandler()
   if isMage == true then
     -- wersja dla magow, same nazwy czarow
     -- oraz jesli affekt nie jest czarem i nie ma nazwy - jako tekstu
-    local fontSize = 14
-    local fontWidth, fontHeight = calcFontSize(fontSize, 'Marcellus')
     local rawAffs = {}
     for _, aff in ipairs(affs) do
       if aff.name == '' then table.insert(rawAffs, aff) end
@@ -176,6 +187,8 @@ function kinfo:charInfoEventHandler()
       if rawAff.negative == true then
         color = "#dd0000"
       end
+      local desc = rawAff.desc
+      if rawAff.extraValue ~= nil then desc = '(' .. rawAff.extraValue .. ') ' .. desc end
       txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. rawAff.desc .. '</div>'
     end
     -- same nazwy afektow w formie word-wrap
@@ -189,8 +202,10 @@ function kinfo:charInfoEventHandler()
         if aff.negative == true then
           color = "#dd0000"
         end
-        table.insert(blockWidths, utf8.len(aff.name) * fontWidth + 10)
-        table.insert(list, '<span style="white-space:nowrap;font-size:'..fontSize..'px;color:'..color..'">'..aff.name..'</span>')
+        local affName = aff.name
+        if aff.extraValue ~= nil then affName = '(' .. aff.extraValue .. ') ' .. affName end
+        table.insert(blockWidths, utf8.len(affName) * fontWidth + 10)
+        table.insert(list, '<span style="white-space:nowrap;font-size:'..fontSize..'px;color:'..color..'">'..affName..'</span>')
       end
     end
     if #list > 0 then
@@ -209,6 +224,8 @@ function kinfo:charInfoEventHandler()
       if aff.negative == true then
         color = "#dd0000"
       end
+      local desc = aff.desc
+      if aff.extraValue ~= nil then desc = '(' .. aff.extraValue .. ') ' .. desc end
       txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. aff.desc .. '</div>'
     end
   end

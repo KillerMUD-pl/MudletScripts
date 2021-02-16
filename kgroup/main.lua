@@ -5,6 +5,7 @@ kgroup = kgroup or {}
 kgroup.group_box = nil
 kgroup.enabled = false
 kgroup.immoGroup = kinstall:getConfig('immoGroup') or 'n'
+kgroup.immoHideCharms = kinstall:getConfig('immoHideCharms') or 'n'
 
 function kgroup:doGroup()
   local param = kinstall.params[1]
@@ -17,6 +18,18 @@ function kgroup:doGroup()
       cecho('<gold>Włączono tryb immo panelu grupy.\n\n')
       kinstall:setConfig('immoGroup', 't')
       kgroup.immoGroup = 't'
+    end
+    return
+  end
+  if param == 'charms' then
+    if kgroup.immoHideCharms == 't' then
+      cecho('<gold>Włączono pokazywanie charmów w grupie.\n\n')
+      kinstall:setConfig('immoHideCharms', 'n')
+      kgroup.immoHideCharms = 'n'
+    else
+      cecho('<gold>Wyłączono pokazywanie charmów w grupie.\n\n')
+      kinstall:setConfig('immoHideCharms', 't')
+      kgroup.immoHideCharms = 't'
     end
     return
   end
@@ -71,7 +84,8 @@ function kgroup:addBox()
   kgroup.group_box:setDoubleClickCallback(function(event)
     if kgroup.immoGroup ~= 't' then return end
     local y = math.ceil((event.y - 14) / 20)
-    local char = gmcp.Char.Group.members[y]
+    local group = kgroup:filterCharms(gmcp.Char.Group)
+    local char = group.members[y]
     send('goto ' .. char.room)
   end)
 end
@@ -243,6 +257,8 @@ function kgroup:charInfoEventHandler()
 
   if group.members == nil then return end
 
+  group = kgroup:filterCharms(group)
+
   local txt = '<table width="100%" align="left" cellspacing="0" cellpadding="0" border="0">'
   for _, ch in ipairs(group.members) do
     local fontSize = 16
@@ -277,6 +293,19 @@ function kgroup:charInfoEventHandler()
 
   kgui:setBoxContent('group', txt, (#group.members) * 20 + 30)
   kgui:update()
+end
+
+function kgroup:filterCharms(group)
+  if kgroup.immoHideCharms == "t" then
+    local members = {}
+    for _, member in ipairs(group.members) do
+      if member.is_npc ~= true then
+        table.insert(members, member)
+      end
+    end
+    group.members = members
+  end
+  return group
 end
 
 function kgroup:pad(str, len)

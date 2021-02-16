@@ -433,5 +433,19 @@ function kgui:toWindow(name, title, content)
 end
 
 function kgui:transliterate(text)
-  -- WIP
+  local utfCodes = {
+    ["±"] = "ą",
+    ["¶"] = "ś",
+    ["Ľ"] = "ź",
+    ["ˇ"] = "Ą",
+    ["¦"] = "Ś",
+    ["¬"] = "Ź",
+  }
+  local out = ""
+  for i = 1, #text do
+    local c = utf8.sub(text, i, i)
+    local s = utfCodes[c]
+    if s == nil then out = out .. c else out = out .. s end
+  end
+  return out
 end

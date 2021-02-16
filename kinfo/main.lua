@@ -188,7 +188,7 @@ function kinfo:charInfoEventHandler()
       if rawAff.negative == true then
         color = "#dd0000"
       end
-      local desc = rawAff.desc
+      local desc = kgui:transliterate(rawAff.desc)
       if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. rawAff.extraValue .. ') ' .. desc end
       txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. rawAff.desc .. '</div>'
     end
@@ -203,7 +203,7 @@ function kinfo:charInfoEventHandler()
         if aff.negative == true then
           color = "#dd0000"
         end
-        local affName = aff.name
+        local affName = kgui:transliterate(aff.name)
         if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. aff.extraValue .. ') ' .. affName end
         table.insert(blockWidths, utf8.len(affName) * fontWidth + 10)
         table.insert(list, '<span style="white-space:nowrap;font-size:'..fontSize..'px;color:'..color..'">'..affName..'</span>')
@@ -225,7 +225,7 @@ function kinfo:charInfoEventHandler()
       if aff.negative == true then
         color = "#dd0000"
       end
-      local desc = aff.desc
+      local desc = kgui:transliterate(aff.desc)
       if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. aff.extraValue .. ') ' .. desc end
       txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. aff.desc .. '</div>'
     end

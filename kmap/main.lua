@@ -336,7 +336,7 @@ function kmap:mapLoad(forceReload)
   kmap:mapRedraw(false)
   kmap:removeGroup()
   kmap.immoMap = kinstall:getConfig('immoMap')
-  if kmap.deleteImageLabelsimmoMap == 'y' then
+  if kmap.immoMap == 'y' then
     kmap:setImmoMap()
   else
     kmap:unsetImmoMap()

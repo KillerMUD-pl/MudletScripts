@@ -35,9 +35,9 @@ function kgui:init()
     Geyser.Container:new({
       name = "KGuiMainContainer",
       x="10px",
-      y="10px",
+      y="2px",
       width="100%-10px",
-      height="100%-10px",
+      height="100%-2px",
     }, kgui.main);
 
   -- pasek do przesuwania
@@ -145,13 +145,15 @@ function kgui:addBox(name, height, title, closeCallback)
   }, kgui.ui[name]['wrapper'])
 
   -- dostosowywanie paska okienka
+  kgui.ui[name]['title']:rawEcho(title)
   kgui.ui[name]['title']:setStyleSheet([[
     QLabel {
       qproperty-alignment: 'AlignLeft | AlignTop';
       padding-left: 2px;
       background-color: rgba(0,0,0,230);
-      font-size: 12px;
       font-family: 'Marcellus';
+      font-size: 10px;
+      color: #eeeeee;
       border-bottom: 2px solid rgb(80,80,80);
     }
     QLabel::hover {
@@ -361,9 +363,9 @@ function kgui:update()
       kgui.ui[data.name]['wrapper']:move(0, currentY)
     end
     if data.minimized == nil or data.minimized == false then
-      currentY = currentY + 10 + kgui.ui[data.name]['wrapper']:get_height()
+      currentY = currentY + 2 + kgui.ui[data.name]['wrapper']:get_height()
     else
-      currentY = currentY + 32
+      currentY = currentY + 24
     end
   end
 end
@@ -428,4 +430,8 @@ function kgui:toWindow(name, title, content)
   end
   kgui.boxes[name]:show()
   kgui:setBoxContent(name, content)
+end
+
+function kgui:transliterate(text)
+  -- WIP
 end

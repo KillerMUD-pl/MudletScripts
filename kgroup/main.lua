@@ -4,24 +4,24 @@ setfenv(1, getfenv(2));
 kgroup = kgroup or {}
 kgroup.group_box = nil
 kgroup.enabled = false
-kgroup.immoMap = kinstall:getConfig('immoGroup') or false
+kgroup.immoGroup = kinstall:getConfig('immoGroup') or 'n'
 
 function kgroup:doGroup()
   local param = kinstall.params[1]
-  if param ~= "silent" then
-    cecho('<gold>Włączam panel grupy\n')
-  end
   if param == 'immo' then
-    if kmap.immoMap == 'y' then
+    if kgroup.immoGroup == 't' then
       cecho('<gold>Wyłączono tryb immo panelu grupy.\n\n')
       kinstall:setConfig('immoGroup', 'n')
-      kgroup.immoMap = 'n'
+      kgroup.immoGroup = 'n'
       else
       cecho('<gold>Włączono tryb immo panelu grupy.\n\n')
-      kinstall:setConfig('immoGroup', 'y')
-      kgroup.immoMap = 'y'
+      kinstall:setConfig('immoGroup', 't')
+      kgroup.immoGroup = 't'
     end
     return
+  end
+  if param ~= "silent" then
+    cecho('<gold>Włączam panel grupy\n')
   end
   kgroup:addBox()
   kinstall:setConfig('group', 't')
@@ -68,6 +68,12 @@ end
 function kgroup:addBox()
   kgui:addBox('group', 0, "Grupa", function() kgroup:undoGroup() end)
   kgroup.group_box = kgui:setBoxContent('group', '<center><b>Zaloguj się do gry.</b><br>Oczekiwanie na informacje z GMCP...</center>')
+  kgroup.group_box:setDoubleClickCallback(function(event)
+    if kgroup.immoGroup ~= 't' then return end
+    local y = math.ceil((event.y - 14) / 20)
+    local char = gmcp.Char.Group.members[y]
+    send('goto ' .. char.room)
+  end)
 end
 
 --
@@ -242,7 +248,7 @@ function kgroup:charInfoEventHandler()
     local fontSize = 16
     --local padSize = 20
     local color = "#f0f0f0"
-    local name = ch.name
+    local name = kgui:transliterate(ch.name)
     if ch.is_npc == true then
       name = '&nbsp;&nbsp;' .. name
       fontSize = 14
@@ -251,13 +257,13 @@ function kgroup:charInfoEventHandler()
     end
     txt = txt .. '<tr style="height:20px;line-height:20px;max-height:20px">'
     -- NAZWA
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">&nbsp;' .. name ..'&nbsp;&nbsp;</td>'
+    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">&nbsp;' .. kgui:transliterate(name) ..'&nbsp;&nbsp;</td>'
     -- HP
     txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">hp: <span style="line-height:20px;font-family:Arial">&nbsp;' .. kgroup:hpBar(kgroup:translateHp(kgroup:normalize(ch.hp))) .. '</span>&nbsp;</td>'
     -- MV
     txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">mv: <span style="line-height:20px;font-family:Arial">&nbsp;' .. kgroup:mvBar(kgroup:translateMv(kgroup:normalize(ch.mv))) .. '</span>&nbsp;</td>'
     -- POS
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. ch.pos .. '</span>&nbsp;</td>'
+    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. kgui:transliterate(ch.pos) .. '</span>&nbsp;</td>'
     -- MEM
     if ch.mem > 0 then
       txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">&nbsp;' .. ch.mem .. ' mem&nbsp;</td>'
@@ -375,6 +381,7 @@ function kgroup:mvBar(value)
 end
 
 function kgroup:normalize(text)
+  text = kgui:transliterate(text)
   if type(text) ~= "string" then return "" end
   text = utf8.gsub(text, 'ą', 'a')
   text = utf8.gsub(text, 'ć', 'c')

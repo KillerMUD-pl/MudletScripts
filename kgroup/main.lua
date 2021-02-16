@@ -4,11 +4,24 @@ setfenv(1, getfenv(2));
 kgroup = kgroup or {}
 kgroup.group_box = nil
 kgroup.enabled = false
+kgroup.immoMap = kinstall:getConfig('immoGroup') or false
 
 function kgroup:doGroup()
   local param = kinstall.params[1]
   if param ~= "silent" then
     cecho('<gold>Włączam panel grupy\n')
+  end
+  if param == 'immo' then
+    if kmap.immoMap == 'y' then
+      cecho('<gold>Wyłączono tryb immo panelu grupy.\n\n')
+      kinstall:setConfig('immoGroup', 'n')
+      kgroup.immoMap = 'n'
+      else
+      cecho('<gold>Włączono tryb immo panelu grupy.\n\n')
+      kinstall:setConfig('immoGroup', 'y')
+      kgroup.immoMap = 'y'
+    end
+    return
   end
   kgroup:addBox()
   kinstall:setConfig('group', 't')
@@ -79,59 +92,141 @@ function kgroup:charInfoEventHandler()
   if kgroup.enabled == false then
     return
   end
-  --local group = gmcp.Char.Group
+  
+  -- DO TESTOWANIA
   local group = {
     ["members"] = {
       {
         ["name"] = "Zeddicus",
         ["hp"] = "żadnych śladów",
         ["mv"] = "wypoczęty",
+        ["pos"] = "standing",
         ["is_npc"] = false,
+        ["mem"] = 3,
       },
       {
         ["name"] = "Pomniejszy cień",
         ["hp"] = "zadrapania",
         ["mv"] = "wypoczęty",
+        ["pos"] = "standing",
         ["is_npc"] = true,
+        ["mem"] = 0,
       },
       {
         ["name"] = "Vorid",
         ["hp"] = "lekkie rany",
         ["mv"] = "lekko zmęczony",
+        ["pos"] = "resting",
         ["is_npc"] = false,
+        ["mem"] = 0,
       },
       {
         ["name"] = "Ąęćłńśóżź",
         ["hp"] = "średnie rany",
+        ["pos"] = "standing",
         ["mv"] = "bardzo zmeczony",
         ["is_npc"] = false,
+        ["mem"] = 0,
       },
       {
         ["name"] = "Grywhsnywns",
         ["hp"] = "ciężkie rany",
         ["mv"] = "zameczony",
+        ["pos"] = "standing",
         ["is_npc"] = false,
+        ["mem"] = 8,
       },
       {
         ["name"] = "Gigantyczna anakonda",
         ["hp"] = "ogromne rany",
         ["mv"] = "lekko zmęczona",
+        ["pos"] = "recuperate",
         ["is_npc"] = true,
+        ["mem"] = 0,
       },
       {
         ["name"] = "Elitarny gwardzista",
         ["hp"] = "ledwo stoi",
         ["mv"] = "zmęczony",
+        ["pos"] = "standing",
         ["is_npc"] = true,
+        ["mem"] = 0,
       },
       {
         ["name"] = "Alalslaldlslalt",
         ["hp"] = "umiera",
         ["mv"] = "wypoczęty",
+        ["pos"] = "standing",
         ["is_npc"] = false,
+        ["mem"] = 0,
+      },
+      {
+        ["name"] = "Zeddicus",
+        ["hp"] = "żadnych śladów",
+        ["mv"] = "wypoczęty",
+        ["pos"] = "standing",
+        ["is_npc"] = false,
+        ["mem"] = 3,
+      },
+      {
+        ["name"] = "Pomniejszy cień",
+        ["hp"] = "zadrapania",
+        ["mv"] = "wypoczęty",
+        ["pos"] = "standing",
+        ["is_npc"] = true,
+        ["mem"] = 0,
+      },
+      {
+        ["name"] = "Vorid",
+        ["hp"] = "lekkie rany",
+        ["mv"] = "lekko zmęczony",
+        ["pos"] = "resting",
+        ["is_npc"] = false,
+        ["mem"] = 0,
+      },
+      {
+        ["name"] = "Ąęćłńśóżź",
+        ["hp"] = "średnie rany",
+        ["pos"] = "standing",
+        ["mv"] = "bardzo zmeczony",
+        ["is_npc"] = false,
+        ["mem"] = 0,
+      },
+      {
+        ["name"] = "Grywhsnywns",
+        ["hp"] = "ciężkie rany",
+        ["mv"] = "zameczony",
+        ["pos"] = "standing",
+        ["is_npc"] = false,
+        ["mem"] = 8,
+      },
+      {
+        ["name"] = "Gigantyczna anakonda",
+        ["hp"] = "ogromne rany",
+        ["mv"] = "lekko zmęczona",
+        ["pos"] = "recuperate",
+        ["is_npc"] = true,
+        ["mem"] = 0,
+      },
+      {
+        ["name"] = "Elitarny gwardzista",
+        ["hp"] = "ledwo stoi",
+        ["mv"] = "zmęczony",
+        ["pos"] = "standing",
+        ["is_npc"] = true,
+        ["mem"] = 0,
+      },
+      {
+        ["name"] = "Alalslaldlslalt",
+        ["hp"] = "umiera",
+        ["mv"] = "wypoczęty",
+        ["pos"] = "standing",
+        ["is_npc"] = false,
+        ["mem"] = 0,
       },
     }
   }
+
   group = gmcp.Char.Group or {}
 
   -- sprawdzamy czy mamy informacje o grupie
@@ -154,7 +249,7 @@ function kgroup:charInfoEventHandler()
       --padSize = 27
       color = "#aaaaaa"
     end
-    txt = txt .. '<tr>'
+    txt = txt .. '<tr style="height:20px;line-height:20px;max-height:20px">'
     -- NAZWA
     txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">&nbsp;' .. name ..'&nbsp;&nbsp;</td>'
     -- HP
@@ -174,7 +269,7 @@ function kgroup:charInfoEventHandler()
   end
   txt = txt .. '</table>'
 
-  kgui:setBoxContent('group', txt)
+  kgui:setBoxContent('group', txt, (#group.members) * 20 + 30)
   kgui:update()
 end
 

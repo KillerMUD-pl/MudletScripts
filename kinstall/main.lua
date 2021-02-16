@@ -148,6 +148,12 @@ function kinstall:checkSystem()
   return true
 end
 
+-- instalowanie czcionek
+function kinstall:installFonts()
+  unzipAsync(getMudletHomeDir() .. '/kinstall/fonts/Marcellus-Regular.ttf.zip', getMudletHomeDir() .. '/../../fonts')
+  cecho('<gold>Zainstalowano nowe czcinki do Mudleta! Polecany jest <orange>restart<gold> Mudleta.')
+end
+
 -- update z repozytorium
 function kinstall:update()
   for moduleName, _ in pairs(kinstall.updateList) do
@@ -331,11 +337,15 @@ function kinstall:kinstallLoaded(_, filename)
     for _, cmd in ipairs(moduleFile.commands) do
       kinstall.cmdCache[cmd] = moduleFile.name
     end
-    if kinstall:getConfig('welcomed') == false then
+    if kinstall:getConfig('welcomed') ~= true then
       kinstall:setConfig('welcomed', true)
       kinstall:welcomeScreen()
     else
       cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
+    end
+    if kinstall:getConfig('fontsInstalled') ~= true then
+      kinstall:setConfig('fontsInstalled', true)
+      kinstall:installFonts()
     end
     kinstall:fetchVersions()
     -- załącza kod od gui
@@ -390,7 +400,8 @@ kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", 
 
 -- handler eventu sysUnzipDone
 function kinstall:sysUnzipDone(_, filename)
-  local name = filename:match("([^/]+).zip$")
+  local name = filename:match("(k[^/]+).zip$")
+  if name == nil or name == '' then return end
   cecho('<green>zainstalowano.\n\n')
   kinstall:initModule(name)
   if name == 'kinstall' then

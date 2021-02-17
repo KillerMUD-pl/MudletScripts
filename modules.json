@@ -18,7 +18,7 @@
     "shortDesc": "Moduł informacji o graczu"
   },
   "kgroup": {
-    "version": 7,
+    "version": 8,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kgroup.zip",
     "commands": [ "group" ],
     "shortDesc": "Moduł informacji o grupie"

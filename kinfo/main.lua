@@ -190,7 +190,9 @@ function kinfo:charInfoEventHandler()
       end
       local desc = kgui:transliterate(rawAff.desc)
       if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. rawAff.extraValue .. ') ' .. desc end
-      txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. rawAff.desc .. '</div>'
+      local bgColor = 'rgba(0,0,0,0)';
+      if rawAff.ending ~= nil and rawAff.ending == true then bgColor = 'rgba(80,0,0,255)' end
+      txt = txt .. '<div style="line-height:20px;background-color:'..bgColor..';font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. desc .. '</div>'
     end
     -- same nazwy afektow w formie word-wrap
     fontSize = 12
@@ -205,12 +207,14 @@ function kinfo:charInfoEventHandler()
         end
         local affName = kgui:transliterate(aff.name)
         if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. aff.extraValue .. ') ' .. affName end
+        local bgColor = 'rgba(0,0,0,0)';
+        if aff.ending ~= nil and aff.ending == true then bgColor = 'rgba(80,0,0,255)' end
         table.insert(blockWidths, utf8.len(affName) * fontWidth + 10)
-        table.insert(list, '<span style="white-space:nowrap;font-size:'..fontSize..'px;color:'..color..'">'..affName..'</span>')
+        table.insert(list, '<span style="white-space:nowrap;background-color:'..bgColor..';font-size:'..fontSize..'px;color:'..color..'">'..affName..'</span>')
       end
     end
     if #list > 0 then
-      txt = txt .. '<div style="white-space:wrap;width:100%;font-family:\''..getFont()..'\'">' .. table.concat(list, ", ") .. '</div>'
+      txt = txt .. '<div style="line-height:20px;white-space:wrap;width:100%;font-family:\''..getFont()..'\'">' .. table.concat(list, ", ") .. '</div>'
       height = height + kinfo:calculateTextHeight(blockWidths, kgui.ui.info.wrapper:get_width() - 30, fontHeight + 2)
     end
   else
@@ -227,7 +231,9 @@ function kinfo:charInfoEventHandler()
       end
       local desc = kgui:transliterate(aff.desc)
       if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. aff.extraValue .. ') ' .. desc end
-      txt = txt .. '<div style="font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. aff.desc .. '</div>'
+      local bgColor = 'rgba(0,0,0,0)';
+      if aff.ending ~= nil and aff.ending == true then bgColor = 'rgba(80,0,0,255)' end
+      txt = txt .. '<div style="line-height:20px;background-color:'..bgColor..';font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. desc .. '</div>'
     end
   end
 

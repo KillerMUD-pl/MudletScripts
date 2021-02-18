@@ -12,7 +12,7 @@
     "shortDesc": "Moduł mapy"
   },
   "kinfo": {
-    "version": 8,
+    "version": 9,
     "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinfo.zip",
     "commands": [ "info" ],
     "shortDesc": "Moduł informacji o graczu"

@@ -99,7 +99,7 @@ function kinstall:installedModules()
     for _, cmd in ipairs(moduleFile.commands) do
       cmds = cmds .. ', ' .. cmd
     end
-    cecho('<DimGrey>' .. string.sub(cmds, 2) .. '\n')
+    cecho('<DimGrey>' .. utf8.sub(cmds, 2) .. '\n')
   end
 end
 
@@ -116,7 +116,7 @@ function kinstall:availableModules()
       for _, cmd in ipairs(data.commands) do
         cmds = cmds .. '<gray>, <cyan>+' .. cmd
       end
-      cecho(string.sub(cmds, 8) .. '\n')
+      cecho(utf8.sub(cmds, 8) .. '\n')
     end
   end
   if count == 0 then
@@ -169,7 +169,7 @@ function kinstall:fetchAndInstall(moduleName)
   end
   local shortModuleName = moduleName
   if beta == true then
-    shortModuleName = string.gsub(moduleName, '-beta', '')
+    shortModuleName = utf8.gsub(moduleName, '-beta', '')
   end
   if kinstall.versions[shortModuleName] == nil then
     cecho('<red>Nie znaleziono modułu ' .. shortModuleName .. '\n\n')
@@ -180,7 +180,7 @@ function kinstall:fetchAndInstall(moduleName)
   local url = data.url
   if beta == true then
     version = 'beta'
-    url = string.gsub(url, shortModuleName, moduleName)
+    url = utf8.gsub(url, shortModuleName, moduleName)
   end
   cecho('<gold>Instalowanie pakietu ' .. shortModuleName .. ' w wersji ' .. version .. ' ... ')
   downloadFile(
@@ -297,7 +297,7 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
       cecho('<red>Coś jest nie tak z listą załadowanych mudułów... Uruchom Mudleta ponownie.')
       return
     end
-    local funcName = string.title(params[1])
+    local funcName = utf8.title(params[1])
     local prefix = mode == '-' and 'undo' or 'do'
     if (_G[moduleName] == nil or _G[moduleName][prefix .. funcName] == nil) then
       cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n')
@@ -385,7 +385,7 @@ function kinstall:sysDownloadError(_, error)
     cecho('<red>Mudlet nie może zapisać na dysk ściągniętego plik! Spróbuj uruchomić go ponownie.\n\n')
     return
   end
-  if string.find(error, '/modules.json') ~= nil then
+  if utf8.find(error, '/modules.json') ~= nil then
     cecho('<red>Mudlet nie może ściągnąć pliku z repozytorium!\nSprawdź czy repozytorium istnieje i spróbuj uruchomić Mudleta ponownie.\n')
     cecho('<red>Link do repozytorium: ')
     echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
@@ -520,12 +520,12 @@ end
 function string:split(delimiter)
   local result = { }
   local from  = 1
-  local delim_from, delim_to = string.find( self, delimiter, from  )
+  local delim_from, delim_to = utf8.find( self, delimiter, from  )
   while delim_from do
-    table.insert( result, string.sub( self, from , delim_from-1 ) )
+    table.insert( result, utf8.sub( self, from , delim_from-1 ) )
     from  = delim_to + 1
-    delim_from, delim_to = string.find( self, delimiter, from  )
+    delim_from, delim_to = utf8.find( self, delimiter, from  )
   end
-  table.insert( result, string.sub( self, from  ) )
+  table.insert( result, utf8.sub( self, from  ) )
   return result
 end

@@ -421,7 +421,7 @@ function kmap:drawGroup()
         ["room"] = player.room,
       }
       lastPlayerName = player.name
-      members[lastPlayerName].name = string.sub(members[lastPlayerName].name, 1, 3)
+      members[lastPlayerName].name = utf8.sub(members[lastPlayerName].name, 1, 3)
     end
   end
 

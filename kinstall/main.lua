@@ -298,7 +298,6 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
       return
     end
     local funcName = string.title(params[1])
-    display(funcName)
     local prefix = mode == '-' and 'undo' or 'do'
     if (_G[moduleName] == nil or _G[moduleName][prefix .. funcName] == nil) then
       cecho('<red>Coś jest nie tak z modułem... Powinien obsługiwać komendę ' .. mode .. cmd .. ' jednak brakuje mu tej funkcji.\n')

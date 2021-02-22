@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ktunkiewicz/KillerMUDScripts.git"
+    "url": "git+https://github.com/KillerMUD-pl/MudletScripts.git"
   },
   "author": "Kamil Tunkiewicz",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ktunkiewicz/KillerMUDScripts/issues"
+    "url": "https://github.com/KillerMUD-pl/MudletScripts/issues"
   },
-  "homepage": "https://github.com/ktunkiewicz/KillerMUDScripts#readme",
+  "homepage": "https://github.com/KillerMUD-pl/MudletScripts#readme",
   "dependencies": {
     "copyfiles": "^2.4.1",
     "cpy": "^8.1.1",

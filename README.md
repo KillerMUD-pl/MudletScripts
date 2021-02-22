@@ -1,6 +1,4 @@
-# KillerMUDScripts
-
-Skrypty do Killer MUDa.
+# Skrypty do Killer MUDa.
 
 ![Screenshot](https://github.com/KillerMUD-pl/MudletScripts/blob/master/screenshot.png?raw=true)
 

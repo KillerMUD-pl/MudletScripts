@@ -1,25 +1,25 @@
 {
   "kinstall": {
-    "version": 21,
-    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinstall.zip",
+    "version": 22,
+    "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kinstall.zip",
     "commands": [ "install", "remove", "update" ],
     "shortDesc": "Instalator modułów"
   },
   "kmap": {
     "version": 24,
-    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kmap.zip",
+    "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kmap.zip",
     "commands": [ "map" ],
     "shortDesc": "Moduł mapy"
   },
   "kinfo": {
     "version": 9,
-    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kinfo.zip",
+    "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kinfo.zip",
     "commands": [ "info" ],
     "shortDesc": "Moduł informacji o graczu"
   },
   "kgroup": {
     "version": 8,
-    "url": "https://raw.githubusercontent.com/ktunkiewicz/KillerMUDScripts/main/dist/kgroup.zip",
+    "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kgroup.zip",
     "commands": [ "group" ],
     "shortDesc": "Moduł informacji o grupie"
   }

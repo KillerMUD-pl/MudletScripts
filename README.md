@@ -2,7 +2,7 @@
 
 Skrypty do Killer MUDa.
 
-![Screenshot](https://github.com/ktunkiewicz/KillerMUDScripts/blob/master/screenshot.png?raw=true)
+![Screenshot](https://github.com/KillerMUD-pl/MudletScripts/blob/master/screenshot.png?raw=true)
 
 Aktualnie posiadana funkcjonalność:
 #### Mapa
@@ -31,4 +31,4 @@ Aktualnie posiadana funkcjonalność:
 
 ## Instalacja
 
-Ściągnij plik [kinstall.zip](https://github.com/ktunkiewicz/KillerMUDScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.
+Ściągnij plik [kinstall.zip](https://github.com/KillerMUD-pl/MudletScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.

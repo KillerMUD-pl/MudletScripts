@@ -1,12 +1,16 @@
 module("kmap", package.seeall)
 setfenv(1, getfenv(2));
 
+package.loaded['kmap/mapper'] = nil
+require('kmap/mapper')
+
 mudlet.mapper_script = true
 
 kmap = kmap or {}
 kmap.mapperBox = kmap.mapperBox or {}
 kmap.messageBox = kmap.messageBox or {}
 kmap.immoMap = kmap.immoMap or false
+kmap.editMap = kmap.editMap or false
 
 function kmap:doMap()
   local param = kinstall.params[1]
@@ -14,20 +18,110 @@ function kmap:doMap()
     kmap:mapLoad(true)
     return
   end
+  if param == 'symbol' then
+    kmap:mapGroupSymbol(param[2])
+    return
+  end
+  if param == 'check' then
+    kmapper:mapCheck()
+    return
+  end
   if param == 'redraw' then
     kmap:mapRedraw(true)
     return
   end
+  if param == 'load' then
+    kmapper:mapLoad()
+    return
+  end
+  if param == 'info' then
+    kmapper:mapInfo(false)
+    return
+  end
+  if param == 'zoom' then
+    kmapper:mapZoom(kinstall.params[2])
+    return
+  end
+  if param == 'refresh' then
+    kmapper:mapRefresh()
+    return
+  end
+  if param == 'start' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapStart()
+    return
+  end
+  if param == 'stop' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapStop()
+    return
+  end
+  if param == 'area' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapArea(kinstall.params[2])
+    return
+  end
+  if param == 'step' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapStep(kinstall.params[2])
+    return
+  end
+  if param == 'symbol' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapSymbol(kinstall.params[2])
+    return
+  end
+  if param == 'forget' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapForget(false)
+    return
+  end
+  if param == 'special' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapSpecial(kinstall.params[2], kinstall.params[3])
+    return
+  end
+  if param == 'export' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:exportArea(getRoomArea(getPlayerRoom()))
+    return
+  end
+  if param == 'import' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:importArea()
+    return
+  end
+  if param == 'label' then
+    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    kmapper:mapLabel(kinstall.params[2])
+    return
+  end
+
   if param == 'immo' then
     kmap.immoMap = kinstall:getConfig('immoMap')
     if kmap.immoMap == 'y' then
       cecho('<gold>Wyłączono tryb immo mapy.\n\n')
       kinstall:setConfig('immoMap', 'n')
+      kmap.immoMap = 'n'
       kmap:unsetImmoMap()
-      else
+    else
       cecho('<gold>Włączono tryb immo mapy.\n\n')
       kinstall:setConfig('immoMap', 'y')
+      kmap.immoMap = 'y'
       kmap:setImmoMap()
+    end
+    return
+  end
+  if param == 'edit' then
+    kmap.editMap = kinstall:getConfig('editMap')
+    if kmap.editMap == 'y' then
+      cecho('<gold>Wyłączono tryb edycji mapy.\n\n')
+      kinstall:setConfig('editMap', 'n')
+      kmap:unsetEditMap()
+      else
+      cecho('<gold>Włączono tryb edycji mapy.\n\n')
+      kinstall:setConfig('editMap', 'y')
+      kmap:setEditMap()
     end
     return
   end
@@ -107,6 +201,10 @@ function kmap:unregister()
   if kmap.ids.charGroupEvent then killAnonymousEventHandler(kmap.ids.charGroupEvent) end
   if kmap.ids.sysExitEvent then killAnonymousEventHandler(kmap.ids.sysExitEvent) end
   if kmap.ids.receivingGmcpTimer then killTimer(kmap.ids.receivingGmcpTimer) end
+end
+
+function kmap:showHelp()
+  cecho('<gold>POMOC MODUŁU MAPY')
 end
 
 --
@@ -211,11 +309,13 @@ function kmap:mapLocate()
   if cachedRoomId ~= nil and roomExists(cachedRoomId) then
     local roomId = kmap.vnumToRoomIdCache[gmcp.Room.Info.num]
     kmap:centerView(roomId)
+    return roomId
   else
     if kinstall.receivingGmcp == false then
       centerview(18914)
     end
   end
+  return nil
 end
 
 -- kasowanie labelek obrazkowych
@@ -315,7 +415,9 @@ end
 function kmap:charGroupEventHandler()
   if kmap.mapperBox ~= nil and kgui.ui.mapper ~= nil and kgui.ui.mapper.wrapper.hidden ~= true then
     kmap:drawGroup()
-    kmap:mapLocate()
+    if kmapper.mapping ~= true then
+      kmap:mapLocate()
+    end
   end
 end
 
@@ -335,6 +437,12 @@ function kmap:mapLoad(forceReload)
   kmap:mapLocate()
   kmap:mapRedraw(false)
   kmap:removeGroup()
+  kmap.editMap = kinstall:getConfig('editMap')
+  if kmap.editMap == 'y' then
+    kmap:setEditMap()
+  else
+    kmap:unsetEditMap()
+  end
   kmap.immoMap = kinstall:getConfig('immoMap')
   if kmap.immoMap == 'y' then
     kmap:setImmoMap()
@@ -368,7 +476,7 @@ function kmap:removeGroup()
     for _, areaId in pairs(getAreaTable()) do
       local labels = getMapLabels(areaId)
       if labels ~= nil and type(labels) == "table" then
-        for id, text in ipairs(getMapLabels(areaId)) do
+        for id, text in pairs(getMapLabels(areaId)) do
           -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
           if text:starts("​") then
             deleteMapLabel(areaId, id)
@@ -387,7 +495,7 @@ function kmap:drawGroup()
   -- sprawdzamy czy mamy informacje o lokalizacji
   if gmcp.Room.Info[1] ~= nil and gmcp.Room.Info[1].unavailable ~= nil then
     kmap.messageBox:show()
-    kmap.messageBox:rawEcho('<center>' .. gmcp.Room.Info[1].unavailable .. '</center>')
+    kmap.messageBox:rawEcho('<center>' .. kgui:transliterate(gmcp.Room.Info[1].unavailable) .. '</center>')
     return
   end
 
@@ -395,7 +503,7 @@ function kmap:drawGroup()
   local group = gmcp.Char.Group
   if group[1] ~= nil and group[1].unavailable ~= nil then
     kmap.messageBox:show()
-    kmap.messageBox:rawEcho('<center>' .. group[1].unavailable .. '</center>')
+    kmap.messageBox:rawEcho('<center>' .. kgui:transliterate(group[1].unavailable) .. '</center>')
     return
   end
 
@@ -409,20 +517,42 @@ function kmap:drawGroup()
 
   kmap.messageBox:hide()
 
+  local symbolMode = "num"
+  if kgui.uiState.group == nil then symbolMode = "short" end
+  if kmap.immoMap == "y" then symbolMode = "name" end
+
+  local playerSymbols = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "②"}
+
   -- rysowanie playerow z kolkami zamiast charmow
   local members = {}
-  local lastPlayerName = nil
+  local lastPlayerId = nil
+  local playerId = 1
+  local mobId = 1
   for _, player in ipairs(group.members) do
-    if player.is_npc and lastPlayerName ~= nil and members[lastPlayerName] ~= nil then
-      members[lastPlayerName].name = members[lastPlayerName].name .. '•'
+    if player.is_npc and lastPlayerId ~= nil and members[lastPlayerId] ~= nil then
+      if members[lastPlayerId] ~= nil and members[lastPlayerId].room == player.room then
+        members[lastPlayerId].name = members[lastPlayerId].name .. '°'
+      else
+        members["m" .. mobId] = {
+          ["name"] = "©",
+          ["room"] = player.room,
+        }
+      end
+      mobId = mobId + 1
     else
-      members[player.name] = {
+      members[playerId] = {
         ["name"] = player.name,
         ["room"] = player.room,
       }
-      lastPlayerName = player.name
-      members[lastPlayerName].name = utf8.sub(members[lastPlayerName].name, 1, 3)
+      lastPlayerId = playerId
+      if symbolMode == "num" then
+        members[lastPlayerId].name = playerSymbols[playerId]
+      end
+      if symbolMode == "short" then
+        members[lastPlayerId].name = utf8.sub(members[lastPlayerId].name, 1, 3)
+      end
     end
+    playerId = playerId + 1
   end
 
   -- grupowanie ludzi wedlug lokalizacji
@@ -430,20 +560,30 @@ function kmap:drawGroup()
   local labelCharCountForRoom = {}
   for _, player in pairs(members) do
     local roomLabel = labelForRoom[player.room]
-    local playerChar = player.name .. '\n'
+    local playerChar = player.name
+    if symbolMode ~= "num" then
+      playerChar = kgui:transliterate(player.name) .. '\n'
+    end
     -- !!! w tych cudzyslowiach jest znak niewidocznej spacji !!!
     if roomLabel == nil then roomLabel = "​" end
     labelForRoom[player.room] = roomLabel .. playerChar
     if labelCharCountForRoom[player.room] == nil then labelCharCountForRoom[player.room] = 0 end
     labelCharCountForRoom[player.room] = labelCharCountForRoom[player.room] + 1
+    if symbolMode == "num" and labelCharCountForRoom[player.room] % 3 == 0 then
+      labelForRoom[player.room] = labelForRoom[player.room] .. '\n'
+    end
   end
 
   for room, label in pairs(labelForRoom) do
     local roomId = kmap.vnumToRoomIdCache[room]
     if roomId ~= nil then
-      local fontW, fontH = calcFontSize(14, "Marcellus")
-      --local deltaX = fontW * labelCharCountForRoom[room] / 20
+      local fontW, fontH = calcFontSize(20, "Marcellus")
       local deltaX = fontW * 3 / 20  / 2
+      if symbolMode == "num" then
+        local symbolCount = labelCharCountForRoom[room]
+        if symbolCount > 3 then symbolCount = 3 end
+        deltaX = fontW * symbolCount / 20
+      end
       local roomX, roomY, roomZ = getRoomCoordinates(roomId)
       createMapLabel(getRoomArea(roomId), label, roomX - deltaX, roomY + 1, roomZ, 240, 240, 240, 0, 0, 0, 30, 14, true, true)
     end
@@ -464,20 +604,46 @@ end
 -- dodatki dla immo na mapie
 --
 function kmap:setImmoMap()
-  addMapEvent("🧰 Skocz do rooma", "onKMapGoto")
-  if kmap.ids.onKMapGotoEvent then killAnonymousEventHandler(kmap.ids.onKMapGotoEvent) end
-  kmap.ids.onKMapGotoEvent = registerAnonymousEventHandler("onKMapGoto", "kmap:gotoRoom")
+  addMapEvent('🚀 Skocz tutaj', 'mapJumpTo')
+  if kmap.ids.onKMapJumpTo then killAnonymousEventHandler(kmap.ids.onKMapJumpTo) end
+  kmap.ids.onKMapJumpTo = registerAnonymousEventHandler("mapJumpTo", function() kmap:jumpTo() end)
 end
 
 function kmap:unsetImmoMap()
-  if kmap.ids.onKMapGotoEvent then killAnonymousEventHandler(kmap.ids.onKMapGotoEvent) end
-  removeMapEvent("🧰 Skocz do rooma")
+  if kmap.ids.onKMapJumpTo then killAnonymousEventHandler(kmap.ids.onKMapJumpTo) end
+  removeMapEvent('🚀 Skocz tutaj')
 end
 
-function kmap:gotoRoom()
-  local sel = getMapSelection()["rooms"]
-  if sel == nil or #sel == 0 then
+--
+-- dodatki dla edytorow na mapie
+--
+function kmap:setEditMap()
+  addMapEvent('🔍 Info', 'mapInfo')
+  addMapEvent('🗑 Wyczyść dane', 'mapForget')
+  if kmap.ids.onKMapForget then killAnonymousEventHandler(kmap.ids.onKMapForget) end
+  kmap.ids.onKMapForget = registerAnonymousEventHandler("mapForget", function() kmapper:mapForget(true) end)
+  if kmap.ids.onKMapInfo then killAnonymousEventHandler(kmap.ids.onKMapInfo) end
+  kmap.ids.onKMapInfo = registerAnonymousEventHandler("mapInfo", function() kmapper:mapInfo(true) end)
+end
+
+function kmap:unsetEditMap()
+  if kmap.ids.onKMapForget then killAnonymousEventHandler(kmap.ids.onKMapForget) end
+  if kmap.ids.onKMapInfo then killAnonymousEventHandler(kmap.ids.onKMapInfo) end
+  removeMapEvent("🔍 Info")
+  removeMapEvent("🗑 Wyczyść dane")
+end
+
+--
+-- Skakanie po mapie
+--
+function kmap:jumpTo()
+  local selectedRooms = getMapSelection()["rooms"]
+  if selectedRooms == nil or #selectedRooms == 0 then
+    cecho('\n<red>Najpierw zaznacz room na mapie!\n')
     return
   end
-  send("goto " .. getRoomUserData(sel[1], "vnum"))
+  local roomId = selectedRooms[1];
+  local vnum = getRoomUserData(roomId, "vnum")
+  send('goto ' .. vnum .. '\n')
+  kmap:centerView(roomId)
 end

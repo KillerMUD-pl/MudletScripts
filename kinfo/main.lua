@@ -84,7 +84,7 @@ function kinfo:charInfoEventHandler()
 
   if kgui.ui.info == nil or kgui.ui.info.wrapper == nil then return end
 
-  local txt = '<div style="white-space:nowrap;"><span style="font-size:25px;">' .. vitals.name .. '</span>'
+  local txt = '<div style="white-space:nowrap;"><span style="font-size:25px;">' .. kgui:transliterate(vitals.name) .. '</span>'
   local sex = 'mężczyzna'
   if vitals.sex == 'F' then sex = 'kobieta' end
   txt = txt .. '<span style="font-size:16px;">, ' .. sex .. ', lev. ' .. vitals.level .. '</span></div>'
@@ -164,7 +164,7 @@ function kinfo:charInfoEventHandler()
   -- sprawdzamy czy mamy informacje o grupie
   if affs[1] ~= nil and affs[1].unavailable ~= nil then
     height = height + (fontHeight + 2)
-    kgui:setBoxContent('info', txt .. '<center>' .. affs[1].unavailable .. '</center>', height)
+    kgui:setBoxContent('info', txt .. '<center>' .. kgui:transliterate(affs[1].unavailable) .. '</center>', height)
     kgui:update()
     return
   end

@@ -112,152 +112,25 @@ function kgroup:charInfoEventHandler()
   if kgroup.enabled == false then
     return
   end
-  
-  -- DO TESTOWANIA
-  local group = {
-    ["members"] = {
-      {
-        ["name"] = "Zeddicus",
-        ["hp"] = "żadnych śladów",
-        ["mv"] = "wypoczęty",
-        ["pos"] = "standing",
-        ["is_npc"] = false,
-        ["mem"] = 3,
-      },
-      {
-        ["name"] = "Pomniejszy cień",
-        ["hp"] = "zadrapania",
-        ["mv"] = "wypoczęty",
-        ["pos"] = "standing",
-        ["is_npc"] = true,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Vorid",
-        ["hp"] = "lekkie rany",
-        ["mv"] = "lekko zmęczony",
-        ["pos"] = "resting",
-        ["is_npc"] = false,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Ąęćłńśóżź",
-        ["hp"] = "średnie rany",
-        ["pos"] = "standing",
-        ["mv"] = "bardzo zmeczony",
-        ["is_npc"] = false,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Grywhsnywns",
-        ["hp"] = "ciężkie rany",
-        ["mv"] = "zameczony",
-        ["pos"] = "standing",
-        ["is_npc"] = false,
-        ["mem"] = 8,
-      },
-      {
-        ["name"] = "Gigantyczna anakonda",
-        ["hp"] = "ogromne rany",
-        ["mv"] = "lekko zmęczona",
-        ["pos"] = "recuperate",
-        ["is_npc"] = true,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Elitarny gwardzista",
-        ["hp"] = "ledwo stoi",
-        ["mv"] = "zmęczony",
-        ["pos"] = "standing",
-        ["is_npc"] = true,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Alalslaldlslalt",
-        ["hp"] = "umiera",
-        ["mv"] = "wypoczęty",
-        ["pos"] = "standing",
-        ["is_npc"] = false,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Zeddicus",
-        ["hp"] = "żadnych śladów",
-        ["mv"] = "wypoczęty",
-        ["pos"] = "standing",
-        ["is_npc"] = false,
-        ["mem"] = 3,
-      },
-      {
-        ["name"] = "Pomniejszy cień",
-        ["hp"] = "zadrapania",
-        ["mv"] = "wypoczęty",
-        ["pos"] = "standing",
-        ["is_npc"] = true,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Vorid",
-        ["hp"] = "lekkie rany",
-        ["mv"] = "lekko zmęczony",
-        ["pos"] = "resting",
-        ["is_npc"] = false,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Ąęćłńśóżź",
-        ["hp"] = "średnie rany",
-        ["pos"] = "standing",
-        ["mv"] = "bardzo zmeczony",
-        ["is_npc"] = false,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Grywhsnywns",
-        ["hp"] = "ciężkie rany",
-        ["mv"] = "zameczony",
-        ["pos"] = "standing",
-        ["is_npc"] = false,
-        ["mem"] = 8,
-      },
-      {
-        ["name"] = "Gigantyczna anakonda",
-        ["hp"] = "ogromne rany",
-        ["mv"] = "lekko zmęczona",
-        ["pos"] = "recuperate",
-        ["is_npc"] = true,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Elitarny gwardzista",
-        ["hp"] = "ledwo stoi",
-        ["mv"] = "zmęczony",
-        ["pos"] = "standing",
-        ["is_npc"] = true,
-        ["mem"] = 0,
-      },
-      {
-        ["name"] = "Alalslaldlslalt",
-        ["hp"] = "umiera",
-        ["mv"] = "wypoczęty",
-        ["pos"] = "standing",
-        ["is_npc"] = false,
-        ["mem"] = 0,
-      },
-    }
-  }
 
   group = gmcp.Char.Group or {}
 
   -- sprawdzamy czy mamy informacje o grupie
   if group[1] ~= nil and group[1].unavailable ~= nil then
-    kgui:setBoxContent('group', '<center>' .. group[1].unavailable .. '</center>')
+    kgui:setBoxContent('group', '<center>' .. kgui:transliterate(group[1].unavailable) .. '</center>')
     return
   end
 
   if group.members == nil then return end
 
   group = kgroup:filterCharms(group)
+
+  local playerSymbols = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "②"}
+  local playerId = 1
+  local hasMap = false
+  if kgui.uiState ~= nil and kgui.uiState.mapper ~= nil and #group.members > 1 then
+    hasMap = true
+  end
 
   local txt = '<table width="100%" align="left" cellspacing="0" cellpadding="0" border="0">'
   for _, ch in ipairs(group.members) do
@@ -270,6 +143,14 @@ function kgroup:charInfoEventHandler()
       fontSize = 14
       --padSize = 27
       color = "#aaaaaa"
+      if hasMap == true then
+        name = '&nbsp;&nbsp;' .. name
+      end
+    else
+      if hasMap == true then
+        name =  '<span style="color:#777777">' .. playerSymbols[playerId] .. '</span>&nbsp;' .. name
+      end
+      playerId = playerId + 1
     end
     txt = txt .. '<tr style="height:20px;line-height:20px;max-height:20px">'
     -- NAZWA

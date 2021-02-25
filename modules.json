@@ -6,7 +6,7 @@
     "shortDesc": "Instalator modułów"
   },
   "kmap": {
-    "version": 24,
+    "version": 25,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kmap.zip",
     "commands": [ "map" ],
     "shortDesc": "Moduł mapy"
@@ -18,7 +18,7 @@
     "shortDesc": "Moduł informacji o graczu"
   },
   "kgroup": {
-    "version": 8,
+    "version": 9,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kgroup.zip",
     "commands": [ "group" ],
     "shortDesc": "Moduł informacji o grupie"

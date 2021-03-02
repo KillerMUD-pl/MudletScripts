@@ -42,9 +42,12 @@ function kgroup:doGroup()
 end
 
 function kgroup:undoGroup()
-  cecho('<gold>Wyłączam panel grupy\n')
+  local param = kinstall.params[1]
+  if param ~= 'silent' then
+    cecho('<gold>Wyłączam panel grupy\n')
+  end
   kgroup:removeBox()
-  kinstall:setConfig('mapa', 'n')
+  kinstall:setConfig('group', 'n')
   kgroup.enabled = false
 end
 
@@ -79,8 +82,8 @@ end
 -- Wyswietla informacje o graczy i grupie w okienku
 --
 function kgroup:addBox()
-  kgui:addBox('group', 0, "Grupa", function() kgroup:undoGroup() end)
-  kgroup.group_box = kgui:setBoxContent('group', '<center><b>Zaloguj się do gry.</b><br>Oczekiwanie na informacje z GMCP...</center>')
+  kgui:addBox('group', 0, "Grupa", "group")
+  kgroup.group_box = kgui:setBoxContent('group', '<center>Zaloguj się do gry lub włącz GMCP</center>')
   kgroup.group_box:setDoubleClickCallback(function(event)
     if kgroup.immoGroup ~= 't' then return end
     local y = math.ceil((event.y - 14) / 20)
@@ -101,7 +104,7 @@ end
 
 function kgroup:checkGmcp()
   if kinstall.receivingGmcp == false then
-    kgui:setBoxContent('group', '<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
+    kgui:setBoxContent('group', '<center>Zaloguj się do gry lub włącz GMCP</center>')
   end
 end
 
@@ -133,15 +136,14 @@ function kgroup:charInfoEventHandler()
   end
 
   local txt = '<table width="100%" align="left" cellspacing="0" cellpadding="0" border="0">'
+  local fontSize = kgui.baseFontHeight
+  local lineHeight = kgui.baseFontHeightPx
   for _, ch in ipairs(group.members) do
-    local fontSize = 16
     --local padSize = 20
     local color = "#f0f0f0"
     local name = kgui:transliterate(ch.name)
     if ch.is_npc == true then
       name = '&nbsp;&nbsp;' .. name
-      fontSize = 14
-      --padSize = 27
       color = "#aaaaaa"
       if hasMap == true then
         name = '&nbsp;&nbsp;' .. name
@@ -152,27 +154,27 @@ function kgroup:charInfoEventHandler()
       end
       playerId = playerId + 1
     end
-    txt = txt .. '<tr style="height:20px;line-height:20px;max-height:20px">'
+    txt = txt .. '<tr style="height:' .. lineHeight .. 'px;line-height:' .. lineHeight .. 'px;max-height:' .. lineHeight .. 'px">'
     -- NAZWA
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">&nbsp;' .. kgui:transliterate(name) ..'&nbsp;&nbsp;</td>'
+    txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;color:' .. color .. ';font-size: ' .. fontSize .. 'px">&nbsp;' .. kgui:transliterate(name) ..'&nbsp;&nbsp;</td>'
     -- HP
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">hp: <span style="line-height:20px;font-family:Arial">&nbsp;' .. kgroup:hpBar(kgroup:translateHp(kgroup:normalize(ch.hp))) .. '</span>&nbsp;</td>'
+    txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">hp: <span style="line-height:' .. lineHeight .. 'px;font-family:Arial">&nbsp;' .. kgroup:hpBar(kgroup:translateHp(kgroup:normalize(ch.hp))) .. '</span>&nbsp;</td>'
     -- MV
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">mv: <span style="line-height:20px;font-family:Arial">&nbsp;' .. kgroup:mvBar(kgroup:translateMv(kgroup:normalize(ch.mv))) .. '</span>&nbsp;</td>'
+    txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">mv: <span style="line-height:' .. lineHeight .. 'px;font-family:Arial">&nbsp;' .. kgroup:mvBar(kgroup:translateMv(kgroup:normalize(ch.mv))) .. '</span>&nbsp;</td>'
     -- POS
-    txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. kgui:transliterate(ch.pos) .. '</span>&nbsp;</td>'
+    txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. kgui:transliterate(ch.pos) .. '</span>&nbsp;</td>'
     -- MEM
     if ch.mem > 0 then
-      txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">&nbsp;' .. ch.mem .. ' mem&nbsp;</td>'
+      txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">&nbsp;' .. ch.mem .. ' mem&nbsp;</td>'
     else
-      txt = txt .. '<td height="20" valign="center" style="line-height:20px;white-space:nowrap;">&nbsp;</td>'
+      txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">&nbsp;</td>'
     end
     --
     txt = txt .. '</tr>'
   end
   txt = txt .. '</table>'
 
-  kgui:setBoxContent('group', txt, (#group.members) * 20 + 30)
+  kgui:setBoxContent('group', txt, #group.members * lineHeight)
   kgui:update()
 end
 
@@ -259,9 +261,12 @@ function kgroup:hpBar(value)
     "#00ee00", -- zadnych sladow
   }
   local max = 7
-  local fullBoxes = value * 2
-  if fullBoxes > 13 then fullBoxes = 13 end
-  local emptyBoxes = (max - value) * 2 - 1
+  --local fullBoxes = value * 2
+  local fullBoxes = value
+  --if fullBoxes > 13 then fullBoxes = 13 end
+  if fullBoxes > 7 then fullBoxes = 7 end
+  --local emptyBoxes = (max - value) * 2 - 1
+  local emptyBoxes = (max - value)
   if emptyBoxes < 0 then emptyBoxes = 0 end
   return '<span style="color:' .. fullColors[value+1] .. '">' .. string.rep("█", fullBoxes) .. '</span>' ..
     '<span style="color:' .. emptyColors[value+1] .. '">' .. string.rep("█", emptyBoxes) .. '</span>'
@@ -283,9 +288,12 @@ function kgroup:mvBar(value)
     "#00ee00", -- wypoczety
   }
   local max = 4
-  local fullBoxes = value * 2
-  if fullBoxes > 8 then fullBoxes = 8 end
-  local emptyBoxes = (max - value) * 2
+  --local fullBoxes = value * 2
+  local fullBoxes = value
+  --if fullBoxes > 8 then fullBoxes = 8 end
+  --local emptyBoxes = (max - value) * 2
+  if fullBoxes > 4 then fullBoxes = 4 end
+  local emptyBoxes = (max - value)
   return '<span style="color:' .. fullColors[value+1] .. '">' .. string.rep("█", fullBoxes) .. '</span>' ..
     '<span style="color:' .. emptyColors[value+1] .. '">' .. string.rep("█", emptyBoxes) .. '</span>'
 end

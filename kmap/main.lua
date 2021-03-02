@@ -132,8 +132,11 @@ function kmap:doMap()
   kinstall:setConfig('mapa', 't')
 end
 
-function kmap:undoMap(params)
-  cecho('<gold>Wyłączam mapę\n')
+function kmap:undoMap()
+  local param = kinstall.params[1]
+  if param ~= 'silent' then
+    cecho('<gold>Wyłączam mapę\n')
+  end
   kmap:removeBox()
   kinstall:setConfig('mapa', 'n')
 end
@@ -211,13 +214,13 @@ end
 -- Wyswietla okienko mapy
 --
 function kmap:addBox()
-  local wrapper = kgui:addBox('mapper', 300, "Mapa", function() kmap:undoMap() end)
+  local wrapper = kgui:addBox('mapper', 300, "Mapa", "map")
   kmap.mapperBox = Geyser.Label:new({
     name = 'mapper',
+    x = 2,
+    y = kgui.baseFontHeightPx + 2 .. "px",
     width = "100%-4px",
-    height = "100%-22px",
-    x = "2px",
-    y = "20px"
+    height = "100%-".. kgui.baseFontHeightPx + 4 .."px",
   }, wrapper)
   wrapper.windowList.mapperWrapperadjLabel:setStyleSheet([[
     QWidget {
@@ -228,7 +231,7 @@ function kmap:addBox()
     background: rgba(0,0,0,0);
     border: 2px solid (30,30,30,230)
   ]])
-  
+
   kmap.messageBox = Geyser.Label:new({
     name = 'mapperMessage',
     width = "100%-4px",
@@ -449,7 +452,6 @@ function kmap:mapLoad(forceReload)
   else
     kmap:unsetImmoMap()
   end
-  echo('\n')
   updateMap()
 end
 
@@ -518,7 +520,7 @@ function kmap:drawGroup()
   kmap.messageBox:hide()
 
   local symbolMode = "num"
-  if kgui.uiState.group == nil then symbolMode = "short" end
+  if not kgui:isClosed('group') then symbolMode = "short" end
   if kmap.immoMap == "y" then symbolMode = "name" end
 
   local playerSymbols = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "②"}
@@ -596,7 +598,7 @@ function kmap:checkGmcp()
   if kmap == nil or kmap.messageBox == nil or kmap.messageBox.show == nil then return end
   if kinstall.receivingGmcp == false and not (kgui.ui ~= nil and kgui.ui.info ~= nil and kgui.ui.info.wrapper.hidden == false ) then
     kmap.messageBox:show()
-    kmap.messageBox:rawEcho('<center>Zaloguj się do gry, lub wpisz <code>config gmcp</code> jeśli już jesteś w grze.<br>Oczekiwanie na informacje z GMCP...</center>')
+    kmap.messageBox:rawEcho('<center>Zaloguj się do gry lub włącz GMCPs</center>')
   end
 end
 

@@ -223,7 +223,7 @@ function kinstall:initModule(moduleName)
     end
   end)
   if err ~= nil then
-    display(err)
+    display({"kinstall:initModule", moduleName, err})
   end
 end
 
@@ -284,6 +284,29 @@ function kinstall:doRemove()
   cecho('<gold>Usunięto moduł ' .. param .. '.\n\n')
 end
 
+function kinstall:doGui()
+  local param = kinstall.params[1]
+  if param == 'font' then
+    local size = kinstall.params[2]
+    kinstall:setConfig('fontSize', tonumber(size))
+    kgui:init()
+    kinstall:checkVersions()
+    return
+  end
+
+  cecho('<gold>Właczam GUI\n\n')
+  tempTimer(0.5, function() kinstall:runCmd('+', 'map', true) end)
+  tempTimer(0.6, function() kinstall:runCmd('+', 'info', true) end)
+  tempTimer(0.7, function() kinstall:runCmd('+', 'group', true) end)
+end
+
+function kinstall:undoGui()
+  cecho('<gold>Wyłaczam GUI\n\n')
+  tempTimer(0.5, function() kinstall:runCmd('-', 'group', true) end)
+  tempTimer(0.6, function() kinstall:runCmd('-', 'info', true) end)
+  tempTimer(0.7, function() kinstall:runCmd('-', 'map', true) end)
+end
+
 function kinstall:runCmd(mode, cmd, isAutoRun)
   local params = {}
   params[1], params[2] = cmd:match("(%w+)(.*)")
@@ -307,7 +330,7 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
     kinstall.params = string.trim(params[2]):split(' ')
     local _, err = pcall(func)
     if err ~= nil then
-      display(err)
+      display({"kinstall:runCmd", mode, cmd, isAutoRun, err})
     end
     kgui:saveState()
   else
@@ -340,6 +363,7 @@ function kinstall:kinstallLoaded(_, filename)
     if kinstall:getConfig('welcomed') ~= true then
       kinstall:setConfig('welcomed', true)
       kinstall:welcomeScreen()
+      kinstall:doGui()
     else
       cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
     end
@@ -393,7 +417,7 @@ function kinstall:sysDownloadError(_, error)
     return
   end
   cecho('<red>Nieoczekiwany błąd przy ściąganiu pliku!\n')
-  display(error)
+  display({"sysDownloadError", _, error})
 end
 if kinstall.sysDownloadErrorId ~= nil then killAnonymousEventHandler(kinstall.sysDownloadErrorId) end
 kinstall.sysDownloadErrorId = registerAnonymousEventHandler("sysDownloadError", "kinstall:sysDownloadError", false)
@@ -413,7 +437,7 @@ function kinstall:sysUnzipDone(_, filename)
     local _, err = pcall(func)
     if err ~= nil then
       cecho('<red>Wystąpił błąd przy instalowaniu modułu ' .. name .. '.\n\n')
-      display(err)
+      display({"sysDownloadError", _, filename})
       return
     end
   end
@@ -439,7 +463,7 @@ kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinst
 -- odświeżanie timera pilnującego GMCP
 function kinstall:restartGmcpWatch()
   if kinstall.receivingGmcpTimer ~= nil then killTimer(kinstall.receivingGmcpTimer) end
-  kinstall.receivingGmcpTimer = tempTimer(5, function()
+  kinstall.receivingGmcpTimer = tempTimer(3, function()
     kinstall.receivingGmcp = false;
   end)
 end

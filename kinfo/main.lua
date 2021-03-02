@@ -4,9 +4,27 @@ setfenv(1, getfenv(2));
 kinfo = kinfo or {}
 kinfo.info_box = nil
 kinfo.enabled = false
+kinfo.colors = kinfo.colors or {}
 
 function kinfo:doInfo()
   local param = kinstall.params[1]
+  if param == 'color' then
+    local cmd = table.concat(kinstall.params, ' ', 2)
+    local parts = string.split(cmd, "=")
+    local affName = string.trim(parts[1])
+    if #parts == 1 then
+      clearCmdLine()
+      printCmdLine('+info color ' .. affName .. ' = ')
+      showColors()
+      cecho('\n<gold>Wybierz kolor klikając go, następnie wcisnij enter\n')
+      return
+    end
+    local color = string.trim(parts[2])
+    cecho('\n<gold>Ustawiono kolor dla '.. affName ..' na ' .. color .. '\n')
+    color = color_table[color]
+    kinfo.colors[affName] = 'rgb(' .. color[1] .. ',' .. color[2] .. ',' .. color[3] .. ')'
+    return
+  end
   if param ~= "silent" then
     cecho('<gold>Włączam panel postaci\n')
   end
@@ -16,9 +34,12 @@ function kinfo:doInfo()
 end
 
 function kinfo:undoInfo()
-  cecho('<gold>Wyłączam panel postaci\n')
+  local param = kinstall.params[1]
+  if param ~= 'silent' then
+    cecho('<gold>Wyłączam panel postaci\n')
+  end
   kinfo:removeBox()
-  kinstall:setConfig('mapa', 'n')
+  kinstall:setConfig('info', 'n')
   kinfo.enabled = false
 end
 
@@ -41,18 +62,29 @@ end
 function kinfo:register()
   kinfo:unregister()
   kinfo.charInfoEvent = registerAnonymousEventHandler("gmcp.Char", "kinfo:charInfoEventHandler")
+  kinfo.receivingGmcpTimer = tempTimer(2, [[ kinfo:checkGmcp() ]], true)
 end
 
 function kinfo:unregister()
   if kinfo.charInfoEvent then killAnonymousEventHandler(kinfo.charInfoEvent) end
+  if kinfo.receivingGmcpTimer then killTimer(kinfo.receivingGmcpTimer) end
 end
 
 --
 -- Wyswietla informacje o graczy i grupie w okienku
 --
 function kinfo:addBox()
-  kgui:addBox('info', 0, "Gracz", function() kinfo:undoInfo() end)
-  kinfo.info_box = kgui:setBoxContent('info', '<center><b>Zaloguj się do gry.</b><br>Oczekiwanie na informacje z GMCP...</center>')
+  kgui:addBox('info', 0, "Gracz", "info")
+  kinfo.info_box = kgui:setBoxContent('info', '<center>Zaloguj się do gry lub włącz GMCP</center>')
+end
+
+--
+-- Info o braku danych
+--
+function kinfo:checkGmcp()
+  if kinstall.receivingGmcp == false then
+    kgui:setBoxContent('info', '<center>Zaloguj się do gry lub włącz GMCP</center>')
+  end
 end
 
 --
@@ -84,90 +116,101 @@ function kinfo:charInfoEventHandler()
 
   if kgui.ui.info == nil or kgui.ui.info.wrapper == nil then return end
 
-  local txt = '<div style="white-space:nowrap;"><span style="font-size:25px;">' .. kgui:transliterate(vitals.name) .. '</span>'
+  local fontSize = kgui.baseFontHeight
+  local compact = false
+  local titleFontSizePx = math.floor(kgui.baseFontHeightPx * 1.5)
+  local titleFontSize = math.floor(fontSize * 1.5)
+  local infoFontSizePx = kgui.baseFontHeightPx
+  local infoFontSize = fontSize
+
+  if kgui.uiState.info ~= nil and kgui.uiState.info.socket == "bottomBar" then
+    compact = true
+    titleFontSizePx = kgui.baseFontHeightPx
+    titleFontSize = fontSize
+    infoFontSizePx = math.ceil(titleFontSizePx * 0.8)
+    infoFontSize = math.ceil(titleFontSize*0.8)
+  end
+
+  local txt = '<span style="white-space:nowrap;height:' .. titleFontSizePx .. 'px;line-height:' .. titleFontSizePx .. 'px"><span style="font-size:' .. titleFontSize .. 'px;">' .. kgui:transliterate(vitals.name) .. '</span>'
   local sex = 'mężczyzna'
   if vitals.sex == 'F' then sex = 'kobieta' end
-  txt = txt .. '<span style="font-size:16px;">, ' .. sex .. ', lev. ' .. vitals.level .. '</span></div>'
+  txt = txt .. '<span style="font-size:' .. fontSize .. 'px;">, ' .. sex .. ', lev. ' .. vitals.level .. '</span></span>\n'
   local list = {}
-  local blockWidths = {}
-  local height = 50
-  local posText, posWidth = kinfo:translatePos(vitals.pos)
-  table.insert(list, '<span style="font-size:16px;white-space:nowrap;">' .. posText .. '</span>')
-  table.insert(blockWidths, posWidth)
+  local height = titleFontSizePx
+  local posText = kinfo:translatePos(vitals.pos)
+  table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;">' .. posText .. '</span>')
   if cond.smoking == true then
-    table.insert(blockWidths, 168)
-    local s = "ćmisz fajkę"
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#dd0000">'..s..'</span>')
+    local s = "ćmisz&nbsp;fajkę"
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#dd0000">'..s..'</span>')
   end
   if cond.hungry == true then
-    table.insert(blockWidths, 200)
-    local s = "jesteś głodny"
+    local s = "jesteś&nbsp;głodny"
     if vitals.sex == "F" then s = "Jesteś głodna" end
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#dd0000">'..s..'</span>')
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#dd0000">'..s..'</span>')
   end
   if cond.thirsty == true then
-    table.insert(blockWidths, 256)
-    local s = "jesteś spragniony"
+    local s = "jesteś&nbsp;spragniony"
     if vitals.sex == "F" then s = "Jesteś spragniona" end
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#dd0000">'..s..'</span>')
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#dd0000">'..s..'</span>')
   end
   if cond.sleepy == true then
-    table.insert(blockWidths, 186)
-    local s = "jesteś śpiący"
+    local s = "jesteś&nbsp;śpiący"
     if vitals.sex == "F" then s = "Jesteś śpiąca" end
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#dd0000">'..s..'</span>')
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#dd0000">'..s..'</span>')
   end
   if cond.overweight == true then
-    table.insert(blockWidths, 272)
-    local s = "jesteś przeciążony"
+    local s = "jesteś&nbsp;przeciążony"
     if vitals.sex == "F" then s = "Jesteś przeciążona" end
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#dd0000">'..s..'</span>')
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#dd0000">'..s..'</span>')
   end
   if cond.drunk == true then
-    table.insert(blockWidths, 184)
-    local s = "jesteś pijany"
+    local s = "jesteś&nbsp;pijany"
     if vitals.sex == "F" then s = "Jesteś pijana" end
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#ff8800">'..s..'</span>')
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#ff8800">'..s..'</span>')
   end
   if cond.halucinations == true then
-    table.insert(blockWidths, 206)
-    local s = "jesteś na haju"
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#ff8800">'..s..'</span>')
+    local s = "jesteś&nbsp;na&nbsp;haju"
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#ff8800">'..s..'</span>')
   end
   if cond.bleedingWound == true then
-    table.insert(blockWidths, 292)
-    local s = "twoje rany krwawią"
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#ff0000">'..s..'</span>')
+    local s = "twoje&nbsp;rany&nbsp;krwawią"
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#ff0000">'..s..'</span>')
   end
   if cond.bleed == true then
-    table.insert(blockWidths, 260)
-    local s = "jesteś okaleczony"
+    local s = "jesteś&nbsp;okaleczony"
     if vitals.sex == "F" then s = "Jesteś okaleczona" end
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#ff0000">'..s..'</span>')
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#ff0000">'..s..'</span>')
   end
   if cond.thighJab == true then
-    table.insert(blockWidths, 226)
-    local s = "krwawisz z uda"
-    table.insert(list, '<span style="white-space:nowrap;font-size:16px;color:#ff0000">'..s..'</span>')
+    local s = "krwawisz&nbsp;z&nbsp;uda"
+    table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;color:#ff0000">'..s..'</span>')
   end
-  txt = txt .. '<div style="white-space:wrap;width:100%">' .. table.concat(list, ", ") .. '</div>'
-  height = height + kinfo:calculateTextHeight(blockWidths, kgui.ui.info.wrapper:get_width() - 30, 16)
 
-  txt = txt .. '<div style="height:5px;font-size:5px;line-height:5px">&nbsp;</div>'
-  height = height + 5
+  local cond = table.concat(list, ", ")
+  if compact == false then
+    txt = txt .. '<div style="font-family:\''..getFont()..'\';white-space:wrap;width:100%">' .. cond .. '</div>'
+    height = height + kinfo:calculateTextHeight(cond, kgui.ui.info.wrapper:get_width() - kgui.boxPadding * 2 - 4, infoFontSize, infoFontSizePx)
+  else
+    txt = txt .. ', <span style="font-family:\''..getFont()..'\';white-space:wrap">' .. cond .. '</span>'
+    height = kinfo:calculateTextHeight(cond, kgui.ui.info.wrapper:get_width() - kgui.boxPadding * 2 - 4, infoFontSize, infoFontSizePx)
+  end
 
   -- AFEKTY
 
-  local fontSize = 14
-  local fontWidth, fontHeight = calcFontSize(fontSize, 'Marcellus')
-
-  -- sprawdzamy czy mamy informacje o grupie
+  -- sprawdzamy czy mamy informacje o afektach
   if affs[1] ~= nil and affs[1].unavailable ~= nil then
-    height = height + (fontHeight + 2)
+    height = height + kgui.baseFontHeightPx
     kgui:setBoxContent('info', txt .. '<center>' .. kgui:transliterate(affs[1].unavailable) .. '</center>', height)
     kgui:update()
     return
   end
+
+  if #affs > 0 and compact == false then
+    txt = txt .. '<div style="height:'..math.floor(fontSize * 0.5)..'px;font-size:'..math.floor(fontSize * 0.5)..'px;line-height:'..math.floor(fontSize * 0.5)..'px">&nbsp;</div>'
+    height = height + math.floor(fontSize * 0.5)
+  end
+
+  txt = txt .. '\n'
 
   -- wykrywamy czy postac jest czarujaca
   isMage = false
@@ -182,58 +225,59 @@ function kinfo:charInfoEventHandler()
     for _, aff in ipairs(affs) do
       if aff.name == '' then table.insert(rawAffs, aff) end
     end
-    height = height + (fontHeight + 2) * #rawAffs
+    height = height + infoFontSizePx * #rawAffs
     for _, rawAff in ipairs(rawAffs) do
       color = "#44aa44"
       if rawAff.negative == true then
         color = "#dd0000"
       end
-      local desc = kgui:transliterate(rawAff.desc)
-      if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. rawAff.extraValue .. ') ' .. desc end
+      local customColor = kinfo.colors[kgui:transliterate(rawAff.desc)]
+      if customColor ~= nil then color = customColor end
+      local desc = utf8.gsub(kgui:transliterate(rawAff.desc), ' ', '&nbsp;')
+      if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. utf8.gsub(rawAff.extraValue, ' ', '&nbsp;' ) .. ') ' .. desc end
       local bgColor = 'rgba(0,0,0,0)';
       if rawAff.ending ~= nil and rawAff.ending == true then bgColor = 'rgba(80,0,0,255)' end
-      txt = txt .. '<div style="line-height:20px;background-color:'..bgColor..';font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. desc .. '</div>'
+      txt = txt .. '<span style="line-height:' .. infoFontSize .. 'px;background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'.. color ..'">' .. desc .. '</div>'
     end
     -- same nazwy afektow w formie word-wrap
-    fontSize = 12
     local list = {}
-    local blockWidths = {}
-    local fontWidth, fontHeight = calcFontSize(fontSize, getFont())
     for _, aff in ipairs(affs) do
       if aff.name ~= '' then
         color = "#44aa44"
         if aff.negative == true then
           color = "#dd0000"
         end
-        local affName = kgui:transliterate(aff.name)
-        if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. aff.extraValue .. ') ' .. affName end
+        local customColor = kinfo.colors[kgui:transliterate(aff.name)]
+        if customColor ~= nil then color = customColor end
+        local affName = utf8.gsub(kgui:transliterate(aff.name), ' ', '&nbsp;')
+        if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. utf8.gsub(aff.extraValue, ' ', '&nbsp;') .. ') ' .. affName end
         local bgColor = 'rgba(0,0,0,0)';
         if aff.ending ~= nil and aff.ending == true then bgColor = 'rgba(80,0,0,255)' end
-        table.insert(blockWidths, utf8.len(affName) * fontWidth + 10)
-        table.insert(list, '<span style="white-space:nowrap;background-color:'..bgColor..';font-size:'..fontSize..'px;color:'..color..'">'..affName..'</span>')
+        table.insert(list, '<span style="background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'..color..'">'..affName..'</span>')
       end
     end
     if #list > 0 then
-      txt = txt .. '<div style="line-height:20px;white-space:wrap;width:100%;font-family:\''..getFont()..'\'">' .. table.concat(list, ", ") .. '</div>'
-      height = height + kinfo:calculateTextHeight(blockWidths, kgui.ui.info.wrapper:get_width() - 30, fontHeight + 2)
+      local afekty = table.concat(list, ", ")
+      txt = txt .. '<div style="line-height:' .. infoFontSize .. 'px;white-space:wrap;width:100%;font-family:\''..getFont()..'\'">' .. afekty .. '</div>'
+      height = height + kinfo:calculateTextHeight(afekty, kgui.ui.info.wrapper:get_width() - kgui.boxPadding * 2 - 4, infoFontSize, infoFontSizePx)
     end
   else
     -- wersja z opisami, dla nie czarujacych
-    local fontSize = 14
-    if #affs > 6 then fontSize = 11 end
-    if #affs > 8 then fontSize = 10 end
-    local fontWidth, fontHeight = calcFontSize(fontSize, 'Marcellus')
-    height = height + (fontHeight + 2) * #affs
+    if #affs > 6 then infoFontSize = math.floor(infoFontSize * 0.85) end
+    if #affs > 8 then infoFontSize = math.floor(infoFontSize * 0.75) end
+    height = height + infoFontSizePx * #affs
     for _, aff in ipairs(affs) do
       color = "#44aa44"
       if aff.negative == true then
         color = "#dd0000"
       end
-      local desc = kgui:transliterate(aff.desc)
-      if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. aff.extraValue .. ') ' .. desc end
+      local customColor = kinfo.colors[kgui:transliterate(aff.desc)]
+      if customColor ~= nil then color = customColor end
+      local desc = utf8.gsub(kgui:transliterate(aff.desc), ' ', '&nbsp;')
+      if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. utf8.gsub(aff.extraValue, ' ', '&nbsp;') .. ') ' .. desc end
       local bgColor = 'rgba(0,0,0,0)';
       if aff.ending ~= nil and aff.ending == true then bgColor = 'rgba(80,0,0,255)' end
-      txt = txt .. '<div style="line-height:20px;background-color:'..bgColor..';font-size:'..fontSize..'px;white-space:nowrap;color:'.. color ..'">' .. desc .. '</div>'
+      txt = txt .. '<div style="line-height:'..infoFontSize..'px;background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'.. color ..'">' .. desc .. '</div>'
     end
   end
 
@@ -242,29 +286,54 @@ function kinfo:charInfoEventHandler()
 end
 
 function kinfo:translatePos(text)
-  local width = 200
-  if text == "dead" then return '<span style="color:#ff0000">martwy</span>', 132 end
-  if text == "mortally wounded" then return '<span style="color:#ff0000">umierający</span>', 168 end
-  if text == "incapacitated" then return '<span style="color:#ff0000">unieruchomiony</span>', 248 end
-  if text == "stunned" then return '<span style="color:#ff8800">oszołomiony</span>', 194 end
-  if text == "sleeping" then return '<span style="color:#cccc00">śpisz</span>', 78 end
-  if text == "resting" then return '<span style="color:#00cc00">odpoczywasz</span>', 202 end
-  if text == "sitting" then return '<span style="color:#ffff00">siedzisz</span>', 118 end
-  if text == "fighting" then return '<span style="color:#ff8800">walczysz</span>', 132 end
-  if text == "standing" then return '<span style="color:#00cc00">stoisz</span>', 98 end
-  return text, width
+  if text == "dead" then return '<span style="color:#ff0000">martwy</span>' end
+  if text == "mortally wounded" then return '<span style="color:#ff0000">umierający</span>' end
+  if text == "incapacitated" then return '<span style="color:#ff0000">unieruchomiony</span>' end
+  if text == "stunned" then return '<span style="color:#ff8800">oszołomiony</span>' end
+  if text == "sleeping" then return '<span style="color:#cccc00">śpisz</span>' end
+  if text == "resting" then return '<span style="color:#00cc00">odpoczywasz</span>' end
+  if text == "sitting" then return '<span style="color:#ffff00">siedzisz</span>' end
+  if text == "fighting" then return '<span style="color:#ff8800">walczysz</span>' end
+  if text == "standing" then return '<span style="color:#00cc00">stoisz</span>' end
+  return text
 end
 
-function kinfo:calculateTextHeight(blockWidths, maxWidth, fontSize)
-  local fontWidth, fontHeight = calcFontSize(fontSize, 'Marcellus')
-  local currWidth = 0
-  local linesCount = 1
-  for _, blockWidth in ipairs(blockWidths) do
-    if currWidth + blockWidth > maxWidth then
-      currWidth = 0
-      linesCount = linesCount + 1
-    end
-    currWidth = currWidth + blockWidth
+function kinfo:calculateTextHeight(txt, maxWidth, fontSize, lineHeight)
+  local fontWidth = calcFontSize(fontSize, getFont())
+  local text = utf8.gsub(utf8.gsub(txt, '&nbsp;', '-'), '\<[^>]+\>', '')
+  local wrapped = kinfo:textwrap(text, math.floor(maxWidth/fontWidth))
+  local linesCount  = select(2, wrapped:gsub('\n', '\n'))
+  return (1 + linesCount) * lineHeight
+end
+
+function kinfo:splittokens(s)
+  local res = {}
+  for w in s:gmatch("%S+") do
+      res[#res+1] = w
   end
-  return linesCount * (fontHeight + 2)
+  return res
+end
+
+function kinfo:textwrap(text, linewidth)
+  if not linewidth then
+      linewidth = 75
+  end
+
+  local spaceleft = linewidth
+  local res = {}
+  local line = {}
+
+  for _, word in ipairs(kinfo:splittokens(text)) do
+      if #word + 1 > spaceleft then
+          table.insert(res, table.concat(line, ' '))
+          line = {word}
+          spaceleft = linewidth - #word
+      else
+          table.insert(line, word)
+          spaceleft = spaceleft - (#word + 1)
+      end
+  end
+
+  table.insert(res, table.concat(line, ' '))
+  return table.concat(res, '\n')
 end

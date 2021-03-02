@@ -8,7 +8,7 @@
   "Lua.runtime.version": "Lua 5.1",
   "Lua.workspace.preloadFileSize": 500,
   "Lua.diagnostics.globals": [
-    "Adjustable",
+    "Adjustable2",
     "mudlet",
     "kinstall",
     "kinstall",

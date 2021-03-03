@@ -10,6 +10,14 @@ function kinfo:doInfo()
   local param = kinstall.params[1]
   if param == 'color' then
     local cmd = table.concat(kinstall.params, ' ', 2)
+    if string.trim(cmd) == '' then
+      cecho('\n<gold>Kolory afektów:\n')
+      for name, color in pairs(kinfo.colors) do
+        decho('<'..color[1]..','..color[2]..','..color[3]..'>'.. name ..' ')
+      end
+      echo('\n\n')
+      return
+    end
     local parts = string.split(cmd, "=")
     local affName = string.trim(parts[1])
     if #parts == 1 then
@@ -21,8 +29,8 @@ function kinfo:doInfo()
     end
     local color = string.trim(parts[2])
     cecho('\n<gold>Ustawiono kolor dla '.. affName ..' na ' .. color .. '\n')
-    color = color_table[color]
-    kinfo.colors[affName] = 'rgb(' .. color[1] .. ',' .. color[2] .. ',' .. color[3] .. ')'
+    kinfo.colors[affName] = color_table[color]
+    kinstall:setConfig('kinfoColors', yajl.to_string(kinfo.colors))
     return
   end
   if param ~= "silent" then
@@ -48,6 +56,9 @@ function kinfo:doUninstall()
 end
 
 function kinfo:doInit()
+  local colors = kinstall:getConfig('kinfoColors')
+  if colors == nil or colors == "" or colors == false then colors = "{}" end
+  kinfo.colors = yajl.to_value(colors)
   kinfo:register()
   if kinstall:getConfig('info') == 't' then
     kinstall.params[1] = 'silent'
@@ -227,12 +238,12 @@ function kinfo:charInfoEventHandler()
     end
     height = height + infoFontSizePx * #rawAffs
     for _, rawAff in ipairs(rawAffs) do
-      color = "#44aa44"
+      local color = "#44aa44"
       if rawAff.negative == true then
         color = "#dd0000"
       end
       local customColor = kinfo.colors[kgui:transliterate(rawAff.desc)]
-      if customColor ~= nil then color = customColor end
+      if customColor ~= nil then color = 'rgb(' .. customColor[1] .. ',' .. customColor[2] .. ',' .. customColor[3] .. ')' end
       local desc = utf8.gsub(kgui:transliterate(rawAff.desc), ' ', '&nbsp;')
       if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. utf8.gsub(rawAff.extraValue, ' ', '&nbsp;' ) .. ') ' .. desc end
       local bgColor = 'rgba(0,0,0,0)';
@@ -243,12 +254,12 @@ function kinfo:charInfoEventHandler()
     local list = {}
     for _, aff in ipairs(affs) do
       if aff.name ~= '' then
-        color = "#44aa44"
+        local color = "#44aa44"
         if aff.negative == true then
           color = "#dd0000"
         end
         local customColor = kinfo.colors[kgui:transliterate(aff.name)]
-        if customColor ~= nil then color = customColor end
+        if customColor ~= nil then color = 'rgb(' .. customColor[1] .. ',' .. customColor[2] .. ',' .. customColor[3] .. ')' end
         local affName = utf8.gsub(kgui:transliterate(aff.name), ' ', '&nbsp;')
         if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. utf8.gsub(aff.extraValue, ' ', '&nbsp;') .. ') ' .. affName end
         local bgColor = 'rgba(0,0,0,0)';
@@ -267,12 +278,12 @@ function kinfo:charInfoEventHandler()
     if #affs > 8 then infoFontSize = math.floor(infoFontSize * 0.75) end
     height = height + infoFontSizePx * #affs
     for _, aff in ipairs(affs) do
-      color = "#44aa44"
+      local color = "#44aa44"
       if aff.negative == true then
         color = "#dd0000"
       end
       local customColor = kinfo.colors[kgui:transliterate(aff.desc)]
-      if customColor ~= nil then color = customColor end
+      if customColor ~= nil then color = 'rgb(' .. customColor[1] .. ',' .. customColor[2] .. ',' .. customColor[3] .. ')' end
       local desc = utf8.gsub(kgui:transliterate(aff.desc), ' ', '&nbsp;')
       if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. utf8.gsub(aff.extraValue, ' ', '&nbsp;') .. ') ' .. desc end
       local bgColor = 'rgba(0,0,0,0)';

@@ -114,10 +114,13 @@ function kgui:init()
     function(_, labelName, _, _, _, _, mouseAdjustment)
       if mouseAdjustment == true and labelName ~= nil then
         kgui.resizedElement = labelName:gsub("Wrapper", "")
-        kgui.resizingUpdateTimer = tempTimer(0.1, function()
-          kgui:updateState()
-          kgui:update()
-        end)
+        if kgui.resizingUpdateTimer == nil then
+          kgui.resizingUpdateTimer = tempTimer(0.5, function()
+            kgui:updateState()
+            kgui:update()
+            kgui.resizingUpdateTimer = nil
+          end)
+        end
       end
     end
   )
@@ -763,14 +766,16 @@ function kgui:updateBottomBar()
   end
   kgui:updateWrapperSize('info')
   local height = kgui.ui.info.wrapper.get_height() or 50
-  height = height + math.floor(kgui.boxPadding/2)
-  kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%-".. height .. "px")
-  kgui.mainRight:resize(kgui.mainRight.get_width(), "100%-".. height .. "px")
-  kgui.mainBottom:move(0, "100%-" .. (height + 6) .. "px")
-  kgui.mainBottom:resize("100%", height)
-  kgui.ui.info.wrapper:move(0, 6)
-  kgui.ui.info.wrapper:resize("100%", height)
-  setBorderBottom(height + 6)
+  if getBorderBottom() - 6 ~= height then
+    height = height + math.floor(kgui.boxPadding/2)
+    kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%-".. height .. "px")
+    kgui.mainRight:resize(kgui.mainRight.get_width(), "100%-".. height .. "px")
+    kgui.mainBottom:move(0, "100%-" .. (height + 6) .. "px")
+    kgui.mainBottom:resize("100%", height)
+    kgui.ui.info.wrapper:move(0, 6)
+    kgui.ui.info.wrapper:resize("100%", height)
+    setBorderBottom(height + 6)
+  end
 end
 
 function kgui:findBottom()

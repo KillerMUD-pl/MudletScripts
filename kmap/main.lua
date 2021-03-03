@@ -520,7 +520,7 @@ function kmap:drawGroup()
   kmap.messageBox:hide()
 
   local symbolMode = "num"
-  if not kgui:isClosed('group') then symbolMode = "short" end
+  if kgui:isClosed('group') then symbolMode = "short" end
   if kmap.immoMap == "y" then symbolMode = "name" end
 
   local playerSymbols = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "②"}

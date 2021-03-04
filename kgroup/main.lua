@@ -56,11 +56,17 @@ function kgroup:doUninstall()
 end
 
 function kgroup:doInit()
+  kgroup.forceUiUpdate = true
   kgroup:register()
   if kinstall:getConfig('group') == 't' then
     kinstall.params[1] = 'silent'
     kgroup:doGroup()
   end
+end
+
+function kgroup:doUpdate()
+  kgroup.forceUiUpdate = true
+  kgroup:charInfoEventHandler()
 end
 
 --
@@ -112,7 +118,7 @@ end
 -- Wyswietla informacje do okienka
 --
 function kgroup:charInfoEventHandler()
-  if kgroup.enabled == false then
+  if kgroup.enabled == false or gmcp.Char == nil then
     return
   end
 
@@ -125,6 +131,12 @@ function kgroup:charInfoEventHandler()
   end
 
   if group.members == nil then return end
+
+  -- sparsowanie do jsona i porownanie dwoch stringow jest szybkie bo to natywne instrukcje
+  -- jesli poprzednie dane gmcp niczym sie nie roznia - olewamy wyswietlanie
+  -- chyba ze trzeba uaktualnic UI
+  --if kgroup.forceUiUpdate == false and kgroup.lastGmcpInfo == yajl.to_string(gmcp.Char.Group) then return end
+  --kgroup.forceUiUpdate = false
 
   group = kgroup:filterCharms(group)
 
@@ -175,6 +187,7 @@ function kgroup:charInfoEventHandler()
   txt = txt .. '</table>'
 
   kgui:setBoxContent('group', txt, #group.members * lineHeight)
+  --kgroup.lastGmcpInfo = yajl.to_string(gmcp.Char.Group)
   kgui:update()
 end
 

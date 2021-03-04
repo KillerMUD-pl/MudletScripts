@@ -177,11 +177,17 @@ function kmap:doInstall()
 end
 
 function kmap:doInit()
+  kmap.forceUiUpdate = true
   kmap:register()
   if kinstall:getConfig('mapa') == 't' then
     kinstall.params[1] = 'silent'
     kmap:doMap()
   end
+end
+
+function kmap:doUpdate()
+  kmap.forceUiUpdate = true
+  kmap:charGroupEventHandler()
 end
 
 --
@@ -352,14 +358,14 @@ function kmap:mapRedraw(forceReload)
   local shouldRepaint = 0
   local imageHashes = {}
   local totalLabelsFromJsonCount = 0
-  for areaId, labels in pairs(kmap.labelsMap) do
-    for id, label in pairs(labels) do
+  for _, labels in pairs(kmap.labelsMap) do
+    for _, label in pairs(labels) do
       imageHashes[string.format("%.3f", label.Width) .. string.format("%.3f", label.Height)] = label
       totalLabelsFromJsonCount = totalLabelsFromJsonCount + 1
     end
   end
   local usedLabelsFromJsonCount = 0
-  for areaId, labels in pairs(kmap.labelsMap) do
+  for areaId in pairs(kmap.labelsMap) do
     local areaLabels = getMapLabels(areaId)
     if areaLabels == nil or type(areaLabels) ~= 'table' then areaLabels = {} end
     for id, txt in pairs(areaLabels) do
@@ -494,6 +500,8 @@ end
 function kmap:drawGroup()
   kmap:removeGroup()
 
+  if gmcp.Room == nil or gmcp.Room.Info == nil then return end
+
   -- sprawdzamy czy mamy informacje o lokalizacji
   if gmcp.Room.Info[1] ~= nil and gmcp.Room.Info[1].unavailable ~= nil then
     kmap.messageBox:show()
@@ -519,6 +527,12 @@ function kmap:drawGroup()
 
   kmap.messageBox:hide()
 
+  -- sparsowanie do jsona i porownanie dwoch stringow jest szybkie bo to natywne instrukcje
+  -- jesli poprzednie dane gmcp niczym sie nie roznia - olewamy wyswietlanie
+  -- chyba ze trzeba uaktualnic UI
+  --if kmap.forceUiUpdate == false and kmap.lastGmcpInfo == yajl.to_string(gmcp.Char.Group) then return end
+  --kmap.forceUiUpdate = false
+  
   local symbolMode = "num"
   if kgui:isClosed('group') then symbolMode = "short" end
   if kmap.immoMap == "y" then symbolMode = "name" end
@@ -591,7 +605,7 @@ function kmap:drawGroup()
     end
   end
 
-  return
+  --kmap.lastGmcpInfo = yajl.to_string(gmcp.Char.Group)
 end
 
 function kmap:checkGmcp()

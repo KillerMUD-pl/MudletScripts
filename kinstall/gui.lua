@@ -15,7 +15,7 @@ function kgui:init()
   kgui:calculateSizes()
   kgui.uiState.mainRight = kgui.uiState.mainRight or {}
   kgui.uiState.mainLeft = kgui.uiState.mainLeft or {}
-  local screenWidth, screenHeight = getMainWindowSize()
+  local screenWidth = getMainWindowSize()
   local widthRight = screenWidth / 3
   local widthLeft = screenWidth / 3
   local x = '-' .. widthRight .. 'px'
@@ -633,6 +633,12 @@ function kgui:saveState()
 end
 
 function kgui:update()
+  -- nie chcemy update czesciej niz 4 razy na sekunde
+  if kgui.updateRateLimiterTimer ~= nil then return end
+  kgui.updateRateLimiterTimer = tempTimer(0.25, function()
+    kgui.updateRateLimiterTimer = nil
+  end)
+
   kgui:updateBottomBar()
   -- przypisanie do jednego z rogow oraz czyszczenie jesli panel zostal zamkniety
   local topLeft = {}
@@ -756,8 +762,7 @@ function kgui:updateBottomBar()
     if kgui.mainBottom.get_height() > 0 then
       kgui.mainBottom:resize("100%", 0)
       kgui.mainBottom:move(0, windowHeight)
-      kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%")
-      kgui.mainRight:resize(kgui.mainRight.get_width(), "100%")
+      kgui:updateMainContainers()
     end
     if getBorderBottom() > 0 then
       setBorderBottom(0)
@@ -765,16 +770,32 @@ function kgui:updateBottomBar()
     return
   end
   kgui:updateWrapperSize('info')
-  local height = kgui.ui.info.wrapper.get_height() or 50
-  if getBorderBottom() - 6 ~= height then
-    height = height + math.floor(kgui.boxPadding/2)
-    kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%-".. height .. "px")
-    kgui.mainRight:resize(kgui.mainRight.get_width(), "100%-".. height .. "px")
-    kgui.mainBottom:move(0, "100%-" .. (height + 6) .. "px")
-    kgui.mainBottom:resize("100%", height)
+  local height = kgui.ui.info.wrapper.get_height()
+  if getBorderBottom() ~= height + 6 then
+    local height2 = height + math.floor(kgui.boxPadding/2)
+    kgui.mainBottom:move(0, "100%-" .. (height2 + 6) .. "px")
+    kgui.mainBottom:resize("100%", height2)
+    kgui:updateMainContainers()
     kgui.ui.info.wrapper:move(0, 6)
-    kgui.ui.info.wrapper:resize("100%", height)
+    kgui.ui.info.wrapper:resize("100%", height2)
     setBorderBottom(height + 6)
+  end
+end
+
+function kgui:updateMainContainers()
+  local height = kgui.mainBottom:get_height()
+  kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%-".. height .. "px")
+  kgui.mainRight:resize(kgui.mainRight.get_width(), "100%-".. height .. "px")
+end
+
+function kgui:updateAll()
+  for name in pairs(kinstall.modules) do
+    if name ~= 'kinstall' then
+      local func = _G[name]['doUpdate']
+      if func ~= nil and type(func) == "function" then
+        func()
+      end
+    end
   end
 end
 
@@ -793,19 +814,20 @@ end
 
 function kgui:onRightHDragTimer()
   local x, y = getMousePosition()
-  local screenWidth, screenHeight = getMainWindowSize()
+  local screenWidth = getMainWindowSize()
+  local height = kgui.mainBottom:get_height()
   if x < 5 then 
     kgui.mainRight:move(5, 0)
-    kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%')
+    kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%-'..height..'px')
     return
   end
   if x > screenWidth - 25 then 
     kgui.mainRight:move(screenWidth - 25, 0)
-    kgui.mainRight:resize('0px' ,'100%')
+    kgui.mainRight:resize('0px' ,'100%-'..height..'px')
     return
   end
   kgui.mainRight:move(x - 5, 0)
-  kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%')
+  kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%-'..height..'px')
 end
 
 function kgui:onRightHDragClick()
@@ -830,17 +852,18 @@ end
 
 function kgui:onLeftHDragTimer()
   local x, y = getMousePosition()
-  local screenWidth, screenHeight = getMainWindowSize()
+  local screenWidth = getMainWindowSize()
+  local height = kgui.mainBottom:get_height()
   kgui.mainLeft:move(0, 0)
   if x < 6 then
-    kgui.mainLeft:resize('10px' ,'100%')
+    kgui.mainLeft:resize('10px' ,'100%-'..height..'px')
     return
   end
   if x > screenWidth - 25 then 
-    kgui.mainLeft:resize(screenWidth - 25 ,'100%')
+    kgui.mainLeft:resize(screenWidth - height,'100%-'..height..'px')
     return
   end
-  kgui.mainLeft:resize(x + 5 .. 'px' ,'100%')
+  kgui.mainLeft:resize(x + 5 .. 'px' ,'100%-'..height..'px')
 end
 
 function kgui:onLeftHDragClick()
@@ -862,6 +885,21 @@ function kgui:onLeftHDragRelease()
   kgui:update()
   kgui:saveState()
 end
+
+--
+-- Gbsluga zmianu rozmiaru okna
+--
+
+function kgui:handleWindowResize()
+  if kgui.windowResizeEventDebounce ~= nil then killTimer(kgui.windowResizeEventDebounce) end
+  kgui.windowResizeEventDebounce = tempTimer(0.2, function()
+    kgui:updateAll()
+    kgui.windowResizeEventDebounce = nil
+  end)
+end
+
+if kgui.onWindowResize ~= nil then killAnonymousEventHandler(kgui.onWindowResize) end
+kgui.onWindowResize = registerAnonymousEventHandler("", "kgui:handleWindowResize")
 
 --
 -- Uproszczone przesylanie tekstu do okienek

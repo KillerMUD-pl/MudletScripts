@@ -47,52 +47,52 @@ function kmap:doMap()
     return
   end
   if param == 'start' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapStart()
     return
   end
   if param == 'stop' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapStop()
     return
   end
   if param == 'area' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapArea(kinstall.params[2])
     return
   end
   if param == 'step' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapStep(kinstall.params[2])
     return
   end
   if param == 'symbol' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapSymbol(kinstall.params[2])
     return
   end
   if param == 'forget' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapForget(false)
     return
   end
   if param == 'special' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapSpecial(kinstall.params[2], kinstall.params[3])
     return
   end
   if param == 'export' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:exportArea(getRoomArea(getPlayerRoom()))
     return
   end
   if param == 'import' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:importArea()
     return
   end
   if param == 'label' then
-    if kinstall:getConfig('immoMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
+    if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
     kmapper:mapLabel(kinstall.params[2])
     return
   end
@@ -116,10 +116,12 @@ function kmap:doMap()
     kmap.editMap = kinstall:getConfig('editMap')
     if kmap.editMap == 'y' then
       cecho('<gold>Wyłączono tryb edycji mapy.\n\n')
+      kmap.editMap = 'n'
       kinstall:setConfig('editMap', 'n')
       kmap:unsetEditMap()
       else
       cecho('<gold>Włączono tryb edycji mapy.\n\n')
+      kmap.editMap = 'y'
       kinstall:setConfig('editMap', 'y')
       kmap:setEditMap()
     end

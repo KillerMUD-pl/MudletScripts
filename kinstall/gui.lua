@@ -434,7 +434,13 @@ function kgui:moveLeftRight(name, commandName)
   kgui.ui[name]['wrapper'].socket = topOrBottom .. leftOrRight
   kgui.uiState[name].socket = kgui.ui[name]['wrapper'].socket
   kinstall:runCmd('-', commandName, true)
-  kinstall:runCmd('+', commandName, true)
+  kgui.updateRateLimiterTimer = nil
+  kgui:update()
+  tempTimer(0.2, function()
+    kinstall:runCmd('+', commandName, true)
+    kgui.updateRateLimiterTimer = nil
+    kgui:update()
+  end)
 end
 
 function kgui:moveTopBottom(name, commandName)
@@ -450,7 +456,13 @@ function kgui:moveTopBottom(name, commandName)
   kgui.ui[name]['wrapper'].socket = topOrBottom .. leftOrRight
   kgui.uiState[name].socket = kgui.ui[name]['wrapper'].socket
   kinstall:runCmd('-', commandName, true)
-  kinstall:runCmd('+', commandName, true)
+  kgui.updateRateLimiterTimer = nil
+  kgui:update()
+  tempTimer(0.2, function()
+    kinstall:runCmd('+', commandName, true)
+    kgui.updateRateLimiterTimer = nil
+    kgui:update()
+  end)
 end
 
 function kgui:moveToBottomBar(name, commandName)
@@ -462,7 +474,13 @@ function kgui:moveToBottomBar(name, commandName)
   kgui.ui[name]['wrapper'].socket = bottomOrNot
   kgui.uiState[name].socket = bottomOrNot
   kinstall:runCmd('-', commandName, true)
-  kinstall:runCmd('+', commandName, true)
+  kgui.updateRateLimiterTimer = nil
+  kgui:update()
+  tempTimer(0.2, function()
+    kinstall:runCmd('+', commandName, true)
+    kgui.updateRateLimiterTimer = nil
+    kgui:update()
+  end)
 end
 
 function kgui:minimize(name)

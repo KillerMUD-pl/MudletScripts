@@ -1,6 +1,6 @@
 {
   "name": "kmem",
-  "version": 11,
+  "version": 1,
   "commands": [ "mem" ],
   "shortDesc": "Moduł informacji o zapamiętywanych czarach"
 }

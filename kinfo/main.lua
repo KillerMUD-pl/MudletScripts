@@ -56,7 +56,7 @@ function kinfo:doUninstall()
 end
 
 function kinfo:doInit()
-  kinfo.forceUiUpdate = true
+  --kinfo.forceUiUpdate = true
   local colors = kinstall:getConfig('kinfoColors')
   if colors == nil or colors == "" or colors == false then colors = "{}" end
   kinfo.colors = yajl.to_value(colors)
@@ -68,7 +68,7 @@ function kinfo:doInit()
 end
 
 function kinfo:doUpdate()
-  kinfo.forceUiUpdate = true
+  --kinfo.forceUiUpdate = true
   kinfo:charInfoEventHandler()
 end
 

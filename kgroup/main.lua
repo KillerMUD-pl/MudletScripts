@@ -56,7 +56,7 @@ function kgroup:doUninstall()
 end
 
 function kgroup:doInit()
-  kgroup.forceUiUpdate = true
+  --kgroup.forceUiUpdate = true
   kgroup:register()
   if kinstall:getConfig('group') == 't' then
     kinstall.params[1] = 'silent'
@@ -65,7 +65,7 @@ function kgroup:doInit()
 end
 
 function kgroup:doUpdate()
-  kgroup.forceUiUpdate = true
+  --kgroup.forceUiUpdate = true
   kgroup:charInfoEventHandler()
 end
 

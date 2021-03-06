@@ -179,7 +179,7 @@ function kmap:doInstall()
 end
 
 function kmap:doInit()
-  kmap.forceUiUpdate = true
+  --kmap.forceUiUpdate = true
   kmap:register()
   if kinstall:getConfig('mapa') == 't' then
     kinstall.params[1] = 'silent'
@@ -188,7 +188,7 @@ function kmap:doInit()
 end
 
 function kmap:doUpdate()
-  kmap.forceUiUpdate = true
+  --kmap.forceUiUpdate = true
   kmap:charGroupEventHandler()
 end
 

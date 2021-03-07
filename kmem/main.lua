@@ -30,10 +30,8 @@ function kmem:doUninstall()
 end
 
 function kmem:doInit()
-  --kmem.forceUiUpdate = true
-  kmem:register()
   if kinstall:getConfig('mem') == 't' then
-    kinstall.params[1] = 'silent'
+    kmem:register()
     kmem:doMem()
   end
 end

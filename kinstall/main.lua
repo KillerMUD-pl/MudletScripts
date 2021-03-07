@@ -218,6 +218,7 @@ function kinstall:initModule(moduleName)
     require(moduleFile.name .. '/main')
     if _G[moduleFile.name] ~= nil and _G[moduleFile.name]['doInit'] ~= nil then
       tempTimer(0, function()
+        kinstall.params[1] = 'silent'
         _G[moduleFile.name]['doInit']()
       end)
     end

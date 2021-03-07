@@ -2,7 +2,6 @@ module("kinfo", package.seeall)
 setfenv(1, getfenv(2));
 
 kinfo = kinfo or {}
-kinfo.info_box = nil
 kinfo.enabled = false
 kinfo.colors = kinfo.colors or {}
 
@@ -56,19 +55,16 @@ function kinfo:doUninstall()
 end
 
 function kinfo:doInit()
-  --kinfo.forceUiUpdate = true
   local colors = kinstall:getConfig('kinfoColors')
   if colors == nil or colors == "" or colors == false then colors = "{}" end
   kinfo.colors = yajl.to_value(colors)
-  kinfo:register()
   if kinstall:getConfig('info') == 't' then
-    kinstall.params[1] = 'silent'
+    kinfo:register()
     kinfo:doInfo()
   end
 end
 
 function kinfo:doUpdate()
-  --kinfo.forceUiUpdate = true
   kinfo:charInfoEventHandler()
 end
 
@@ -92,7 +88,7 @@ end
 --
 function kinfo:addBox()
   kgui:addBox('info', 0, "Gracz", "info")
-  kinfo.info_box = kgui:setBoxContent('info', '<center>Zaloguj się do gry lub włącz GMCP</center>')
+  kgui:setBoxContent('info', '<center>Zaloguj się do gry lub włącz GMCP</center>')
 end
 
 --

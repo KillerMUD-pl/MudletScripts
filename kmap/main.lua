@@ -569,8 +569,8 @@ function kmap:drawGroup()
       if symbolMode == "short" then
         members[lastPlayerId].name = utf8.sub(members[lastPlayerId].name, 1, 3)
       end
+      playerId = playerId + 1
     end
-    playerId = playerId + 1
   end
 
   -- grupowanie ludzi wedlug lokalizacji

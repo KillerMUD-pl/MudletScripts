@@ -10,6 +10,7 @@ kgui.resizedElement = nil
 kgui.resizingUpdateTimer = nil
 kgui.vRightDragTimer = kgui.vRightDragTimer or nil
 kgui.vLeftDragTimer = kgui.vLeftDragTimer or nil
+kgui.extraBorderBottom = kgui.extraBorderBottom or nil
 
 function kgui:init()
   kgui:calculateSizes()
@@ -783,27 +784,27 @@ function kgui:updateBottomBar()
       kgui:updateMainContainers()
     end
     if getBorderBottom() > 0 then
-      setBorderBottom(0)
+      setBorderBottom(0 + kgui.extraBorderBottom)
     end
     return
   end
   kgui:updateWrapperSize('info')
   local height = kgui.ui.info.wrapper.get_height()
-  if getBorderBottom() ~= height + 6 then
+  if getBorderBottom() ~= height + 6 + kgui.extraBorderBottom then
     local height2 = height + math.floor(kgui.boxPadding/2)
     kgui.mainBottom:move(0, "100%-" .. (height2 + 6) .. "px")
     kgui.mainBottom:resize("100%", height2)
     kgui:updateMainContainers()
     kgui.ui.info.wrapper:move(0, 6)
     kgui.ui.info.wrapper:resize("100%", height2)
-    setBorderBottom(height + 6)
+    setBorderBottom(height + 6 + kgui.extraBorderBottom)
   end
 end
 
 function kgui:updateMainContainers()
   local height = kgui.mainBottom:get_height()
-  kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%-".. height .. "px")
-  kgui.mainRight:resize(kgui.mainRight.get_width(), "100%-".. height .. "px")
+  kgui.mainLeft:resize(kgui.mainLeft.get_width(), "100%-".. (height + kgui.extraBorderBottom) .. "px")
+  kgui.mainRight:resize(kgui.mainRight.get_width(), "100%-".. (height + kgui.extraBorderBottom) .. "px")
 end
 
 function kgui:updateAll()
@@ -826,6 +827,12 @@ function kgui:findTop()
   return 0
 end
 
+function kgui:setBorderBottom(val)
+  kgui.extraBorderBottom = tonumber(val)
+  kgui:updateBottomBar()
+  kinstall:setConfig('extraBorderBottom', kgui.extraBorderBottom)
+end
+
 --
 -- Przeciaganie glownego kontenera
 --
@@ -836,16 +843,16 @@ function kgui:onRightHDragTimer()
   local height = kgui.mainBottom:get_height()
   if x < 5 then 
     kgui.mainRight:move(5, 0)
-    kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%-'..height..'px')
+    kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%-'..(height + kgui.extraBorderBottom)..'px')
     return
   end
   if x > screenWidth - 25 then 
     kgui.mainRight:move(screenWidth - 25, 0)
-    kgui.mainRight:resize('0px' ,'100%-'..height..'px')
+    kgui.mainRight:resize('0px' ,'100%-'..(height + kgui.extraBorderBottom)..'px')
     return
   end
   kgui.mainRight:move(x - 5, 0)
-  kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%-'..height..'px')
+  kgui.mainRight:resize('100%-' .. (kgui.mainRight.get_x() + 20) .. 'px' ,'100%-'..(height + kgui.extraBorderBottom)..'px')
 end
 
 function kgui:onRightHDragClick()
@@ -874,14 +881,14 @@ function kgui:onLeftHDragTimer()
   local height = kgui.mainBottom:get_height()
   kgui.mainLeft:move(0, 0)
   if x < 6 then
-    kgui.mainLeft:resize('10px' ,'100%-'..height..'px')
+    kgui.mainLeft:resize('10px' ,'100%-'..(height + kgui.extraBorderBottom)..'px')
     return
   end
   if x > screenWidth - 25 then 
-    kgui.mainLeft:resize(screenWidth - height,'100%-'..height..'px')
+    kgui.mainLeft:resize(screenWidth - height,'100%-'..(height + kgui.extraBorderBottom)..'px')
     return
   end
-  kgui.mainLeft:resize(x + 5 .. 'px' ,'100%-'..height..'px')
+  kgui.mainLeft:resize(x + 5 .. 'px' ,'100%-'..(height + kgui.extraBorderBottom)..'px')
 end
 
 function kgui:onLeftHDragClick()
@@ -951,6 +958,8 @@ function kgui:transliterate(text)
 end
 
 function kgui:calculateSizes()
+  kgui.extraBorderBottom = kinstall:getConfig('extraBorderBottom')
+  if kgui.extraBorderBottom == nil or kgui.extraBorderBottom == false or kgui.extraBorderBottom == '' then kgui.extraBorderBottom = 0 end
   local storedFontSize = kinstall:getConfig('fontSize')
   local _, targetPixelHeight = calcFontSize(getFontSize())
   if storedFontSize ~= nil and storedFontSize ~= false and storedFontSize ~= "" and tonumber(storedFontSize) > 0 then

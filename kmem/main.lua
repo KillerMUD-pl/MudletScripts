@@ -183,6 +183,8 @@ function kmem:memInfoEventHandler()
   end
   txt = txt .. '</td></tr></table>'
 
+  if height < #queue then height = #queue end
+
   kgui:setBoxContent('mem', txt, height * fontSizePx + kgui.baseFontHeightPx + kgui.boxPadding * 2 + 4)
   --kmem.lastGmcpInfo = yajl.to_string(gmcp.Char)
   kgui:update()

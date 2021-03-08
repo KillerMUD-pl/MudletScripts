@@ -228,7 +228,7 @@ function kinfo:charInfoEventHandler()
   -- wykrywamy czy postac jest czarujaca
   isMage = false
   for _, aff in ipairs(affs) do
-    if affs.name ~= '' then isMage = true end
+    if aff.name ~= '' then isMage = true end
   end
 
   if isMage == true then
@@ -250,7 +250,7 @@ function kinfo:charInfoEventHandler()
       if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. utf8.gsub(rawAff.extraValue, ' ', '&nbsp;' ) .. ') ' .. desc end
       local bgColor = 'rgba(0,0,0,0)';
       if rawAff.ending ~= nil and rawAff.ending == true then bgColor = 'rgba(80,0,0,255)' end
-      txt = txt .. '<span style="line-height:' .. infoFontSize .. 'px;background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'.. color ..'">' .. desc .. '</div>'
+      txt = txt .. '<div style="line-height:' .. infoFontSize .. 'px;background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'.. color ..'">' .. desc .. '</div>'
     end
     -- same nazwy afektow w formie word-wrap
     local list = {}

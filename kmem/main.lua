@@ -2,7 +2,6 @@ module("kmem", package.seeall)
 setfenv(1, getfenv(2));
 
 kmem = kmem or {}
-kmem.info_box = nil
 kmem.enabled = false
 
 function kmem:doMem()
@@ -30,14 +29,14 @@ function kmem:doUninstall()
 end
 
 function kmem:doInit()
+  kmem:register()
   if kinstall:getConfig('mem') == 't' then
-    kmem:register()
+    kinstall.params[1] = 'silent'
     kmem:doMem()
   end
 end
 
 function kmem:doUpdate()
-  --kmem.forceUiUpdate = true
   kmem:memInfoEventHandler()
 end
 
@@ -57,7 +56,7 @@ end
 --
 function kmem:addBox()
   kgui:addBox('mem', 0, "Mem", "mem")
-  kmem.info_box = kgui:setBoxContent('mem', '<center>Zaloguj się do gry lub włącz GMCP</center>')
+  kgui:setBoxContent('mem', '<center>Zaloguj się do gry lub włącz GMCP</center>')
 end
 
 --
@@ -95,12 +94,6 @@ function kmem:memInfoEventHandler()
   if mems == nil then return end
 
   if kgui.ui.mem == nil or kgui.ui.mem.wrapper == nil then return end
-
-  -- sparsowanie do jsona i porownanie dwoch stringow jest szybkie bo to natywne instrukcje
-  -- jesli poprzednie dane gmcp niczym sie nie roznia - olewamy wyswietlanie
-  -- chyba ze trzeba uaktualnic UI
-  --if kmem.forceUiUpdate == false and kmem.lastGmcpInfo == yajl.to_string(gmcp.Char) then return end
-  --kmem.forceUiUpdate = false
 
   -- porzadkowanie po kregach
   local circles = {}
@@ -184,7 +177,6 @@ function kmem:memInfoEventHandler()
   if height < #queue then height = #queue end
 
   kgui:setBoxContent('mem', txt, height * fontSizePx + kgui.baseFontHeightPx + kgui.boxPadding * 2 + 4)
-  --kmem.lastGmcpInfo = yajl.to_string(gmcp.Char)
   kgui:update()
 end
 

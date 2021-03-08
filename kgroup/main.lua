@@ -2,7 +2,6 @@ module("kgroup", package.seeall)
 setfenv(1, getfenv(2));
 
 kgroup = kgroup or {}
-kgroup.group_box = nil
 kgroup.enabled = false
 kgroup.immoGroup = kinstall:getConfig('immoGroup') or 'n'
 kgroup.immoHideCharms = kinstall:getConfig('immoHideCharms') or 'n'
@@ -56,7 +55,6 @@ function kgroup:doUninstall()
 end
 
 function kgroup:doInit()
-  --kgroup.forceUiUpdate = true
   kgroup:register()
   if kinstall:getConfig('group') == 't' then
     kinstall.params[1] = 'silent'
@@ -65,13 +63,8 @@ function kgroup:doInit()
 end
 
 function kgroup:doUpdate()
-  --kgroup.forceUiUpdate = true
   kgroup:charInfoEventHandler()
 end
-
---
---
---
 
 function kgroup:register()
   kgroup:unregister()
@@ -89,8 +82,8 @@ end
 --
 function kgroup:addBox()
   kgui:addBox('group', 0, "Grupa", "group")
-  kgroup.group_box = kgui:setBoxContent('group', '<center>Zaloguj się do gry lub włącz GMCP</center>')
-  kgroup.group_box:setDoubleClickCallback(function(event)
+  local group_box = kgui:setBoxContent('group', '<center>Zaloguj się do gry lub włącz GMCP</center>')
+  group_box:setDoubleClickCallback(function(event)
     if kgroup.immoGroup ~= 't' then return end
     local y = math.ceil((event.y - 14) / 20)
     local group = kgroup:filterCharms(gmcp.Char.Group)
@@ -132,12 +125,6 @@ function kgroup:charInfoEventHandler()
 
   if group.members == nil then return end
 
-  -- sparsowanie do jsona i porownanie dwoch stringow jest szybkie bo to natywne instrukcje
-  -- jesli poprzednie dane gmcp niczym sie nie roznia - olewamy wyswietlanie
-  -- chyba ze trzeba uaktualnic UI
-  --if kgroup.forceUiUpdate == false and kgroup.lastGmcpInfo == yajl.to_string(gmcp.Char.Group) then return end
-  --kgroup.forceUiUpdate = false
-
   group = kgroup:filterCharms(group)
 
   local playerSymbols = { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "②"}
@@ -151,7 +138,6 @@ function kgroup:charInfoEventHandler()
   local fontSize = kgui.baseFontHeight
   local lineHeight = kgui.baseFontHeightPx
   for _, ch in ipairs(group.members) do
-    --local padSize = 20
     local color = "#f0f0f0"
     local name = kgui:transliterate(ch.name)
     if ch.is_npc == true then
@@ -181,13 +167,11 @@ function kgroup:charInfoEventHandler()
     else
       txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">&nbsp;</td>'
     end
-    --
     txt = txt .. '</tr>'
   end
   txt = txt .. '</table>'
 
   kgui:setBoxContent('group', txt, #group.members * lineHeight)
-  --kgroup.lastGmcpInfo = yajl.to_string(gmcp.Char.Group)
   kgui:update()
 end
 
@@ -274,11 +258,8 @@ function kgroup:hpBar(value)
     "#00ee00", -- zadnych sladow
   }
   local max = 7
-  --local fullBoxes = value * 2
   local fullBoxes = value
-  --if fullBoxes > 13 then fullBoxes = 13 end
   if fullBoxes > 7 then fullBoxes = 7 end
-  --local emptyBoxes = (max - value) * 2 - 1
   local emptyBoxes = (max - value)
   if emptyBoxes < 0 then emptyBoxes = 0 end
   return '<span style="color:' .. fullColors[value+1] .. '">' .. string.rep("█", fullBoxes) .. '</span>' ..
@@ -301,10 +282,7 @@ function kgroup:mvBar(value)
     "#00ee00", -- wypoczety
   }
   local max = 4
-  --local fullBoxes = value * 2
   local fullBoxes = value
-  --if fullBoxes > 8 then fullBoxes = 8 end
-  --local emptyBoxes = (max - value) * 2
   if fullBoxes > 4 then fullBoxes = 4 end
   local emptyBoxes = (max - value)
   return '<span style="color:' .. fullColors[value+1] .. '">' .. string.rep("█", fullBoxes) .. '</span>' ..

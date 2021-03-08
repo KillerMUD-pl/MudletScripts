@@ -5,6 +5,7 @@ var path = require('path');
 var remove = require('remove');
 
 var name = process.argv[2];
+var command = process.argv[3];
 var baseDir = path.join(__dirname, '..', '..')
 
 if (fs.existsSync(path.join(baseDir, name))) {
@@ -20,14 +21,23 @@ cpy(
   path.join(templateDir, '**', '*.*'),
   templateCopyDir
 ).then(function(){
-  process.chdir(templateCopyDir);
-  const options = {
-    files: '*',
-    from: /template/g,
-    to: name,
-  };
   try {
-    const results = replace.sync(options);
+    process.chdir(templateCopyDir);
+    replace.sync({
+      files: '*',
+      from: /template/g,
+      to: name,
+    });
+    replace.sync({
+      files: '*',
+      from: /test/g,
+      to: command,
+    });
+    replace.sync({
+      files: '*',
+      from: /Test/g,
+      to: command.charAt(0).toUpperCase() + command.slice(1),
+    });
     fs.mkdirSync(path.join(baseDir, name), { recursive: true });
     cpy(
       path.join(templateCopyDir, '**', '*.*'),
@@ -40,9 +50,8 @@ cpy(
           console.log('Stworzono nowy moduł ' + name)
           if (fs.existsSync(path.join(baseDir, '.gitignore'))) {
             fs.appendFileSync(path.join(baseDir, '.gitignore'), '\n!/' + name + '/');
-            console.log('Dodano wpis "' + name + '" do .gitignore by dodać moduł do brancha.');
+            console.log('Dodano wpis "' + name + '" do .gitignore');
           }
-          console.log('\n');
         }
       });
     }).catch(function(){

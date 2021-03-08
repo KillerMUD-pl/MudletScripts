@@ -129,12 +129,6 @@ function kinfo:charInfoEventHandler()
 
   if kgui.ui.info == nil or kgui.ui.info.wrapper == nil then return end
 
-  -- sparsowanie do jsona i porownanie dwoch stringow jest szybkie bo to natywne instrukcje
-  -- jesli poprzednie dane gmcp niczym sie nie roznia - olewamy wyswietlanie
-  -- chyba ze trzeba uaktualnic UI
-  --if kinfo.forceUiUpdate == false and kinfo.lastGmcpInfo == yajl.to_string(gmcp.Char) then return end
-  --kinfo.forceUiUpdate = false
-
   local fontSize = kgui.baseFontHeight
   local compact = false
   local titleFontSizePx = math.floor(kgui.baseFontHeightPx * 1.5)
@@ -221,7 +215,6 @@ function kinfo:charInfoEventHandler()
     height = height + kgui.baseFontHeightPx
     kgui:setBoxContent('info', txt .. '<center>' .. kgui:transliterate(affs[1].unavailable) .. '</center>', height)
     kgui:update()
-    --kinfo.lastGmcpInfo = yajl.to_string(gmcp.Char)
     return
   end
 
@@ -302,7 +295,6 @@ function kinfo:charInfoEventHandler()
   end
 
   kgui:setBoxContent('info', txt, height)
-  --kinfo.lastGmcpInfo = yajl.to_string(gmcp.Char)
   kgui:update()
 end
 

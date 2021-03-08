@@ -572,8 +572,7 @@ function kgui:setBoxContent(name, content, height)
   return kgui.ui[name]['content']
 end
 
-function kgui:calculateBoxSize(name, content)
-  local fontSize = kgui.ui[name]['content'].fontSize
+function kgui:calculateBoxSize(content)
   local _, count = string.gsub(content, "<br>", "")
   local _, count2 = string.gsub(content, "<tr>", "")
   local _, count3 = string.gsub(content, "<meta>", "")
@@ -609,7 +608,7 @@ function kgui:updateWrapperSize(name)
     end
     if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
       if kgui.ui[name]['content'].contentHeight == nil then
-        height = kgui:calculateBoxSize(name, kgui.ui[name]['content'].message) + 4
+        height = kgui:calculateBoxSize(kgui.ui[name]['content'].message) + 4
       else
         height = kgui.ui[name]['content'].contentHeight
       end

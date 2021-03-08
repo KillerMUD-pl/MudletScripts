@@ -237,7 +237,7 @@ function kmap:addBox()
   ]])
   kmap.mapperBox:setStyleSheet([[
     background: rgba(0,0,0,0);
-    border: 2px solid (30,30,30,230)
+    border: 2px solid rgba(30,30,30,230)
   ]])
 
   kmap.messageBox = Geyser.Label:new({

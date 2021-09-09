@@ -20,10 +20,6 @@ function kmap:doMap()
     kmap:mapLoad(true)
     return
   end
-  if param == 'symbol' then
-    kmap:mapGroupSymbol(param[2])
-    return
-  end
   if param == 'check' then
     kmapper:mapCheck()
     return
@@ -154,11 +150,22 @@ function kmap:undoMap()
 end
 
 function kmap:doWalk()
-  kspeedwalk:walk()
+  local param = kinstall.params[1]
+  kspeedwalk:walk(param)
 end
 
 function kmap:doStop()
   kspeedwalk:stop()
+end
+
+function kmap:doPoi()
+  local param = kinstall.params[1]
+  kspeedwalk:poiAdd(param)
+end
+
+function kmap:undoPoi()
+  local param = kinstall.params[1]
+  kspeedwalk:removePoi(param)
 end
 
 function kmap:doUninstall()

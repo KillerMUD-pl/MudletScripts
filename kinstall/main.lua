@@ -554,3 +554,16 @@ function string:split(delimiter)
   table.insert( result, utf8.sub( self, from  ) )
   return result
 end
+
+-- porównuje dwa stringi, ale tylko najkrótszą wspólną część na początku, ignorując wielkość znaków i ogonki
+function string:areLooselySame(aStr, bStr)
+  local a = string.trim(strip_accents(string.lower(aStr)))
+  local b = string.trim(strip_accents(string.lower(bStr)))
+  local width = string.len(a)
+  if string.len(b) < width then
+    width = string.len(b)
+  end
+  a = string.cut(a, width)
+  b = string.cut(b, width)
+  return a == b
+end

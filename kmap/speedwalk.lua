@@ -9,20 +9,28 @@ kspeedwalk.walking = false
 kspeedwalk.nextId = nil
 kspeedwalk.nextDir = nil
 kspeedwalk.lastRoomId = nil
+kspeedwalk.poi = {}
 
 function kspeedwalk:init()
   local path = kinstall:getConfig('highlight')
   kspeedwalk:unhighlight(path)
   kinstall:setConfig('highlight', {})
+  kspeedwalk.poi = kinstall:getConfig('poi', {})
 end
 
 --
 -- Rozpoczyna speedwalk wedlug sciezki podanej przez Mudleta
 --
 function kspeedwalk:start()
+  local targetRoomName, targetRoomId, cost = kspeedwalk:prepare()
+  cecho('\n<gold>Ścieżka do <green>' .. targetRoomName .. ' (id: ' .. targetRoomId .. ')<gold> znaleziona.\nSzacowana ilość punktów ruchu: <green>'.. cost ..'\n<gold>Wpisz <green>+walk<gold> by rozpocząć, <green>+stop<gold> by zakończyć.\n')
+end
+
+function kspeedwalk:prepare()
   kspeedwalk:unhighlight(kspeedwalk.roomIdQueue)
   kspeedwalk.dirQueue = speedWalkDir
   kspeedwalk.roomIdQueue = speedWalkPath
+  kspeedwalk.lastRoomId = nil
   local targetRoomId = kspeedwalk.roomIdQueue[#kspeedwalk.roomIdQueue]
   local targetRoomName = getRoomUserData(targetRoomId, 'name')
   local success, cost = getPath(getPlayerRoom(), targetRoomId)
@@ -31,7 +39,7 @@ function kspeedwalk:start()
     return nil
   end
   kspeedwalk:highlight(kspeedwalk.roomIdQueue)
-  cecho('\n<gold>Ścieżka do <green>' .. targetRoomName .. ' (id: ' .. targetRoomId .. ')<gold> znaleziona.\nSzacowana ilość punktów ruchu: <green>'.. cost ..'\n<gold>Wpisz <green>+walk<gold> by rozpocząć, <green>+stop<gold> by zakończyć.\n')
+  return targetRoomName, targetRoomId, cost
 end
 
 function kspeedwalk:highlight(path)
@@ -48,10 +56,32 @@ function kspeedwalk:unhighlight(path)
   kinstall:setConfig('highlight', {})
 end
 
-function kspeedwalk:walk()
-  cecho('\n<gold>Rozpoczęto podróż.\n')
-  kspeedwalk.walking = true
-  kspeedwalk:step()
+function kspeedwalk:walk(param)
+  if param == "" then
+    if #kspeedwalk.roomIdQueue == 0 then
+      cecho('\n<red>Chciałbyś gdzieś podróżować, tylko gdzie?')
+      cecho('\n<gold>Kliknij dwukrotnie na lokację na mapie by wybrać cel podróży lub użyj instrukcji <green>+poi\n')
+      return nil
+    end
+    cecho('\n<gold>Rozpoczęto podróż.\n')
+    kspeedwalk.walking = true
+    kspeedwalk.lastRoomId = nil
+    kspeedwalk:step()
+  else
+    local poi = kspeedwalk:findPoi(param)
+    if poi == nil then
+      cecho('\n<red>Nie znaleziono lokacji <green>'.. param ..'\n')
+      return nil
+    end
+    if kgui:isClosed('mapper') then
+      cecho('\n<red>Z powodów technicznych, nie można nawigować do zapisanego punktu kiedy mapa jest zamknięta. Musi być otwarta, lub przynajmniej zminimalizowana.\n')
+      return nil
+    end
+    getPath(getPlayerRoom(), poi.id)
+    kspeedwalk:prepare()
+    kspeedwalk.lastRoomId = 
+    kspeedwalk:step()
+  end
 end
 
 function kspeedwalk:stop()
@@ -68,7 +98,7 @@ function kspeedwalk:step()
   local nextDir = kspeedwalk.dirQueue[1]
   local currentRoomId = getPlayerRoom()
   if currentRoomId == kspeedwalk.lastRoomId then
-    return nil  
+    return nil
   end
 
   -- koniec podrozy
@@ -88,14 +118,26 @@ function kspeedwalk:step()
     unHighlightRoom(currentRoomId)
     return kspeedwalk:step()
   end
- 
+
   if kspeedwalk.walking ~= true then
     return nil
   end
   local next = kspeedwalk:findExit(currentRoomId, nextId, nextDir)
   if next ~= nil and next ~= '' then
-    kspeedwalk.lastRoomId = currentRoomId
     send(next)
+    kspeedwalk.lastRoomId = currentRoomId
+    return nil
+  end
+
+  if kspeedwalk.walking then
+    cecho('<red>Zgubiłem droge, przeliczam trasę...\n')
+    local targetRoomId = kspeedwalk.roomIdQueue[#kspeedwalk.roomIdQueue]
+    local path, cost = getPath(getPlayerRoom(), targetRoomId)
+    if cost == 0 then
+      cecho('Ojoj... zgubiłem się totalnie...\n')
+    end
+    kspeedwalk:prepare()
+    kspeedwalk:step()
   end
 end
 
@@ -107,35 +149,39 @@ function kspeedwalk:findExit(fromRoomId, toRoomId, toDir)
   local normalExit = roomExits[namedDir]
   local specialExit = roomData[toDir];
 
-  local closedDoor = kspeedwalk:checkDoor()
-  if closedDoor ~= nil then
-    send('open ' .. closedDoor)
+  local command = nil
+  if normalExit ~= nil and normalExit == toRoomId then
+    command = toDir
   end
   if specialExit ~= nil then
     specialExit = yajl.to_value(specialExit)
-    if specialExit.command ~= nil then
-      return specialExit.command
+    if specialExit.command ~= nil and specialExit.id == toRoomId then
+      command = specialExit.command
     end
   end
-  if normalExit ~= nil then
-    return toDir
+  if command ~= nil then
+    local closedDoor = kspeedwalk:checkDoor(command)
+    if closedDoor ~= nil then
+      send('open ' .. closedDoor)
+    end
+    return command
   end
   return nil
 end
 
-function kspeedwalk:checkDoor()
+function kspeedwalk:checkDoor(command)
   if gmcp == nil or gmcp.Room == nil or gmcp.Room.Info == nil or gmcp.Room.Info.exits == nil then
     return nil
   end
   local exits = gmcp.Room.Info.exits
   local foundExit = nil
   for _, v in ipairs(exits) do
-    if v ~= nil and v.closed == true then
-      local doorName = v.dir
-      if v.name ~= "" then
-        doorName = v.name
-      end
-      return doorName
+    local doorName = string.lower(v.dir)
+    if v.name ~= "" then
+      doorName = v.name
+    end
+    if v ~= nil and string:areLooselySame(doorName, command) and v.closed == true then
+      return command
     end
   end
   return nil
@@ -154,4 +200,69 @@ function kspeedwalk:markLockedRooms()
       end
     end
   end
+end
+
+function kspeedwalk:poiAdd(param)
+  if param == "" then
+    cecho('\n<gold>Zapisane lokacje:\n')
+    if #kspeedwalk.poi == 0 then
+      cecho('<gray>(brak)\n')
+    else
+      for _, poi in pairs(kspeedwalk.poi) do
+        cecho('<green>' .. poi.phrase .. '<DimGray> - '.. poi.name ..' (vnum: ' .. poi.vnum .. ')')
+      end
+    end
+    cecho('\n\n<gold>Możesz dodac lokacje do tej listy wpisując <green>+poi <nazwa><gold> stojąc w lokacji którą chcesz zapisać')
+    cecho('\n<gold>Aby podróżować do danej lokacji, wpisz <green>+walk <nazwa>\n')
+  else
+    local roomId = getPlayerRoom();
+    local vnum = getRoomUserData(roomId, 'vnum')
+    if vnum == nil then
+      cecho('\n<red>Lokacja w której stoisz nie jest poprawnie zmapowana, brakuje jej vnuma.\n')
+      return nil
+    end
+    local name = getRoomUserData(roomId, 'name')
+    if name == nil then
+      cecho('\n<red>Lokacja w której stoisz nie jest poprawnie zmapowana, brakuje jej nazwy.\n')
+      return nil
+    end
+    local existingPoi = kspeedwalk:findPoi(param)
+    if existingPoi ~= nil then
+      cecho('\n<red>Lokacja o takiej nazwie już istnieje: <green>' .. existingPoi.phrase .. '<DimGray> - '.. existingPoi.name ..' (vnum: ' .. existingPoi.vnum .. ')\n')
+      return nil
+    end
+  
+    local poi = {}
+    poi['name'] = name
+    poi['vnum'] = vnum
+    poi['phrase'] = param
+    poi['id'] = roomId
+    table.insert(kspeedwalk.poi, poi)
+    kinstall:setConfig('poi', kspeedwalk.poi)
+    cecho('\n<gold>Dodano nową lokację: <green>' .. poi.phrase .. '<DimGray> - '.. poi.name ..' (vnum: ' .. poi.vnum .. ')\n')
+  end
+end
+
+function kspeedwalk:removePoi(param)
+  if param == "" then
+    cecho('\n<red>Musisz podać lokację do usunięcia\n')
+    return nil
+  end
+  local poi, poiIndex = kspeedwalk:findPoi(param)
+  if poiIndex == nil then
+    cecho('\n<red>Nie znaleziono lokacji <green>'.. param ..'\n')
+    return nil
+  end
+  cecho('\n<gold>Usunięto lokację: <green>' .. poi.phrase .. '<DimGray> - '.. poi.name ..' (vnum: ' .. poi.vnum .. ')\n')
+  table.remove(kspeedwalk.poi, poiIndex)
+  kinstall:setConfig('poi', kspeedwalk.poi)
+end
+
+function kspeedwalk:findPoi(param)
+  for index, item in pairs(kspeedwalk.poi) do
+    if item.phrase == param then
+      return item, index
+    end
+  end
+  return nil, nil
 end

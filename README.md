@@ -52,6 +52,7 @@ Jak jesteś w tym trybie, może tylko się poruszać plus możesz wykonać tylko
 - imm
 - map
 - who
+
 plus parę podstawowych komend immowskich
 
 #### +map stop
@@ -95,7 +96,7 @@ Przerysowuje obrazki na mapie, użyj jeśli przypadkiem przesunałeś obrazek na
   
 #### +map load
 
-Wymusza na Mudlecie załadowanie mapy, właściwie niepotrzebne ale można spróbować jakby coś się zawiesiło.
+Ładowanie mapy z dysku. **UWAGA! to usuwa wszystkie twoje zmiany.**
 
 #### +map info
 

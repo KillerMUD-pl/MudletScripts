@@ -27,6 +27,16 @@ kmapper.dirTable['southwest'] = 'sw'
 kmapper.dirTable['northeast'] = 'ne'
 kmapper.dirTable['northwest'] = 'nw'
 
+kmapper.swapDirTable = {}
+kmapper.swapDirTable['n'] = 'north'
+kmapper.swapDirTable['s'] = 'south'
+kmapper.swapDirTable['w'] = 'west'
+kmapper.swapDirTable['e'] = 'east'
+kmapper.swapDirTable['se'] = 'southeast'
+kmapper.swapDirTable['sw'] = 'southwest'
+kmapper.swapDirTable['ne'] = 'northeast'
+kmapper.swapDirTable['nw'] = 'northwest'
+
 kmapper.dirOpposite = {}
 kmapper.dirOpposite['n'] = 's'
 kmapper.dirOpposite['s'] = 'n'
@@ -775,6 +785,26 @@ function kmapper:mapLoad()
   cecho('<green>Załadowano nową mapę.')
   kmap:vnumCacheRebuild()
   kmapper:mapStop(false)
+end
+
+--
+-- eksportowanie mapy
+--
+function kmapper:mapSave()
+  cecho('\n<yellow>Wybierz miejsce do zapisania pliku mapy.\n')
+  local path = invokeFileDialog(false, "Wybierz miejsce do zapisania pliku mapy")
+  if path == "" then
+    cecho('<yellow>Anulowano zapisywanie mapy.\n')
+    return nil
+  end
+  kmap:deleteImageLabels()
+  if saveMap(path .. '/mapa_' .. os.date("!%Y-%m-%d_%T") .. '.dat') == false then
+    cecho('<red>Zapisywanie mapy nie powiodło się.\n')
+    kmap:mapRedraw(true)
+    return nil
+  end
+  kmap:mapRedraw(true)
+  cecho('<green>Zapisano mapę.\n')
 end
 
 --

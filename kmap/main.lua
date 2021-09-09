@@ -2,7 +2,9 @@ module("kmap", package.seeall)
 setfenv(1, getfenv(2));
 
 package.loaded['kmap/mapper'] = nil
+package.loaded['kmap/speedwalk'] = nil
 require('kmap/mapper')
+require('kmap/speedwalk')
 
 mudlet.mapper_script = true
 
@@ -32,6 +34,10 @@ function kmap:doMap()
   end
   if param == 'load' then
     kmapper:mapLoad()
+    return
+  end
+  if param == 'save' then
+    kmapper:mapSave()
     return
   end
   if param == 'info' then
@@ -93,7 +99,11 @@ function kmap:doMap()
   end
   if param == 'label' then
     if kinstall:getConfig('editMap') ~= 'y' then cecho('<red>Nie włączyłeś funkcji edytora\n\n') return end
-    kmapper:mapLabel(kinstall.params[2])
+    local text = ''
+    for k,v in pairs(kinstall.params) do
+      if k ~= 1 then text = text .. ' ' .. kinstall.params[k] end
+    end
+    kmapper:mapLabel(string.trim(text))
     return
   end
 
@@ -143,6 +153,14 @@ function kmap:undoMap()
   kinstall:setConfig('mapa', 'n')
 end
 
+function kmap:doWalk()
+  kspeedwalk:walk()
+end
+
+function kmap:doStop()
+  kspeedwalk:stop()
+end
+
 function kmap:doUninstall()
   kmap:undoMap()
   kmap:unregister()
@@ -185,6 +203,7 @@ function kmap:doInit()
     kinstall.params[1] = 'silent'
     kmap:doMap()
   end
+  kspeedwalk:init()
 end
 
 function kmap:doUpdate()
@@ -333,12 +352,11 @@ end
 function kmap:deleteImageLabels()
   for _, areaId in pairs(getAreaTable()) do
     local labels = getMapLabels(areaId)
-    if type(labels) ~= 'table' then 
+    if type(labels) ~= 'table' then
       labels = {}
     end
     for id, text in pairs(labels) do
-      -- nie kasujemy laabelek "?" w Default Area
-      if id ~= -1 and text ~= "?" then
+      if id ~= -1 and ( text == "" or text == "no text") then
         deleteMapLabel(areaId, id)
       end
     end
@@ -371,8 +389,7 @@ function kmap:mapRedraw(forceReload)
     local areaLabels = getMapLabels(areaId)
     if areaLabels == nil or type(areaLabels) ~= 'table' then areaLabels = {} end
     for id, txt in pairs(areaLabels) do
-      -- specjalny przypadek dla labelek "?" w Default Area
-      if id ~= -1 and txt ~= "?" then
+      if id ~= -1 and (txt == "" or txt == "no text") then
         local existing = getMapLabel(areaId, id)
         local label = imageHashes[string.format("%.3f", existing.Width) .. string.format("%.3f", existing.Height)]
         if label ~= nil then
@@ -430,6 +447,7 @@ function kmap:charGroupEventHandler()
       kmap:mapLocate()
     end
   end
+  kspeedwalk:step()
 end
 
 --
@@ -664,4 +682,12 @@ function kmap:jumpTo()
   local vnum = getRoomUserData(roomId, "vnum")
   send('goto ' .. vnum .. '\n')
   kmap:centerView(roomId)
+end
+
+--
+-- Podpinamy się pod Mudletowego speedwalka
+--
+
+function doSpeedWalk()
+  kspeedwalk:start()
 end

@@ -11,8 +11,13 @@ Aktualnie posiadana funkcjonalność:
 Komendy:
 - `+map` - włącza mapę
 - `-map` - wyłącza mapę
+- `+poi` - pokazuje listę zapisanych lokacji
+- `+poi <nazwa>` - dodaje lokację w któ®ej stoisz do listy zapisanych lokacji
+- `+walk <nazwa>` - idzie do zapisanej lokacji
+- `+walk` - rozpoczyna podróż do lokacji po dwukliku na room na mapie. Jeżeli już masz wyznaczoną trasę, i naprzykład na chwilę usiadłeś, komenda `+walk` wznawia podróż.
 
 Dodatkowe informacje:
+- Dwuklik na room na mapie powoduje wyznaczenie trasy do tego miejsca.
 - Jeśli przypadkiem popsujesz obrazki tła mapy, po prostu zrestartuj Mudleta, a obrazki się przerysują
 - Jeśli przypadkiem popsujesz same roomy na mapie, możesz wydać komendę `+map reload` by przywrócić oryginalną wersję. UWAGA - to nadpisuje wszelkie Twoje zmiany
 
@@ -35,6 +40,9 @@ Komendy:
 Komendy:
 - `+group` - włącza panel grupy
 - `-group` - wyłącza panel grupy
+
+#### Inne
+- `+reset` - resetuje wszystkie ustawienia, oprócz zapisanych punktów POI. Przydatne jeśli coś się popsuje z ustawieniem okienek itp.
 
 ## Instalacja
 

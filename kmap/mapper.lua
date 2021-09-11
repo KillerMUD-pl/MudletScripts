@@ -778,7 +778,7 @@ function kmapper:mapLoad()
     cecho('<yellow>Anulowano ładowanie nowej mapy.')
     return nil
   end
-  if loadMap(path) == false then
+  if loadJsonMap(path) == false then
     cecho('<red>Ładowanie mapy nie powiodło się.')
     return nil
   end
@@ -798,7 +798,7 @@ function kmapper:mapSave()
     return nil
   end
   kmap:deleteImageLabels()
-  if saveJsonMap(path .. '/mapa_' .. os.date("!%Y-%m-%d_%T") .. '.json') == false then
+  if saveJsonMap(path .. '/mapa_' .. os.date("!%Y-%m-%d_%H.%M.%S") .. '.json') == false then
     cecho('<red>Zapisywanie mapy nie powiodło się.\n')
     kmap:mapRedraw(true)
     return nil

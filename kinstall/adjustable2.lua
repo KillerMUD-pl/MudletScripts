@@ -1192,3 +1192,17 @@ function Adjustable2.Container:oldnew(cons, container)
     local me = self:new(cons, container)
     return me
 end
+
+-- addressing empty locale in development version
+if Adjustable2.Container.Locale == nil then
+  Adjustable2.Container['Locale'] = {}
+  Adjustable2.Container.Locale = {
+    lock = { message = "lock" },
+    min_restore = { message = "min_restore"},
+    save = { message = "save"},
+    load = { message = "load"},
+    attach = { message = "attach"},
+    lockstyle = { message = "lockstyle"},
+    custom = { message = "custom"},
+  }
+end

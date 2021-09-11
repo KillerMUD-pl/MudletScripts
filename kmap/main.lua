@@ -464,7 +464,7 @@ function kmap:mapLoad(forceReload)
   kmap:addMapper()
   if getMapUserData("type") ~= 'killermud' or forceReload then
     cecho('<gold>Ładuje mapę z dysku\n')
-    loadMap(getMudletHomeDir() .. '/kmap/mapa.dat')
+    loadJsonMap(getMudletHomeDir() .. '/kmap/mapa.json')
   end
   kmap:vnumCacheRebuild()
   if gmcp.Room == nil then

@@ -798,7 +798,7 @@ function kmapper:mapSave()
     return nil
   end
   kmap:deleteImageLabels()
-  if saveMap(path .. '/mapa_' .. os.date("!%Y-%m-%d_%T") .. '.dat') == false then
+  if saveJsonMap(path .. '/mapa_' .. os.date("!%Y-%m-%d_%T") .. '.json') == false then
     cecho('<red>Zapisywanie mapy nie powiodło się.\n')
     kmap:mapRedraw(true)
     return nil
@@ -943,7 +943,8 @@ function kmapper:importArea()
       0, 
       100,
       12, 
-      false
+      false,
+      'Marcellus'
     )
   end
   
@@ -1269,7 +1270,7 @@ function kmapper:mapLabel(label)
   local roomId = getPlayerRoom()
   local areaId = getRoomArea(roomId)
   local x,y,z = getRoomCoordinates(roomId)
-  createMapLabel(areaId, label, x+0.5, y+1.3, z, 230,230,230, 0,0,0, 30, size, false, false)
+  createMapLabel(areaId, label, x+0.5, y+1.3, z, 230,230,230, 0,0,0, 30, size, false, false, 'Marcellus')
 end
 
 function kmapper:setupColors()

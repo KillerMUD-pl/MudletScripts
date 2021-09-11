@@ -12,7 +12,7 @@ kspeedwalk.lastRoomId = nil
 kspeedwalk.poi = {}
 
 function kspeedwalk:init()
-  local path = kinstall:getConfig('highlight')
+  local path = kinstall:getConfig('highlight', {})
   kspeedwalk:unhighlight(path)
   kinstall:setConfig('highlight', {})
   kspeedwalk.poi = kinstall:getConfig('poi', {})
@@ -50,6 +50,7 @@ function kspeedwalk:highlight(path)
 end
 
 function kspeedwalk:unhighlight(path)
+  if path == nil or path == false then return nil end
   for _, roomId in ipairs(path) do
     unHighlightRoom(roomId)
   end

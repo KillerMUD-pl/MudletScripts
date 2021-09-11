@@ -308,6 +308,15 @@ function kinstall:undoGui()
   tempTimer(0.7, function() kinstall:runCmd('-', 'map', true) end)
 end
 
+function kinstall:doReset()
+  cecho('\n<gold>Resetuje ustawienia\n\n')
+  local poi = kinstall:getConfig('poi', nil);
+  os.remove(kinstall.configFile)
+  os.remove(kgui.settingsFile)
+  kinstall:setConfig('poi', poi);
+  raiseEvent("kinstallInit")
+end
+
 function kinstall:runCmd(mode, cmd, isAutoRun)
   local params = {}
   params[1], params[2] = cmd:match("(%w+)(.*)")

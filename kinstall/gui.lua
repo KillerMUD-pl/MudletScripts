@@ -3,7 +3,8 @@ setfenv(1, getfenv(2));
 
 kgui = kgui or {}
 kgui.ui = {}
-kgui.uiState = kinstall:loadJsonFile(getMudletHomeDir() .. '/kguiSettings.json')
+kgui.settingsFile = getMudletHomeDir() .. '/kguiSettings.json'
+kgui.uiState = kinstall:loadJsonFile(kgui.settingsFile)
 kgui.resizingEventHandler = kgui.resizingEventHandler or nil
 kgui.resizingFinishEventHandler = kgui.resizingFinishEventHandler or nil
 kgui.resizedElement = nil
@@ -633,6 +634,7 @@ function kgui:updateState()
   kgui.uiState.mainLeft.width = kgui.mainLeft.get_width()
   for name, _ in pairs(kgui.ui) do
     if kgui.uiState[name] == nil then kgui.uiState[name] = {} end
+    if kgui.ui[name].wrapper == nil then return nil end
     kgui.uiState[name].y = kgui.ui[name].wrapper.get_y()
     local minimized = kgui:isMinimized(name)
     if minimized == false then
@@ -648,7 +650,7 @@ end
 
 function kgui:saveState()
   kgui:updateState()
-  kinstall:saveJsonFile(getMudletHomeDir() .. '/kguiSettings.json', kgui.uiState)
+  kinstall:saveJsonFile(kgui.settingsFile, kgui.uiState)
 end
 
 function kgui:update()

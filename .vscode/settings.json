@@ -16,6 +16,7 @@
     "map",
     "kgui",
     "utf8",
-    "kmapper"
+    "kmapper",
+    "saveJsonMap"
   ]
 }

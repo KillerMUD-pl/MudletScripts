@@ -1,12 +1,12 @@
 {
   "kinstall": {
-    "version": 26,
+    "version": 27,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kinstall.zip",
     "commands": [ "install", "remove", "update" ],
     "shortDesc": "Instalator modułów"
   },
   "kmap": {
-    "version": 28,
+    "version": 29,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kmap.zip",
     "commands": [ "map" ],
     "shortDesc": "Moduł mapy"

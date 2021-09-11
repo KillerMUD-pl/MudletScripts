@@ -6,31 +6,41 @@ Aktualnie posiadana funkcjonalność:
 #### Mapa
 - Automatyczne podążanie za graczem.
 - Wyświetlanie skróconych imion graczy z grupy na mapie, oraz znaczki oznaczające jego charmy.
-- W przyszłości:
-  - Labelki z nazwami miast i miejsc
-  - Speedwalk  
+- Speedwalk
+
+Komendy:
+- `+map` - włącza mapę
+- `-map` - wyłącza mapę
+
+Dodatkowe informacje:
+- Jeśli przypadkiem popsujesz obrazki tła mapy, po prostu zrestartuj Mudleta, a obrazki się przerysują
+- Jeśli przypadkiem popsujesz same roomy na mapie, możesz wydać komendę `+map reload` by przywrócić oryginalną wersję. UWAGA - to nadpisuje wszelkie Twoje zmiany
 
 #### Panel gracza
 - Imię, płeć i poziom gracza.
 - Najważniejsze informacje z `condition`.
 - Wszystkie affekty.
-- W przyszłości:
-  - Pozostałe szczegóły z `condition` - czyli aktualny stan holy. 
+
+Komendy:
+- `+info` - włącza panel info
+- `-info` - wyłącza panel info
+- `+info color` - pokazuje schemat kolorowania afektów
+- `+info color <nazwa afektu>` - ustawia kolor afektu
 
 #### Panel grupy
 - Nazwa gracza/charma
 - HP i MV gracza/charma w formie uśrednionej, tak jak w komendzie `group`)
 - pozycja gracza/charma oraz ilośc jego memów
 
-#### W przyszłości:
-- Panel "chata" który przechwytuje `say/tell/gt/ct` kiedy jest włączony
-- Panel notatnika, do którego można wysłać rezultat dowolnej komendy wydanej mudowi
-- Pakiet kompatybilności z zMudem - narzędzie do importu aliasów/triggerów oraz zMudowe komendy linii poleceń.
+Komendy:
+- `+group` - włącza panel grupy
+- `-group` - wyłącza panel grupy
 
 ## Instalacja
 
-Ściągnij plik [kinstall.zip](https://github.com/KillerMUD-pl/MudletScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.
+**UWAGA! wymagana wersja Mudleta to 4.12+**
 
+Ściągnij plik [kinstall.zip](https://github.com/KillerMUD-pl/MudletScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.
 
 # Instrukcja używania "mappera"
 ### Czyli instrukcji do edycji mapy.

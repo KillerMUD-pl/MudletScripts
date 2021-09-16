@@ -1,10 +1,8 @@
 module("kmap", package.seeall)
 setfenv(1, getfenv(2));
 
-package.loaded['kmap/mapper'] = nil
-package.loaded['kmap/speedwalk'] = nil
-require('kmap/mapper')
-require('kmap/speedwalk')
+kinstall:require('kmap/mapper')
+kinstall:require('kmap/speedwalk')
 
 mudlet.mapper_script = true
 
@@ -131,6 +129,14 @@ function kmap:doMap()
       kinstall:setConfig('editMap', 'y')
       kmap:setEditMap()
     end
+    return
+  end
+  if param == 'backup' then
+    kmapper:mapBackup()
+    return
+  end
+  if param == 'restore' then
+    kmapper:mapRestore(kinstall.params[2])
     return
   end
   if param ~= "silent" then

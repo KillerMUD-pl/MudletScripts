@@ -131,6 +131,14 @@ function kmap:doMap()
     end
     return
   end
+  if param == 'backup' then
+    kmapper:mapBackup()
+    return
+  end
+  if param == 'restore' then
+    kmapper:mapRestore(kinstall.params[2])
+    return
+  end
   if param ~= "silent" then
     cecho('<gold>Włączam mapę\n')
   end

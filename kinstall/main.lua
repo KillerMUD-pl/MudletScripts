@@ -214,8 +214,7 @@ function kinstall:initModule(moduleName)
   end
   -- uruchamianie skryptu
   local _, err = pcall(function()
-    package.loaded[moduleFile.name .. '/main'] = nil
-    require(moduleFile.name .. '/main')
+    kinstall:require(moduleFile.name .. '/main')
     if _G[moduleFile.name] ~= nil and _G[moduleFile.name]['doInit'] ~= nil then
       tempTimer(0, function()
         kinstall.params[1] = 'silent'
@@ -383,10 +382,8 @@ function kinstall:kinstallLoaded(_, filename)
     end
     kinstall:fetchVersions()
     -- załącza kod od gui
-    package.loaded['kinstall/gui'] = nil
-    require('kinstall/gui')
-    package.loaded['kinstall/adjustable2'] = nil
-    require('kinstall/adjustable2')
+    kinstall:require('kinstall/gui')
+    kinstall:require('kinstall/adjustable2')
 
     if kinstall.gmcpHandler then killAnonymousEventHandler(kinstall.gmcpHandler) end
     kinstall.gmcpHandler = registerAnonymousEventHandler("gmcp.Char", function()
@@ -576,3 +573,19 @@ function string:areLooselySame(aStr, bStr)
   b = string.cut(b, width)
   return a == b
 end
+
+function kinstall:require(moduleName)
+  local filename = getMudletHomeDir() .. '/' .. moduleName .. '.lua'
+  package.loaded[filename] = nil
+  require(filename)
+end
+
+-- adding a simplistic Lua package.loader to get around UTF-8 paths issue
+local function loadLuaFile(filename)
+  local file = io.open(filename, "rb")
+  if file then
+    return assert(loadstring(assert(file:read("*a")), filename))
+  end
+  return "\n\tno file '".. filename
+end
+table.insert(package.loaders, loadLuaFile)

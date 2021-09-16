@@ -1211,7 +1211,7 @@ function kmapper:mapSpecial(dir, cmd)
     clearRoomUserDataItem(getPlayerRoom(), dir)
     cecho('\n<green>Usunięto wyjscie w kierunku na ' .. dir .. '\n')
     return
-  end 
+  end
   --exit = {}
   --exit["command"] = cmd
   --exit["id"] = 'new'

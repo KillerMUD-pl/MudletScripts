@@ -16,6 +16,7 @@ kmapper.askingForDirection = false
 kmapper.selectedDir = nil
 kmapper.step = 2
 kmapper.msgBox = nil
+kmapper.backupFolder = getMudletHomeDir() .. '/kmap/backup'
 
 kmapper.dirTable = {}
 kmapper.dirTable['north'] = 'n'
@@ -805,6 +806,62 @@ function kmapper:mapSave()
   end
   kmap:mapRedraw(true)
   cecho('<green>Zapisano mapę.\n')
+end
+
+--
+-- backup mapy
+--
+function kmapper:mapBackup()
+  lfs.mkdir(kmapper.backupFolder)
+  kmap:deleteImageLabels()
+  if saveJsonMap(kmapper.backupFolder .. '/mapa_' .. os.date("!%Y-%m-%d_%H.%M.%S") .. '.json') == false then
+    cecho('<red>Zapisywanie backupu nie powiodło się.\n')
+    kmap:mapRedraw(true)
+    return nil
+  end
+  kmap:mapRedraw(true)
+  cecho('<green>Wykonano backup mapy.\n\n')
+end
+
+--
+-- restore mapy
+--
+function kmapper:mapRestore(param)
+  if param == nil then
+    cecho('<gold>Składnia instrukcji: +map restore <numer_kopii>\n\n')
+    cecho('<gold>Lista kopii:\n')
+    local i = 1
+    for file in lfs.dir (kmapper.backupFolder) do
+      if file ~= "." and file ~= ".." then
+        cecho('<gold>' .. i .. ' - ' .. file .. '\n')
+        i = i + 1
+      end
+    end
+    echo('\n')
+    return nil
+  end
+
+  local target = tonumber(param)
+  if target == 0 or target == nil then
+    cecho('<red>Niepoprawny parametr ' .. param .. '\n\n')
+    return nil
+  end
+  local i = 1
+  for file in lfs.dir(kmapper.backupFolder) do
+    if file ~= "." and file ~= ".." then
+      if i == target then
+        if loadJsonMap(kmapper.backupFolder .. '/' .. file) ~= true then
+          cecho('<red>Odczytanie backupu nie powiodło się.\n\n')
+          kmap:mapRedraw(true)
+          return nil
+        end
+        cecho('\n<green>Przywrócono zapis: ' .. file .. '\n\n')
+        return
+      else
+        i = i + 1
+      end
+    end
+  end
 end
 
 --

@@ -12,6 +12,7 @@ node_modules
 /kinstall/tmp
 !/dist/
 !/kmap/
+/kmap/backup
 !/kinfo/
 !/kgroup/
 !/kmem/

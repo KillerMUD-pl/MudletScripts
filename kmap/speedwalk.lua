@@ -80,7 +80,7 @@ function kspeedwalk:walk(param)
     end
     getPath(getPlayerRoom(), poi.id)
     kspeedwalk:prepare()
-    kspeedwalk.lastRoomId = 
+    kspeedwalk.walking = true
     kspeedwalk:step()
   end
 end

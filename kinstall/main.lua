@@ -580,12 +580,26 @@ function kinstall:require(moduleName)
   require(filename)
 end
 
--- adding a simplistic Lua package.loader to get around UTF-8 paths issue
-local function loadLuaFile(filename)
-  local file = io.open(filename, "rb")
-  if file then
-    return assert(loadstring(assert(file:read("*a")), filename))
-  end
-  return "\n\tno file '".. filename
-end
-table.insert(package.loaders, loadLuaFile)
+-- -- getting shortpath from windows
+-- local function getShortPath(filename)
+--   local ok, winapi = pcall(require, "winapi")
+--   if ok then
+--     winapi.set_encoding(winapi.CP_UTF8)
+--     local shortpath = winapi.short_path(filename)
+--     if shortpath ~= filename then
+--       return shortpath
+--     end
+--     return filename
+--   end
+--   return filename
+-- end
+
+-- -- adding a simplistic Lua package.loader to get around UTF-8 paths issue
+-- local function loadLuaFile(filename)
+--   local file = io.open(filename, "rb")
+--   if file then
+--     return assert(loadstring(assert(file:read("*a")), getShortPath(filename)))
+--   end
+--   return "\n\tno file '".. filename
+-- end
+-- table.insert(package.loaders, loadLuaFile)

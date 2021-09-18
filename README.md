@@ -12,19 +12,22 @@ Komendy:
 - `+map` - włącza mapę
 - `-map` - wyłącza mapę
 - `+poi` - pokazuje listę zapisanych lokacji
-- `+poi <nazwa>` - dodaje lokację w któ®ej stoisz do listy zapisanych lokacji
+- `+poi <nazwa>` - dodaje lokację w której stoisz do listy zapisanych lokacji
+- `-poi <nazwa>` - usuwa zapisaną lokalizację
 - `+walk <nazwa>` - idzie do zapisanej lokacji
 - `+walk` - rozpoczyna podróż do lokacji po dwukliku na room na mapie. Jeżeli już masz wyznaczoną trasę, i naprzykład na chwilę usiadłeś, komenda `+walk` wznawia podróż.
+- `+stop` - zatrzymuje podróż i zapomina trasę
 
 Dodatkowe informacje:
-- Dwuklik na room na mapie powoduje wyznaczenie trasy do tego miejsca.
+- Dwuklik na room na mapie powoduje wyznaczenie trasy do tego miejsca. Musisz potwierdzić podróż wpisująć `+walk`. Jeżeli z jakiegoś powodu się zatrzymasz (nie poprzez instrukcję `+stop`), możesz wznowić podróż wpisująć komendę `+walk` ponownie, lub po prostu klikając dwukrotnie na mapie w ten sam (lub inny) room.
 - Jeśli przypadkiem popsujesz obrazki tła mapy, po prostu zrestartuj Mudleta, a obrazki się przerysują
 - Jeśli przypadkiem popsujesz same roomy na mapie, możesz wydać komendę `+map reload` by przywrócić oryginalną wersję. UWAGA - to nadpisuje wszelkie Twoje zmiany
 
 #### Panel gracza
 - Imię, płeć i poziom gracza.
 - Najważniejsze informacje z `condition`.
-- Wszystkie affekty.
+- Wszystkie affekty
+- Kolorowanie affektów na wybrany kolor
 
 Komendy:
 - `+info` - włącza panel info
@@ -35,7 +38,7 @@ Komendy:
 #### Panel grupy
 - Nazwa gracza/charma
 - HP i MV gracza/charma w formie uśrednionej, tak jak w komendzie `group`)
-- pozycja gracza/charma oraz ilośc jego memów
+- Pozycja gracza/charma oraz ilośc jego memów
 
 Komendy:
 - `+group` - włącza panel grupy

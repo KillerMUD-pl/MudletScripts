@@ -10,12 +10,14 @@ kspeedwalk.nextId = nil
 kspeedwalk.nextDir = nil
 kspeedwalk.lastRoomId = nil
 kspeedwalk.poi = {}
+kspeedwalk.autowalk = false
 
 function kspeedwalk:init()
   local path = kinstall:getConfig('highlight', {})
   kspeedwalk:unhighlight(path)
   kinstall:setConfig('highlight', {})
   kspeedwalk.poi = kinstall:getConfig('poi', {})
+  kspeedwalk.autowalk = kinstall:getConfig('autowalk', false)
 end
 
 --
@@ -23,6 +25,11 @@ end
 --
 function kspeedwalk:start()
   local targetRoomName, targetRoomId, cost = kspeedwalk:prepare()
+  if kspeedwalk.autowalk == true then
+    kspeedwalk.walking = true
+    kspeedwalk:step()
+    return nil
+  end
   cecho('\n<gold>Ścieżka do <green>' .. targetRoomName .. ' (id: ' .. targetRoomId .. ')<gold> znaleziona.\nSzacowana ilość punktów ruchu: <green>'.. cost ..'\n<gold>Wpisz <green>+walk<gold> by rozpocząć, <green>+stop<gold> by zakończyć.\n')
 end
 
@@ -58,6 +65,18 @@ function kspeedwalk:unhighlight(path)
 end
 
 function kspeedwalk:walk(param)
+  if param == "auto" then
+    if kspeedwalk.autowalk == false then
+      kspeedwalk.autowalk = true
+      kinstall:getConfig('autowalk', true)
+      cecho('\n<gold>Włączono automatyczne rozpoczynanie podróży po dwu-kliku na mapie\n')
+      return nil
+    end
+    kspeedwalk.autowalk = false
+    kinstall:getConfig('autowalk', false)
+    cecho('\n<gold>Wyłączono automatyczne rozpoczynanie podróży po dwu-kliku na mapie\n')
+    return nil
+  end
   if param == "" then
     if #kspeedwalk.roomIdQueue == 0 then
       cecho('\n<red>Chciałbyś gdzieś podróżować, tylko gdzie?')
@@ -204,6 +223,9 @@ function kspeedwalk:markLockedRooms()
 end
 
 function kspeedwalk:poiAdd(param)
+  if param == "auto" then
+    cecho('\nSorki, nie możesz dodać poi o nazwie "auto"\n')
+  end
   if param == "" then
     cecho('\n<gold>Zapisane lokacje:\n')
     if #kspeedwalk.poi == 0 then

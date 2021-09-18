@@ -16,10 +16,12 @@ Komendy:
 - `-poi <nazwa>` - usuwa zapisaną lokalizację
 - `+walk <nazwa>` - idzie do zapisanej lokacji
 - `+walk` - rozpoczyna podróż do lokacji po dwukliku na room na mapie. Jeżeli już masz wyznaczoną trasę, i naprzykład na chwilę usiadłeś, komenda `+walk` wznawia podróż.
+- `+walk auto` - włącza/wyłącza automatyczne rozpoczęcie podróży po dwu-kliku na mapie
 - `+stop` - zatrzymuje podróż i zapomina trasę
 
 Dodatkowe informacje:
-- Dwuklik na room na mapie powoduje wyznaczenie trasy do tego miejsca. Musisz potwierdzić podróż wpisująć `+walk`. Jeżeli z jakiegoś powodu się zatrzymasz (nie poprzez instrukcję `+stop`), możesz wznowić podróż wpisująć komendę `+walk` ponownie, lub po prostu klikając dwukrotnie na mapie w ten sam (lub inny) room.
+- Dwuklik na room na mapie powoduje wyznaczenie trasy do tego miejsca. Musisz potwierdzić podróż wpisująć `+walk`. Możesz ominąć potwierdzanie jeśli włączysz automatyczne rozpoczęcie podróży po dwu-kliku (komenda `+walk auto`)
+- Jeżeli z jakiegoś powodu się zatrzymasz (nie poprzez instrukcję `+stop`), możesz wznowić podróż wpisująć komendę `+walk` ponownie, lub po prostu klikając dwukrotnie na mapie w ten sam (lub inny) room.
 - Jeśli przypadkiem popsujesz obrazki tła mapy, po prostu zrestartuj Mudleta, a obrazki się przerysują
 - Jeśli przypadkiem popsujesz same roomy na mapie, możesz wydać komendę `+map reload` by przywrócić oryginalną wersję. UWAGA - to nadpisuje wszelkie Twoje zmiany
 

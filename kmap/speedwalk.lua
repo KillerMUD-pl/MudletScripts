@@ -224,7 +224,8 @@ end
 
 function kspeedwalk:poiAdd(param)
   if param == "auto" then
-    cecho('\nSorki, nie możesz dodać poi o nazwie "auto"\n')
+    cecho('\n<red>Sorki, nie możesz dodać poi o nazwie "auto"\n')
+    return nil
   end
   if param == "" then
     cecho('\n<gold>Zapisane lokacje:\n')

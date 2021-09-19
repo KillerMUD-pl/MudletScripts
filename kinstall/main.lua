@@ -573,3 +573,8 @@ function string:areLooselySame(aStr, bStr)
   b = string.cut(b, width)
   return a == b
 end
+
+function kinstall:require(moduleName)
+  package.loaded[moduleName] = nil
+  require(moduleName)
+end

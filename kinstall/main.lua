@@ -573,9 +573,3 @@ function string:areLooselySame(aStr, bStr)
   b = string.cut(b, width)
   return a == b
 end
-
-function kinstall:require(moduleName)
-  local filename = getMudletHomeDir() .. '/' .. moduleName .. '.lua'
-  package.loaded[filename] = nil
-  require(filename)
-end

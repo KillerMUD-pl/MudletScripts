@@ -98,6 +98,10 @@ function kspeedwalk:walk(param)
       return nil
     end
     getPath(getPlayerRoom(), poi.id)
+    if #speedWalkPath == 0 then
+      cecho('\n<red>Uh... ciężka sprawa, nie wiem jak tam dojść z miejsca w którym się znajdujesz...\n')
+      return nil
+    end
     kspeedwalk:prepare()
     kspeedwalk.walking = true
     kspeedwalk:step()
@@ -223,6 +227,14 @@ function kspeedwalk:markLockedRooms()
 end
 
 function kspeedwalk:poiAdd(param)
+  if param == "save" then
+    kspeedwalk:savePoi();
+    return nil
+  end
+  if param == "load" then
+    kspeedwalk:loadPoi();
+    return nil
+  end
   if param == "auto" then
     cecho('\n<red>Sorki, nie możesz dodać poi o nazwie "auto"\n')
     return nil
@@ -233,15 +245,18 @@ function kspeedwalk:poiAdd(param)
       cecho('<gray>(brak)\n')
     else
       for _, poi in pairs(kspeedwalk.poi) do
-        cecho('<green>' .. poi.phrase .. '<DimGray> - '.. poi.name ..' (vnum: ' .. poi.vnum .. ')')
+        cecho('<green>' .. poi.phrase .. '<DimGray> - '.. poi.name ..' (vnum: ' .. poi.vnum .. ')\n')
       end
     end
     cecho('\n\n<gold>Możesz dodac lokacje do tej listy wpisując <green>+poi <nazwa><gold> stojąc w lokacji którą chcesz zapisać')
     cecho('\n<gold>Aby podróżować do danej lokacji, wpisz <green>+walk <nazwa>\n')
   else
-    local roomId = getPlayerRoom();
-    local vnum = getRoomUserData(roomId, 'vnum')
-    if vnum == nil then
+    local roomId = tonumber(getPlayerRoom());
+    if roomId == nil then
+      cecho('\n<red>Nie znam twojej lokacji, czy zalogowałeś się do gry?\n')
+    end
+    local vnum = tonumber(getRoomUserData(roomId, 'vnum'))
+    if vnum == nil or vnum == 0 then
       cecho('\n<red>Lokacja w której stoisz nie jest poprawnie zmapowana, brakuje jej vnuma.\n')
       return nil
     end
@@ -289,4 +304,51 @@ function kspeedwalk:findPoi(param)
     end
   end
   return nil, nil
+end
+
+function kspeedwalk:savePoi()
+  cecho('\n<yellow>Wybierz miejsce do zapisania pliku.\n')
+  local path = invokeFileDialog(false, "Wybierz miejsce do zapisania pliku")
+  if path == "" then
+    cecho('<yellow>Anulowano zapisywanie pliku.\n')
+    return nil
+  end
+  local poi = kinstall:getConfig("poi", {})
+  local filename = path .. '/poi_' .. os.date("!%Y-%m-%d_%H.%M.%S") .. '.json'
+  if kinstall:saveJsonFile(filename, poi) == false then
+    cecho('<red>Zapisywanie poi nie powiodło się.\n')
+    return nil
+  end
+  cecho('<green>Zapisano plik '.. filename ..'\n')
+end
+
+function kspeedwalk:loadPoi()
+  local path = invokeFileDialog(true, "Wybierz plik poi do załadowania")
+  if path == "" then
+    cecho('\n<yellow>Anulowano ładowanie poi.\n')
+    return nil
+  end
+  local poi = kinstall:loadJsonFile(path)
+  if poi == nil then
+    cecho('\n<red>Ładowanie poi nie powiodło się.\n')
+    return nil
+  end
+  if #poi == nil then
+    cecho('\n<red>Plik poi jest pusty.\n')
+    return nil
+  end
+  echo('\n')
+  for _, item in pairs(poi) do
+    local existing = kspeedwalk:findPoi(item.phrase)
+    if existing ~= nil then
+      cecho('<ansiYellow>Punkt o nazwie ' .. item.phrase .. ' już istnieje, pomijam.\n')
+    else
+      cecho('<gold>Dodaję punkt <green>' .. item.phrase .. '<DimGray> - '.. item.name ..' (vnum: ' .. item.vnum .. ')\n')
+      item.vnum = tonumber(item.vnum)
+      item.id = tonumber(item.id)
+      table.insert(kspeedwalk.poi, item)
+    end
+  end
+  echo('\n')
+  kinstall:setConfig("poi", kspeedwalk.poi)
 end

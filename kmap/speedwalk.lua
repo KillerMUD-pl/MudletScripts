@@ -18,6 +18,11 @@ function kspeedwalk:init()
   kinstall:setConfig('highlight', {})
   kspeedwalk.poi = kinstall:getConfig('poi', {})
   kspeedwalk.autowalk = kinstall:getConfig('autowalk', false)
+  addMapEvent("📌 Zapisz lokację", "addPoi")
+  if kspeedwalk.onAddPoi then
+    killAnonymousEventHandler(kspeedwalk.onAddPoi)
+  end
+  kspeedwalk.onAddPoi = registerAnonymousEventHandler("addPoi", function() kspeedwalk:addPoiFromMap() end)
 end
 
 --
@@ -68,12 +73,12 @@ function kspeedwalk:walk(param)
   if param == "auto" then
     if kspeedwalk.autowalk == false then
       kspeedwalk.autowalk = true
-      kinstall:getConfig('autowalk', true)
+      kinstall:setConfig('autowalk', true)
       cecho('\n<gold>Włączono automatyczne rozpoczynanie podróży po dwu-kliku na mapie\n')
       return nil
     end
     kspeedwalk.autowalk = false
-    kinstall:getConfig('autowalk', false)
+    kinstall:setConfig('autowalk', false)
     cecho('\n<gold>Wyłączono automatyczne rozpoczynanie podróży po dwu-kliku na mapie\n')
     return nil
   end
@@ -251,18 +256,37 @@ function kspeedwalk:poiAdd(param)
     cecho('\n\n<gold>Możesz dodac lokacje do tej listy wpisując <green>+poi <nazwa><gold> stojąc w lokacji którą chcesz zapisać')
     cecho('\n<gold>Aby podróżować do danej lokacji, wpisz <green>+walk <nazwa>\n')
   else
-    local roomId = tonumber(getPlayerRoom());
-    if roomId == nil then
-      cecho('\n<red>Nie znam twojej lokacji, czy zalogowałeś się do gry?\n')
-    end
-    local vnum = tonumber(getRoomUserData(roomId, 'vnum'))
-    if vnum == nil or vnum == 0 then
-      cecho('\n<red>Lokacja w której stoisz nie jest poprawnie zmapowana, brakuje jej vnuma.\n')
-      return nil
+    local roomId = nil
+    local vnum = nil
+    local phrase = nil
+    if param == "vnum" then
+      vnum = tonumber(kinstall.params[2])
+      roomId = tonumber(kmap.vnumToRoomIdCache[vnum])
+      if roomId == nil then
+        cecho('\n<red>Nie znam lokacji o takim vnum.\n')
+        return nil
+      end
+      phrase = kinstall.params[3]
+    else
+      roomId = tonumber(getPlayerRoom())
+      if roomId == nil then
+        cecho('\n<red>Nie znam twojej lokacji, czy zalogowałeś się do gry?\n')
+        return nil
+      end
+      vnum = tonumber(getRoomUserData(roomId, 'vnum'))
+      if vnum == nil or vnum == 0 then
+        cecho('\n<red>Lokacja w której stoisz nie jest poprawnie zmapowana, brakuje jej vnuma.\n')
+        return nil
+      end
+      phrase = param
     end
     local name = getRoomUserData(roomId, 'name')
     if name == nil then
-      cecho('\n<red>Lokacja w której stoisz nie jest poprawnie zmapowana, brakuje jej nazwy.\n')
+      cecho('\n<red>Lokacja o vnumie '.. vnum ..' nie jest poprawnie zmapowana, brakuje jej nazwy.\n')
+      return nil
+    end
+    if phrase == nil or phrase == '' then
+      cecho('\n<red>Musisz podać nazwę dla lokacji.\n')
       return nil
     end
     local existingPoi = kspeedwalk:findPoi(param)
@@ -270,11 +294,10 @@ function kspeedwalk:poiAdd(param)
       cecho('\n<red>Lokacja o takiej nazwie już istnieje: <green>' .. existingPoi.phrase .. '<DimGray> - '.. existingPoi.name ..' (vnum: ' .. existingPoi.vnum .. ')\n')
       return nil
     end
-  
     local poi = {}
     poi['name'] = name
     poi['vnum'] = vnum
-    poi['phrase'] = param
+    poi['phrase'] = phrase
     poi['id'] = roomId
     table.insert(kspeedwalk.poi, poi)
     kinstall:setConfig('poi', kspeedwalk.poi)
@@ -351,4 +374,16 @@ function kspeedwalk:loadPoi()
   end
   echo('\n')
   kinstall:setConfig("poi", kspeedwalk.poi)
+end
+
+function kspeedwalk:addPoiFromMap()
+  local selectedRooms = getMapSelection()["rooms"]
+  if selectedRooms == nil or #selectedRooms == 0 then
+    return nil
+  end
+  local roomId = selectedRooms[1]
+  local vnum = tonumber(getRoomUserData(roomId, 'vnum'))
+  clearCmdLine()
+  cecho("<gold>Dopisz nazwę punktu do zapisania i wciśnij Enter:")
+  appendCmdLine("+poi vnum " .. vnum .. " ")
 end

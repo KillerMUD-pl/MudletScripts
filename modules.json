@@ -1,6 +1,6 @@
 {
   "kinstall": {
-    "version": 29,
+    "version": 30,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kinstall.zip",
     "commands": [ "install", "remove", "update" ],
     "shortDesc": "Instalator modułów"

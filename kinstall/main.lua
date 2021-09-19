@@ -575,6 +575,17 @@ function string:areLooselySame(aStr, bStr)
 end
 
 function kinstall:require(moduleName)
-  package.loaded[moduleName] = nil
-  require(moduleName)
+  local filename = getMudletHomeDir() .. '/' .. moduleName .. '.lua'
+  package.loaded[filename] = nil
+  require(filename)
 end
+
+-- adding a simplistic Lua package.loader to get around UTF-8 paths issue
+local function loadLuaFile(filename)
+  local file = io.open(filename, "rb")
+  if file then
+    return assert(loadstring(assert(file:read("*a")), filename))
+  end
+  return "\n\tno file '".. filename
+end
+table.insert(package.loaders, loadLuaFile)

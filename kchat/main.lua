@@ -42,7 +42,7 @@ function kchat:doInit()
 end
 
 function kchat:doUpdate()
-  kchat.console:reposition()
+  --
 end
 
 --
@@ -51,7 +51,7 @@ end
 
 function kchat:register()
   kchat:unregister()
-  kchat.chatTrigger = tempRegexTrigger("(^(\\[(\\w+)\\]:\\s(.+)|(\\w+) m[oó]wi klanowi '(.+)'|()M[oó]wisz do klanu '(.+)'|(\\w+) m[oó]wi '(.+)'|()M[oó]wisz '(.+)'|(\\w+) m[oó]wi tobie '(.+)'|(\\w+) m[oó]wi \\w+ '(.+)'|()M[oó]wisz \\w+ '(.+)'|()Pytasz '(.+)'|()Pytasz \\w+ '(.+)'|()Wykrzykujesz '(.+)'|()Wykrzykujesz do \\w+ '(.+)'|(\\w+) pyta '(.+)'|(\\w+) wykrzykuje '(.+)'|(\\w+) pyta si[eę] ciebie '(.+)'|(\\w+) wykrzykuje w twoim kierunku '(.+)'|(\\w+) krzyczy do ciebie '(.+)'|()M[oó]wisz do grupy '(.+)'|()Krzyczysz '(.+)'|()Wrzeszczysz '(.+)'|(\\w+) wrzeszczy '(.+)'|(\\w+) krzyczy '(.+)')$)", kchat.chatTriggerHandler)
+  kchat.chatTrigger = tempRegexTrigger("^((\\w+) (m[oó]wi|nuci|dudni|grzmi|piszczy|warczy|miauczy|szczeka|ryczy|syczy|[sś]piewa|zawodzi|wydaje d[zź]wi[ęe]k|pieje|skrzeczy).*'(.+)'|(\\w+) (pyta|nuci|dudni|piszczy|warczy|miauczy|szczeka|ryczy|syczy|[sś]piewa|pieje|skrzeczy).*'(.+)'|()(M[oó]wisz|Nucisz|Dudnisz|Grzmisz|Piszczysz|Warczysz|Miauczysz|Szczekasz|Ryczysz|Syczysz|[ŚS]piewasz|Zawodzisz|Wydajesz d[zź]wi[eę]k|Piejesz|[ŚS]piewasz).*'(.+)'|()Pytasz.*'(.+)'|()Wykrzykujesz.*'(.+)'|()Krzyczysz '(.+)'|()Wrzeszczysz '(.+)'|(\\w+) wrzeszczy '(.+)'|(\\w+) krzyczy.*'(.+)'|(\\w+) wykrzykuje.*'(.+)'|\\[(\\w+)\\]:\\s(.+))$", kchat.chatTriggerHandler)
 end
 
 function kchat:unregister()
@@ -62,8 +62,9 @@ end
 -- Wyswietla konsole chatu w okienku
 --
 function kchat:addBox()
-  local wrapper = kgui:addBox('chat', 0, "Czat", "chat")
+  local wrapper = kgui:addBox('chat', 200, "Czat", "chat")
   kchat.box = Geyser.Label:new({
+    name = "chat",
     x = 2,
     y = kgui.baseFontHeightPx + 4 .. "px",
     width = "100%-4px",
@@ -79,8 +80,11 @@ function kchat:addBox()
     fontSize = kgui.baseFontHeight,
   }, kchat.box)
   kchat.console:setColor(33, 33, 33)
-  kchat.console:echo("\n")
   kchat.console:enableAutoWrap()
+  -- upewniamy sie ze wszystko jest odpowiednio przypiete i nie schowane
+  kchat.box:add(kchat.console)
+  kchat.box:raiseAll()
+  kchat.box:show()
   kgui:update()
 end
 
@@ -88,7 +92,6 @@ end
 -- Usuwa okienko chatu
 --
 function kchat:removeBox()
-  kgui.console = nil
   kgui:removeBox('chat')
   kgui:update()
 end

@@ -76,7 +76,6 @@ function kchat:addBox()
     height = "100%-4px",
     x = "4px",
     y = "2px",
-    scrollBar = true,
     fontSize = kgui.baseFontHeight,
   }, kchat.box)
   kchat.console:setColor(33, 33, 33)

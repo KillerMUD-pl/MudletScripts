@@ -28,5 +28,11 @@
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kmem.zip",
     "commands": [ "mem" ],
     "shortDesc": "Moduł informacji o zapamiętywanych czarach"
+  },
+  "kchat": {
+    "name": "kchat",
+    "version": 1,
+    "commands": [ "chat" ],
+    "shortDesc": "Moduł czatu (wersja testowa)"
   }
 }

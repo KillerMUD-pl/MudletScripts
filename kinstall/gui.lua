@@ -922,7 +922,7 @@ function kgui:onLeftHDragRelease()
 end
 
 --
--- Gbsluga zmianu rozmiaru okna
+-- Obsluga zmianu rozmiaru okna
 --
 
 function kgui:handleWindowResize()

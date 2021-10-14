@@ -5,6 +5,7 @@ kchat = kchat or {}
 kchat.enabled = false
 kchat.colors = kchat.colors or {}
 kchat.box = nil;
+kchat.console = nil;
 
 function kchat:doChat()
   local param = kinstall.params[1]
@@ -41,7 +42,7 @@ function kchat:doInit()
 end
 
 function kchat:doUpdate()
-  kchat:charchatTriggerHandler()
+  --
 end
 
 --
@@ -50,35 +51,7 @@ end
 
 function kchat:register()
   kchat:unregister()
-
-  -- [Zeddicus]: Trul napisz cos na kanale immo
-  -- [Trul]: e
-  -- Trul mówi klanowi 'e'
-  -- Mówisz do klanu 'test'
-  -- Trul mówi 'e'
-  -- Mówisz 'test'
-  -- Trul mówi tobie 'test'
-  -- Mówisz Trulowi 'test'
-  -- Pytasz 'test!?'
-  -- Wykrzykujesz 'test!'
-  -- Trul pyta 'tesst?'
-  -- Trul wykrzykuje 'test!'
-  -- Pytasz Trula 'test?'
-  -- Wykrzykujesz do Trula 'test!'
-  -- Trul pyta się ciebie 'test?'
-  -- Trul wykrzykuje w twoim kierunku 'test!'
-  -- Trul mówi ci 'test'
-  -- Trul krzyczy do ciebie 'test!'
-  -- Trul mówi ci 'dest?'
-  -- Trul mowi grupie 'test!'
-  -- Mowisz do grupy 'test?'
-  -- Krzyczysz 'test'
-  -- Wrzeszczysz 'test!'
-  -- Trul wrzeszczy 'eqwewq!'
-  -- Trul krzyczy 'e'
-  -- 
-
-  kchat.chatTrigger = tempRegexTrigger("^(\\[(\\w+)\\]:\\s(.+)|(\\w+) m[oó]wi klanowi '(.+)'|()M[oó]wisz do klanu '(.+)'|(\\w+) m[oó]wi '(.+)'|()M[oó]wisz '(.+)'|(\\w+) m[oó]wi tobie '(.+)'|(\\w+) m[oó]wi \\w+ '(.+)'|()M[oó]wisz \\w+ '(.+)'|()Pytasz '(.+)'|()Pytasz \\w+ '(.+)'|()Wykrzykujesz '(.+)'|()Wykrzykujesz do \\w+ '(.+)'|(\\w+) pyta '(.+)'|(\\w+) wykrzykuje '(.+)'|(\\w+) pyta si[eę] ciebie '(.+)'|(\\w+) wykrzykuje w twoim kierunku '(.+)'|(\\w+) krzyczy do ciebie '(.+)'|()M[oó]wisz do grupy '(.+)'|()Krzyczysz '(.+)'|()Wrzeszczysz '(.+)'|(\\w+) wrzeszczy '(.+)'|(\\w+) krzyczy '(.+)')$", kchat.chatTriggerHandler)
+  kchat.chatTrigger = tempRegexTrigger("^((\\w+) (m[oó]wi|nuci|dudni|grzmi|piszczy|warczy|miauczy|szczeka|ryczy|syczy|[sś]piewa|zawodzi|wydaje d[zź]wi[ęe]k|pieje|skrzeczy).*'(.+)'|(\\w+) (pyta|nuci|dudni|piszczy|warczy|miauczy|szczeka|ryczy|syczy|[sś]piewa|pieje|skrzeczy).*'(.+)'|()(M[oó]wisz|Nucisz|Dudnisz|Grzmisz|Piszczysz|Warczysz|Miauczysz|Szczekasz|Ryczysz|Syczysz|[ŚS]piewasz|Zawodzisz|Wydajesz d[zź]wi[eę]k|Piejesz|[ŚS]piewasz).*'(.+)'|()Pytasz.*'(.+)'|()Wykrzykujesz.*'(.+)'|()Krzyczysz '(.+)'|()Wrzeszczysz '(.+)'|(\\w+) wrzeszczy '(.+)'|(\\w+) krzyczy.*'(.+)'|(\\w+) wykrzykuje.*'(.+)'|\\[(\\w+)\\]:\\s(.+))$", kchat.chatTriggerHandler)
 end
 
 function kchat:unregister()
@@ -89,18 +62,28 @@ end
 -- Wyswietla konsole chatu w okienku
 --
 function kchat:addBox()
-  local wrapper = kgui:addBox('chat', 0, "Czat", "chat")
-  kchat.box = kchat.box or Geyser.MiniConsole:new({
-    name = "kchatBox",
-    x = 4,
+  local wrapper = kgui:addBox('chat', 200, "Czat", "chat")
+  kchat.box = Geyser.Label:new({
+    name = "chat",
+    x = 2,
     y = kgui.baseFontHeightPx + 4 .. "px",
-    width = "100%-6px",
+    width = "100%-4px",
     height = "100%-".. kgui.baseFontHeightPx + 6 .."px",
-    scrollBar = true,
-    fontSize = kgui.baseFontHeight,
-    color = "black",
   }, wrapper)
-  kchat.box:echo("\n")
+  kchat.console = kchat.console or Geyser.MiniConsole:new({
+    name = "chatConsole",
+    width = "100%-6px",
+    height = "100%-4px",
+    x = "4px",
+    y = "2px",
+    fontSize = kgui.baseFontHeight,
+  }, kchat.box)
+  kchat.console:setColor(33, 33, 33)
+  kchat.console:enableAutoWrap()
+  -- upewniamy sie ze wszystko jest odpowiednio przypiete i nie schowane
+  kchat.box:add(kchat.console)
+  kchat.box:raiseAll()
+  kchat.box:show()
   kgui:update()
 end
 
@@ -120,9 +103,17 @@ function kchat:chatTriggerHandler()
     return
   end
 
+  if not hasFocus() then
+    alert(5)
+  end
+
   selectCurrentLine()
-  copy()
-  kchat.box:appendBuffer()
+  local formattedText = copy2decho()
+  -- usuwanie tla
+  formattedText = string.gsub(formattedText, ":%d+,%d+,%d+>", ">")
+  -- poprawka buga w copy2echo
+  formattedText = utf8.gsub(formattedText, "<r><%d+,%d+,%d+>(.)'<r>$", "%1'<r>")
+  kchat.console:decho(formattedText .. "\n")
 
   kgui:update()
 end

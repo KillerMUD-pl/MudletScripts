@@ -46,8 +46,18 @@ Komendy:
 - `+group` - włącza panel grupy
 - `-group` - wyłącza panel grupy
 
+#### Panel czata
+- Przechwytuje i wyświetla każdą "komunikację" typu `say`, `sayto`, `tell`, `clantell`, `grouptell`, `yell`, `shout`
+- Jeżeli Twoje okno Mudleta nie ma "focusa" (nie jest aktywne) a dostaniesz wiadomość, ikonka Mudleta na pasku zadań będzie migała przez 5 sekund
+- Wyświetlanie jest w formie mini-konsoli tak więc można ją przewijać i kopiować z niej tekst
+
+Komendy:
+- `+chat` - włącza panel czata
+- `-chat` - wyłącza panel czata
+
 #### Inne
 - `+reset` - resetuje wszystkie ustawienia, oprócz zapisanych punktów POI. Przydatne jeśli coś się popsuje z ustawieniem okienek itp.
+- `+gui font <wielkosc>` - ustawia rozmiar czcionki używanej w okienkach
 
 ## Instalacja
 

@@ -1,0 +1,51 @@
+[
+  {
+  "vnum": 1256,
+  "mob": "Mistrz Gharion",
+  "region": "Forteca",
+  "classs": [
+          "kleryk", "złodziej", "wojownik", "złodziej"
+  ],
+  "skills": [
+    {"name":  "sword", "min":  0, "max":  21, "price":  0, "reqSkill":  0},
+    {"name":  "axe", "min":  0, "max":  26, "price":  0, "reqSkill":  0},
+    {"name":  "charge", "min":  0, "max":  26, "price":  0, "reqSkill":  0},
+    {"name":  "spear", "min":  0, "max":  21, "price":  50, "reqSkill":  10},
+    {"name":  "recuperate", "min":  0, "max":  21, "price":  0, "reqSkill":  0},
+    {"name":  "backstab", "min":  0, "max":  21, "price":  0, "reqSkill":  0}
+  ],
+  "notes": "Biega po Carrallak"
+  },
+  {
+    "vnum": 15,
+    "mob": "Mag Blaczun",
+    "region": "Arras",
+    "classs": [
+      "mag", "kleryk", "druid"
+    ],
+    "skills": [
+      {"name":  "control of magic", "min":  0, "max":  21, "price":  0, "reqSkill":  0},
+      {"name":  "twohanded weapon style", "min":  0, "max":  26, "price":  0, "reqSkill":  0},
+      {"name":  "bandage", "min":  0, "max":  26, "price":  0, "reqSkill":  0},
+      {"name":  "meditation", "min":  0, "max":  21, "price":  50, "reqSkill":  10}
+    ],
+    "notes": "Biega po Carrallak"
+  },
+  {
+    "vnum": 712556,
+    "mob": "Paladyn Durnot",
+    "region": "Carrallak",
+    "classs": [
+       "kleryk", "wojownik", "paladyn"
+    ],
+    "skills": [
+      {"name":  "dualwield style", "min":  0, "max":  21, "price":  0, "reqSkill":  0},
+      {"name":  "mace", "min":  0, "max":  26, "price":  0, "reqSkill":  0},
+      {"name":  "flail", "min":  0, "max":  26, "price":  0, "reqSkill":  0},
+      {"name":  "stun", "min":  0, "max":  21, "price":  50, "reqSkill":  10},
+      {"name":  "lay", "min":  0, "max":  21, "price":  0, "reqSkill":  0},
+      {"name":  "backstab", "min":  0, "max":  21, "price":  0, "reqSkill":  0}
+    ],
+    "notes": "Biega po Carrallak"
+  }
+]

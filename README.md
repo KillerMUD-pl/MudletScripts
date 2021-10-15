@@ -72,6 +72,10 @@ Komendy:
 
 Komendy mappera:
 
+#### +map edit
+
+Włącza/wyłacza tryb edycji mapy. Musisz włączyć tryb edycji żeby używać większości komend poniżej. To takie zabezpieczenie zeby nie zrobić czegoś głupiego.
+
 #### +map start
 
 Włącza śledzenie ruchu i zaczyna rysować po mapie, oczywiście tylko jeśli jest coś nowego.

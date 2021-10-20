@@ -36,6 +36,11 @@ function kinstall:welcomeScreen()
   echo('\n\n')
 end
 
+function kinstall:getModuleDotJsonFile(moduleName)
+  local path = getMudletHomeDir()
+  return kinstall:loadJsonFile(path .. '/' .. moduleName .. '/module.json')
+end
+
 -- sprawdzanie wersji zainstalowanych pakietów i odświeżanie informacji o pakietach
 function kinstall:checkVersions(filename)
   -- ładowanie pliku modules.json
@@ -53,7 +58,7 @@ function kinstall:checkVersions(filename)
     if lfs.attributes(path .. '/' .. name, "mode") == "directory"
     and kinstall:fileExists(path .. '/' .. name .. '/module.json') then
       -- znaleziono moduł na dysku
-      local moduleFile = kinstall:loadJsonFile(path .. '/' .. name .. '/module.json')
+      local moduleFile = kinstall:getModuleDotJsonFile(name)
       if moduleFile.version ~= nil and moduleFile.name ~= nil then
         local moduleName = moduleFile.name
         -- uruchamianie modulu

@@ -246,6 +246,7 @@ function kbase:formatSpellEntry(entry)
 end
 
 function kbase:applySpellFilter(item)
+  if item == nil then return false end
   if not(kbase:isEmpty(regions)) and not(table.contains(regions, item.region)) then return false end
   if not(kbase:isEmpty(classes)) and not(table.contains(classes, item.class)) then return false end
   return true

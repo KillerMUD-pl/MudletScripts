@@ -1001,6 +1001,7 @@ function kmapper:importArea()
       100,
       12, 
       false,
+      false,
       'Marcellus'
     )
   end

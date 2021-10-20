@@ -17,7 +17,8 @@ end
 
 function kbase:doInit()
   if kinstall:getConfig('lookupKlasy') == 't' then
-    classes = yajl.to_value(kinstall:getConfig('lookupKlasy'))
+    classes = yajl.to_value(kinstall:getConfig('lookupKlasy', {}))
+    regions = yajl.to_value(kinstall:getConfig('lookupRegiony', {}))
   end
 end
 

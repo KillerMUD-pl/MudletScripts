@@ -34,5 +34,11 @@
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kchat.zip",
     "commands": [ "chat" ],
     "shortDesc": "Moduł czatu (wersja testowa)"
-  }
+  },
+  "kbase": {
+    "version": 2,
+    "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kbase.zip",
+    "commands": [ "lookup" ],
+    "shortDesc": "Moduł informacji o świecie"
+  },
 }

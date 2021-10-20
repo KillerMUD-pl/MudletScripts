@@ -40,5 +40,5 @@
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kbase.zip",
     "commands": [ "lookup" ],
     "shortDesc": "Moduł informacji o świecie"
-  },
+  }
 }

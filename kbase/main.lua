@@ -72,6 +72,7 @@ function kbase:setRegionFilter(phrase)
       cecho(string.format('Ustawienie filtrowania po regionie: <green>%s\n', lastFilterValue))
       table.insert(regions, lastFilterValue)
     end
+    kinstall:setConfig('lookupRegiony', yajl.to_string(regions))
     return
   else
     cecho(string.format('Filtrowanie nieudane, nie rozpoznano regionu: <red>%s\n', phrase))

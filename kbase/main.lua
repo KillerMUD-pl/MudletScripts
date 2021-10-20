@@ -291,11 +291,8 @@ function kbase:filterMatcher(phrase, t)
     return true
   end
 
-  local lowerPhrase = string.sub(string.lower(phrase), 1,3)
-
   for keyword in kbase:values(t) do
-    local lowerKeyword = string.sub(string.lower(keyword), 1,3)
-    if (lowerPhrase == lowerKeyword) then
+    if string:areLooselySame(phrase, keyword) then
       lastFilterValue = keyword
       return true
     end

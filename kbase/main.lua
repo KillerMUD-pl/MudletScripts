@@ -134,7 +134,7 @@ function kbase:searchSpells(phrase)
   cecho(string.format('<gold>Wyszukiwanie ksiąg z czarem: <cyan>%s\n', phrase))
   kbase:echoFilterInfo()
 
-  local filteredSpells = table.n_collect(spells, applySpellFilter)
+  local filteredSpells = table.n_collect(spells, kbase.applySpellFilter)
 
   if phrase ~= 'all' then
     for value in kbase:values(filteredSpells) do

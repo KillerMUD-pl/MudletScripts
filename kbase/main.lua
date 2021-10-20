@@ -261,7 +261,7 @@ function kbase:speedwalkToVnum(vnum)
     cecho('\n<red>Uh... ciężka sprawa, nie wiem jak tam dojść z miejsca w którym się znajdujesz...\n')
     return nil
   end
-  speedwalk:prepare()
+  kspeedwalk:prepare()
 end
 
 function kbase:forAny(t1, t2)

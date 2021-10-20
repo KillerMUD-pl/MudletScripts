@@ -611,7 +611,8 @@
         "reqSkill": 40,
         "price": 60
       }
-    ]
+    ],
+    "locked": "t"
   },
   "6143": {
     "classes": [
@@ -966,7 +967,8 @@
         "reqSkill": 35,
         "price": 85
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "24933": {
     "classes": [
@@ -1132,7 +1134,8 @@
         "reqSkill": 80,
         "price": 80
       }
-    ]
+    ],
+    "dangerious": "t"
   },
   "19409": {
     "classes": [
@@ -1359,7 +1362,9 @@
         "reqSkill": 35,
         "price": 35
       }
-    ]
+    ],
+    "roaming": "t",
+    "notes": "Trzeba sprezentować mu butelke dobrej gorzały"
   },
   "17168": {
     "classes": [
@@ -2354,7 +2359,8 @@
         "reqSkill": 0,
         "price": 0
       }
-    ]
+    ],
+    "roaming": "t"
   },
   "4507": {
     "classes": [
@@ -2469,7 +2475,9 @@
         "reqSkill": 80,
         "price": 50
       }
-    ]
+    ],
+    "locked": "t",
+    "dangerous": "t"
   },
   "19018": {
     "classes": [
@@ -2654,7 +2662,8 @@
         "price": 0,
         "reqSkill": 0
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "17654": {
     "classes": [
@@ -2777,7 +2786,9 @@
         "price": 0,
         "reqSkill": 0
       }
-    ]
+    ],
+    "dangerous": "t",
+    "locked": "t"
   },
   "26985": {
     "classes": [
@@ -3020,7 +3031,8 @@
         "reqSkill": 60,
         "price": 30
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "5321": {
     "classes": [
@@ -3467,7 +3479,8 @@
         "reqSkill": 60,
         "price": 45
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "27577": {
     "classes": [
@@ -3860,7 +3873,9 @@
         "price": 65
       }
     ],
-    "roomVnum": "10959"
+    "roomVnum": "10959",
+    "dangerous": "t",
+    "boss": "t"
   },
   "26991": {
     "classes": [
@@ -4638,7 +4653,8 @@
         "reqSkill": 35,
         "price": 25
       }
-    ]
+    ],
+    "locked": "t"
   },
   "882": {
     "classes": [
@@ -4836,7 +4852,8 @@
         "reqSkill": 25,
         "price": 50
       }
-    ]
+    ],
+    "notes": "Uczy tylko niziołki"
   },
   "9331": {
     "classes": [
@@ -5137,7 +5154,8 @@
         "reqSkill": 40,
         "price": 35
       }
-    ]
+    ],
+    "locked": "t"
   },
   "45188": {
     "classes": [
@@ -5593,7 +5611,8 @@
       }
     ],
     "roomVnum": 6644,
-    "notes": "Pojawia się po pokonaniu opętanego paladyna"
+    "notes": "Pojawia się po pokonaniu opętanego paladyna",
+    "boss": "t"
   },
   "3983": {
     "classes": [
@@ -7290,7 +7309,8 @@
         "reqSkill": 36,
         "price": 70
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "23606": {
     "classes": [
@@ -7398,7 +7418,8 @@
         "reqSkill": 55,
         "price": 75
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "61507": {
     "classes": [
@@ -7682,7 +7703,7 @@
       "Nomad"
     ],
 
-    "mob": "wędrowiec",
+    "mob": "Wędrowiec",
     "region": "Karakris",
     "roomVnum": "60721",
     "skills": [
@@ -7857,7 +7878,7 @@
       "Czarny Rycerz",
       "szaman"
     ],
-    "mob": "nauczyciel Gindal",
+    "mob": "Nauczyciel Gindal",
     "region": "Silea",
     "roomVnum": "50171",
     "skills": [
@@ -8769,7 +8790,8 @@
         "reqSkill": 30,
         "price": 12
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "50446": {
     "classes": [
@@ -9215,7 +9237,8 @@
         "price": 0,
         "reqSkill": 0
       }
-    ]
+    ],
+    "notes": "Wymaga umiejętności latania"
   },
   "2114": {
     "classes": [
@@ -9574,7 +9597,8 @@
         "reqSkill": 30,
         "price": 100
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "50138": {
     "classes": [
@@ -9749,7 +9773,9 @@
         "reqSkill": 0,
         "price": 0
       }
-    ]
+    ],
+    "dangerous": "t",
+    "locked": "t"
   },
   "15677": {
     "classes": [
@@ -10658,7 +10684,8 @@
         "reqSkill": 64,
         "price": 80
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "26977": {
     "classes": [
@@ -11061,7 +11088,8 @@
       }
     ],
     "roomVnum": 27682,
-    "notes": "Trzeba pokonać widmo kapłanki nie zabijając opętanego rycerza"
+    "notes": "Trzeba pokonać widmo kapłanki nie zabijając opętanego rycerza",
+    "dangerous": "t"
   },
   "1960": {
     "classes": [
@@ -11914,7 +11942,7 @@
       "Barbarzyńca",
       "szaman"
     ],
-    "mob": "paladyn Dyne",
+    "mob": "Paladyn Dyne",
     "region": "Carrallak",
     "roomVnum": "521",
     "skills": [
@@ -12232,7 +12260,8 @@
         "reqSkill": 70,
         "price": 100
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "20399": {
     "classes": [
@@ -12332,7 +12361,8 @@
         "reqSkill": 60,
         "price": 60
       }
-    ]
+    ],
+    "locked": "t"
   },
   "26983": {
     "classes": [
@@ -12564,7 +12594,7 @@
       "Barbarzyńca",
       "szaman"
     ],
-    "mob": "młody paladyn",
+    "mob": "Młody paladyn",
     "region": "Forteca",
     "roomVnum": "3712",
     "skills": [
@@ -12642,7 +12672,7 @@
     "classes": [
       "Nomad"
     ],
-    "mob": "brzuchaty krasnolud",
+    "mob": "Brzuchaty krasnolud",
     "region": "Forteca",
     "roomVnum": "2128",
     "skills": [
@@ -12935,7 +12965,8 @@
         "price": 0,
         "reqSkill": 0
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "8213": {
     "classes": [
@@ -13098,7 +13129,7 @@
     "classes": [
       "Druid"
     ],
-    "mob": "stary druid",
+    "mob": "Stary druid",
     "region": "Carrallak",
     "roomVnum": "1678",
     "skills": [
@@ -13279,7 +13310,8 @@
         "reqSkill": 35,
         "price": 110
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "16505": {
     "classes": [
@@ -13440,7 +13472,8 @@
         "price": 0,
         "reqSkill": 0
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "505": {
     "classes": [
@@ -13561,7 +13594,9 @@
         "reqSkill": 35,
         "price": 65
       }
-    ]
+    ],
+    "locked": "t",
+    "notes": "Wymaga nacisnięcia jelenia przy źródelku"
   },
   "1791": {
     "classes": [
@@ -13717,7 +13752,8 @@
         "reqSkill": 80,
         "price": 60
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "2024": {
     "classes": [
@@ -13812,7 +13848,8 @@
         "reqSkill": 35,
         "price": 35
       }
-    ]
+    ],
+    "dangerous": "t"
   },
   "510": {
     "classes": [
@@ -13905,7 +13942,7 @@
     "classes": [
       "Czarny Rycerz"
     ],
-    "mob": "zakapturzony rycerz",
+    "mob": "Zakapturzony rycerz",
     "region": "Forteca",
     "roomVnum": "64995",
     "skills": [

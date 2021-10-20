@@ -12,6 +12,12 @@ local availableRegions = { 'Arras', 'Forteca', 'Carrallak', 'Easterial', 'Silea'
 local availableClasses = { 'Wojownik', 'Złodziej', 'Barbarzyńca', 'Czarny Rycerz', 'Nomad', 'Mag', 'Druid', 'Kleryk', 'Paladyn' }
 local lastFilterValue = nil
 
+local icon_locked = '🗝️'
+local icon_notes = '‼'
+local icon_boss = '💀️'
+local icon_dungerous = '⚔'
+local icon_roaming = '🥾'
+
 function kbase:doUninstall()
 end
 
@@ -119,7 +125,13 @@ function kbase:printLookupHelp()
   cecho('<cyan>+lookup                        <grey>- pokazuje helpa i aktywne filtry.\n\n')
   kbase:echoFilterInfo(true)
   cecho(string.format('<gold>Dostępne klasy:  <cyan> %s\n', table.concat(availableClasses, ", ")))
-  cecho(string.format('<gold>Dostępne regiony:<cyan> %s\n', table.concat(availableRegions, ", ")))
+  cecho(string.format('<gold>Dostępne regiony:<cyan> %s\n\n', table.concat(availableRegions, ", ")))
+  cecho(string.format('<gold>Legenda Ikon:\n'))
+  cecho(string.format('<cyan>%s - Mob znajduje się za zamkniętymi drzwiami lub w innym trudno dostępnym miejscu\n', icon_locked))
+  cecho(string.format('<cyan>%s  - Mob znajduje się w kraince z agresywnymi mobami lub sam jest agresywny\n', icon_dungerous))
+  cecho(string.format('<cyan>%s - Mob jest bossem lub wymaga pokonania bossa by się do niego dostać\n', icon_boss))
+  cecho(string.format('<cyan>%s - Mob chodzi po krainie lub wielu krainach, nawigacja prowadzi do krainy\n', icon_roaming))
+  cecho(string.format('<DimGrey>%s<cyan>  - Dodatkowe informacje wyświetlające się w toolipie po najechaniu na moba\n', icon_notes))
 end
 
 function kbase:decodeSpells()
@@ -129,31 +141,29 @@ end
 
 function kbase:searchSpells(phrase)
 
-  if spells == nil then
-    kbase:decodeSpells()
-  end
-
-  cecho(string.format('<gold>Wyszukiwanie ksiąg z czarem: <cyan>%s\n', phrase))
-  kbase:echoFilterInfo()
-
-  local filteredSpells = table.n_collect(spells, kbase.applySpellFilter)
-
-  if phrase ~= 'all' then
-    for value in kbase:values(filteredSpells) do
-      for spell in kbase:values(value.spells) do
-        if (string.lower(spell) == string.lower(phrase)) then
-          cechoLink(kbase:formatSpellEntry(value), string.format([[ kbase:speedwalkToVnum(%s) ]], value.vnum), string.format("Kliknij by wyznaczyć ściężke do %s!", value.mob), true)
-          break
-        end
-      end
+    if spells == nil then
+        kbase:decodeSpells()
     end
-  else
-    for value in kbase:values(filteredSpells) do
-        cechoLink(kbase:formatSpellEntry(value), string.format([[ kbase:speedwalkToVnum(%s) ]], value.vnum), string.format("Kliknij by wyznaczyć ściężke do %s!", value.mob), true)
-      end
-  end
 
-  cecho('<gold>Wyszukiwanie zakończone\n')
+    cecho(string.format('<gold>Wyszukiwanie ksiąg z czarem: <cyan>%s\n', phrase))
+    kbase:echoFilterInfo()
+
+    for value in kbase:values(spells) do
+        if kbase:satisfiesSpellFilters(value) then
+          local text = kbase:formatSpellEntry(value)
+            if phrase == 'all' then
+              kbase:printEntry(value, text)
+            else
+                for spell in kbase:values(value.spells) do
+                    if (string.lower(spell) == string.lower(phrase)) then
+                        kbase:printEntry(value, text)
+                        break
+                    end
+                end
+            end
+        end
+    end
+    cecho('<gold>Wyszukiwanie zakończone\n')
 end
 
 function kbase:decodeTeachers()
@@ -174,14 +184,11 @@ function kbase:searchTeachers(phrase)
 
   for _, teacher in pairs(teachers) do
 
-    if kbase:satisfiesFilters(teacher) then
+    if kbase:satisfiesTeacherFilters(teacher) then
       for skill in kbase:values(teacher.skills) do
         if skill.name == phrase then
-          local key = string.format('<green>%s<grey>: uczy %s-%s <cyan>%s <red>%s', teacher.mob, skill.min, skill.max, kbase:paidFrom(skill), kbase:learnCost(skill))
-          local wayText = string.format("Kliknij by wyznaczyć ściężke do: %s!", teacher.mob)
-          local roomVnum = teacher.roomVnum
-          local notes = teacher.notes
-          teachersList[key] = {max = skill.max, linkText = wayText, roomVnum = roomVnum, notes = notes}
+          local key = string.format('<green>%s<grey>: uczy %s<grey>-%s %s', teacher.mob, tostring(skill.min), tostring(skill.max), kbase:paidInfo(skill))
+          teachersList[key] = {max = skill.max, item = teacher}
           break
         end
       end
@@ -189,26 +196,41 @@ function kbase:searchTeachers(phrase)
   end
 
   for k, v in spairs(teachersList, function(t,a,b) return t[b].max > t[a].max end) do
-
-    if v.notes ~= nil then
-      v.notes = string.format('\n   <grey>[%s]', v.notes)
-    else
-      v.notes = ''
-    end
-
-    if v.roomVnum ~= nil then
-      local text = string.format('<white>(+) %s %s\n', k, v.notes)
-      cechoLink(text, string.format([[ kbase:speedwalkToVnum(%s) ]], v.roomVnum), v.linkText, true)
-    else
-      local text = string.format('<DimGrey>(*) %s %s\n', k, v.notes)
-      cecho(text)
-    end
+    kbase:printEntry(v.item, k)
   end
 
   cecho('<gold>Wyszukiwanie zakończone\n')
 end
 
-function kbase:satisfiesFilters(teacher)
+function kbase:printEntry(item, text)
+    local notes, dangerous, boss, locked, roaming, fullNotes
+    if item.notes ~= nil then
+      notes = icon_notes
+      fullNotes = item.notes
+    else notes = '' end
+    if item.dangerous ~= nil then dangerous = icon_dungerous else dangerous = '' end
+    if item.isBoss ~= nil then boss = icon_boss else boss = '' end
+    if item.locked ~= nil then locked = icon_locked else locked = '' end
+    if item.roaming ~= nil then roaming = icon_roaming else roaming = '' end
+
+    if notes ~= '' or dangerous ~= '' or boss ~= '' or locked ~= '' or roaming ~= '' then
+      text = text .. string.format(' <DimGrey>[%s%s%s%s%s]', notes, dangerous, boss, locked, roaming)
+    end
+
+    local tooltip = ''
+    if fullNotes ~= nil then tooltip = string.format('%s %s\n', icon_notes, fullNotes) end
+    tooltip = tooltip .. string.format("Kliknij by wyznaczyć ściężke do: %s!", item.mob)
+
+    if item.roomVnum ~= nil then
+      cechoLink('<white>(+) ' .. text .. '\n', string.format([[ kbase:speedwalkToVnum(%s) ]], item.roomVnum), tooltip, true)
+    elseif fullNotes ~= nil then
+      cechoLink('<DimGrey>(*) ' .. text .. '\n', '', tooltip, true)
+    else
+      cecho('<DimGrey>(*) ' .. text .. '\n')
+  end
+end
+
+function kbase:satisfiesTeacherFilters(teacher)
   if not(kbase:isEmpty(regions)) and table.contains(regions, teacher.region) then
     return false
   elseif not(kbase:isEmpty(classes)) and not(kbase:forAny(teacher.classes, classes)) then
@@ -216,6 +238,16 @@ function kbase:satisfiesFilters(teacher)
   else
     return true
   end
+end
+
+function kbase:satisfiesSpellFilters(spell)
+    if not(kbase:isEmpty(regions)) and table.contains(regions, spell.region) then
+        return false
+    elseif not(kbase:isEmpty(classes)) and not(table.contains(classes, spell.class)) then
+        return false
+    else
+        return true
+    end
 end
 
 function kbase:read_file(path)
@@ -239,10 +271,7 @@ function kbase:printSpellsTable(tbl)
 end
 
 function kbase:formatSpellEntry(entry)
-  if entry.notes ~= nil then
-    return string.format("<green>%s<white>: %s - %s [<gold>%s<white>]\n", entry.class, entry.mob, kbase:printSpellsTable(entry.spells), entry.notes)
-  end
-  return string.format("<green>%s<white>: %s - %s\n", entry.class, entry.mob, kbase:printSpellsTable(entry.spells))
+  return string.format("<green>%s<white>: %s - %s", entry.class, entry.mob, kbase:printSpellsTable(entry.spells))
 end
 
 function kbase:applySpellFilter(item)
@@ -262,7 +291,8 @@ function kbase:speedwalkToVnum(vnum)
     cecho('\n<red>Uh... ciężka sprawa, nie wiem jak tam dojść z miejsca w którym się znajdujesz...\n')
     return nil
   end
-  kspeedwalk:prepare()
+  local targetRoomName, targetRoomId, cost = kspeedwalk:prepare()
+  cecho('\n<gold>Ścieżka do <green>' .. targetRoomName .. ' (id: ' .. targetRoomId .. ')<gold> znaleziona.\nSzacowana ilość punktów ruchu: <green>'.. cost ..'\n<gold>Wpisz <green>+walk<gold> by rozpocząć, <green>+stop<gold> by zakończyć.\n')
 end
 
 function kbase:forAny(t1, t2)
@@ -302,18 +332,43 @@ function kbase:filterMatcher(phrase, t)
   return false
 end
 
-function kbase:paidFrom(skill)
-  if skill.reqSkill ~= nil and skill.reqSkill ~= 0 then
-    return string.format('(Płatne od: %s)', tostring(skill.reqSkill))
+function kbase:paidInfo(skill)
+  if skill.reqSkill ~= nil and skill.reqSkill ~= 0 and skill.max >= skill.reqSkill then
+    return string.format('<cyan>(Płatne od: <grey>%s%s)', kbase:max(skill.min, skill.reqSkill), kbase:discount(skill))
   end
   return ''
 end
 
-function kbase:learnCost(skill)
+function kbase:discount(skill)
   if skill.price ~= nil and skill.price ~= 0 then
-    return string.format('(Cena: %s)', tostring(skill.price))
+    if skill.price < 25 then
+      return string.format("<cyan>, <PaleGreen>%s<cyan>", "prawie za darmo")
+    elseif skill.price < 40 then
+      return string.format("<cyan>, <dark_green>%s<cyan>", "dobra cena")
+    elseif skill.price < 60 then
+      return string.format("<cyan>, <YellowGreen>%s<cyan>", "cena okazjonalna")
+    elseif skill.price < 80 then
+      return string.format("<cyan>, <yellow>%s<cyan>", "mały upust")
+    elseif skill.price < 99 then
+      return string.format("<cyan>, <orange>%s<cyan>", "zwykła cena")
+    elseif skill.price < 105 then
+      return string.format("<cyan>, <DarkOrange>%s<cyan>", "trochę drożej")
+    elseif skill.price < 115 then
+      return string.format("<cyan>, <OrangeRed>%s<cyan>", "drogo")
+    elseif skill.price < 130 then
+      return string.format("<cyan>, <red>%s<cyan>", "rabunek w biały dzień")
+    else
+      return string.format("<cyan>, <ansiRed>%s<cyan>", "jak w krasnoludzkim banku")
+    end
+  else return ""
   end
-  return ''
+end
+
+function kbase:max(v1, v2)
+  if (v1 > v2) then
+    return v1
+  end
+  return v2
 end
 
 function kbase:values(t)

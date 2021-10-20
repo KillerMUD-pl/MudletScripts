@@ -210,7 +210,6 @@ function kmap:doInstall()
 end
 
 function kmap:doInit()
-  --kmap.forceUiUpdate = true
   kmap:register()
   if kinstall:getConfig('mapa') == 't' then
     kinstall.params[1] = 'silent'
@@ -220,7 +219,6 @@ function kmap:doInit()
 end
 
 function kmap:doUpdate()
-  --kmap.forceUiUpdate = true
   kmap:charGroupEventHandler()
 end
 
@@ -468,9 +466,13 @@ end
 --
 function kmap:mapLoad(forceReload)
   kmap:addMapper()
-  if getMapUserData("type") ~= 'killermud' or forceReload then
+  local mapVersion = tonumber(getMapUserData("version") or 0)
+  local moduleFile = kinstall:getModuleDotJsonFile("kmap")
+  local moduleVersion = moduleFile.version
+  if forceReload or mapVersion ~= moduleVersion then
     cecho('<gold>Ładuje mapę z dysku\n')
     loadJsonMap(getMudletHomeDir() .. '/kmap/mapa.json')
+    setMapUserData("version", tostring(moduleVersion))
   end
   kmap:vnumCacheRebuild()
   if gmcp.Room == nil then
@@ -560,12 +562,6 @@ function kmap:drawGroup()
 
   kmap.messageBox:hide()
 
-  -- sparsowanie do jsona i porownanie dwoch stringow jest szybkie bo to natywne instrukcje
-  -- jesli poprzednie dane gmcp niczym sie nie roznia - olewamy wyswietlanie
-  -- chyba ze trzeba uaktualnic UI
-  --if kmap.forceUiUpdate == false and kmap.lastGmcpInfo == yajl.to_string(gmcp.Char.Group) then return end
-  --kmap.forceUiUpdate = false
-  
   local symbolMode = "num"
   if kgui:isClosed('group') then symbolMode = "short" end
   if kmap.immoMap == "y" then symbolMode = "name" end

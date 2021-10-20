@@ -243,7 +243,7 @@ function kbase:formatSpellEntry(entry)
   return string.format("<green>%s<white>: %s - %s\n", entry.class, entry.mob, kbase:printSpellsTable(entry.spells))
 end
 
-function applySpellFilter(item)
+function kbase:applySpellFilter(item)
   if not(kbase:isEmpty(regions)) and not(table.contains(regions, item.region)) then return false end
   if not(kbase:isEmpty(classes)) and not(table.contains(classes, item.class)) then return false end
   return true

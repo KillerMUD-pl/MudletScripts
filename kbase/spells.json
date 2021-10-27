@@ -153,7 +153,7 @@
     "region": "Forteca",
     "class": "Kleryk",
     "spells": [
-      "Hold Undead", "Remove paralisys", "Restoration", "Mass Cure Serious"
+      "Hold Undead", "Remove paralysis", "Restoration", "Mass Cure Serious"
     ],
     "dangerous": "t",
     "boss": "t"
@@ -701,7 +701,7 @@
     "region": "Carrallak",
     "class": "Mag",
     "spells": [
-      "Hold Undead", "free action", "remove paralisis", "repayment"
+      "Hold Undead", "free action", "remove paralysis", "repayment"
     ],
     "dangerous": "t"
   },

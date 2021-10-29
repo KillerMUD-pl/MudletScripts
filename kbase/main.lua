@@ -145,6 +145,8 @@ function kbase:searchSpells(phrase)
         kbase:decodeSpells()
     end
 
+    local fphrase = '(^| )'..string.lower(phrase)
+
     cecho(string.format('<gold>Wyszukiwanie ksiąg z czarem: <cyan>%s\n', phrase))
     kbase:echoFilterInfo()
 
@@ -155,8 +157,9 @@ function kbase:searchSpells(phrase)
               kbase:printEntry(value, text)
             else
                 for spell in kbase:values(value.spells) do
-                    if (string.lower(spell) == string.lower(phrase)) then
-                        kbase:printEntry(value, text)
+                    local i, j = rex.find(string.lower(spell), fphrase)
+                    if i then
+                        kbase:printEntry(value, text, fphrase)
                         break
                     end
                 end
@@ -207,7 +210,7 @@ function kbase:searchTeachers(phrase)
   cecho('<gold>Wyszukiwanie zakończone\n')
 end
 
-function kbase:printEntry(item, text)
+function kbase:printEntry(item, text, fphrase)
     local notes, dangerous, boss, locked, roaming, fullNotes
     if item.notes ~= nil then
       notes = icon_notes
@@ -220,6 +223,10 @@ function kbase:printEntry(item, text)
 
     if notes ~= '' or dangerous ~= '' or boss ~= '' or locked ~= '' or roaming ~= '' then
       text = text .. string.format(' <DimGrey>[%s%s%s%s%s]', notes, dangerous, boss, locked, roaming)
+    end
+
+    if fphrase then
+      text, _, _ = rex.gsub(text, fphrase, '<cyan>%0<white>')
     end
 
     local tooltip = ''

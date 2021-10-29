@@ -145,6 +145,8 @@ function kbase:searchSpells(phrase)
         kbase:decodeSpells()
     end
 
+    local fphrase = '(^| )'..string.lower(phrase)
+
     cecho(string.format('<gold>Wyszukiwanie ksiąg z czarem: <cyan>%s\n', phrase))
     kbase:echoFilterInfo()
 
@@ -155,8 +157,9 @@ function kbase:searchSpells(phrase)
               kbase:printEntry(value, text)
             else
                 for spell in kbase:values(value.spells) do
-                    if (string.lower(spell) == string.lower(phrase)) then
-                        kbase:printEntry(value, text)
+                    local i, j = rex.find(string.lower(spell), fphrase)
+                    if i then
+                        kbase:printEntry(value, text, fphrase)
                         break
                     end
                 end
@@ -187,7 +190,12 @@ function kbase:searchTeachers(phrase)
     if kbase:satisfiesTeacherFilters(teacher) then
       for skill in kbase:values(teacher.skills) do
         if skill.name == phrase then
-          local key = string.format('<green>%s<grey>: uczy %s<grey>-%s %s', teacher.mob, tostring(skill.min), tostring(skill.max), kbase:paidInfo(skill))
+          local key = ''
+          if skill.max ~= nil then
+            key = string.format('<green>%s<grey>: uczy %s<grey>-%s %s', teacher.mob, tostring(skill.min), tostring(skill.max), kbase:paidInfo(skill))
+          else
+            key = string.format('<green>%s<grey>: uczy tego czaru', teacher.mob)
+          end
           teachersList[key] = {max = skill.max, item = teacher}
           break
         end
@@ -195,26 +203,30 @@ function kbase:searchTeachers(phrase)
     end
   end
 
-  for k, v in spairs(teachersList, function(t,a,b) return t[b].max > t[a].max end) do
+  for k, v in spairs(teachersList, function(t,a,b) return kbase:getOrDefault(t[b].max) > kbase:getOrDefault(t[a].max) end) do
     kbase:printEntry(v.item, k)
   end
 
   cecho('<gold>Wyszukiwanie zakończone\n')
 end
 
-function kbase:printEntry(item, text)
+function kbase:printEntry(item, text, fphrase)
     local notes, dangerous, boss, locked, roaming, fullNotes
     if item.notes ~= nil then
       notes = icon_notes
       fullNotes = item.notes
     else notes = '' end
     if item.dangerous ~= nil then dangerous = icon_dungerous else dangerous = '' end
-    if item.isBoss ~= nil then boss = icon_boss else boss = '' end
+    if item.boss ~= nil then boss = icon_boss else boss = '' end
     if item.locked ~= nil then locked = icon_locked else locked = '' end
     if item.roaming ~= nil then roaming = icon_roaming else roaming = '' end
 
     if notes ~= '' or dangerous ~= '' or boss ~= '' or locked ~= '' or roaming ~= '' then
       text = text .. string.format(' <DimGrey>[%s%s%s%s%s]', notes, dangerous, boss, locked, roaming)
+    end
+
+    if fphrase then
+      text, _, _ = rex.gsub(text, fphrase, '<cyan>%0<white>')
     end
 
     local tooltip = ''
@@ -381,4 +393,11 @@ function kbase:isEmpty(t)
     return true
   end
   return false
+end
+
+function kbase:getOrDefault(value)
+    if value ~= nil then
+        return value
+    end
+    return 0
 end

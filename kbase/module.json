@@ -1,6 +1,6 @@
 {
   "name": "kbase",
-  "version": 4,
+  "version": 5,
   "commands": [ "lookup" ],
   "shortDesc": "Moduł informacji o świecie"
 }

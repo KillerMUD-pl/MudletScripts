@@ -55,6 +55,22 @@ Komendy:
 - `+chat` - włącza panel czata
 - `-chat` - wyłącza panel czata
 
+### Moduł Bazodanowy (kbase)
+- Pozwala wyszukiwać nauczycieli danego skilla
+- Pozwala wyszukiwać moby które posiadają dany czar w księdze
+- Możliwość ustawienia filtrów per regiony/klasy
+- Zintegrowany speedwalk dla większości wpisów
+
+Komendy:
+- `+lookup skill <nazwa skilla>`    - wyszukuje nauczycieli danego skilla lub spella
+- `+lookup spell <nazwa spella>`    - wyszukuje księgi z danym czarem
+- `+lookup spell all`               - pokazuje wszystkie moby z księgami
+- `+lookup region <nazwa regionu>`  - dodaje region do listy filtrów
+- `+lookup region <all/clear>`      - czyści filtr regionów
+- `+lookup class <nazwa klasy>`     - dodaje klasę do listy filtrów
+- `+lookup class <all/clear>`       - czyści filtr klas
+- `+lookup`                         - okazuje helpa i aktywne filtry
+
 #### Inne
 - `+reset` - resetuje wszystkie ustawienia, oprócz zapisanych punktów POI. Przydatne jeśli coś się popsuje z ustawieniem okienek itp.
 - `+gui font <wielkosc>` - ustawia rozmiar czcionki używanej w okienkach

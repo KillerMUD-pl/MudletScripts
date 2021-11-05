@@ -14,6 +14,9 @@ Komendy:
 - `+poi` - pokazuje listę zapisanych lokacji
 - `+poi <nazwa>` - dodaje lokację w której stoisz do listy zapisanych lokacji
 - `-poi <nazwa>` - usuwa zapisaną lokalizację
+- `+poi save` - zapisuje POI do pliku JSON
+- `+poi load` - łąduje POI z pliku JSON
+- `+pol vunm <vnum> <nazwa>` - dodaje poi o nazwie <nazwa> na podstawie <vnum> roomu. Skrypt sam znajdzie room na mapie.
 - `+walk <nazwa>` - idzie do zapisanej lokacji
 - `+walk` - rozpoczyna podróż do lokacji po dwukliku na room na mapie. Jeżeli już masz wyznaczoną trasę, i naprzykład na chwilę usiadłeś, komenda `+walk` wznawia podróż.
 - `+walk auto` - włącza/wyłącza automatyczne rozpoczęcie podróży po dwu-kliku na mapie

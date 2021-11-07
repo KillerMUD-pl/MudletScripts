@@ -835,7 +835,7 @@
     "spells": [
       "revive", "raise ghast", "orb of entropy", "bashee's howl"
     ],
-    "notes": "Ksiegi laduja sie w szczelinie, na mobie laduje sie klucz",
+    "notes": "Ksiega Nekromancji: Ksiegi laduja sie w szczelinie, na mobie laduje sie klucz",
     "dangerous": "t",
     "boss": "t"
   },
@@ -847,7 +847,19 @@
     "spells": [
       "Chain Lightning", "domination", "deflect wounds", "brainwash", "wizard eye"
     ],
-    "notes": "Ksiegi laduja sie w szczelinie, na mobie laduje sie klucz",
+    "notes": "Ksiega Magiczna Zakurzona: Ksiegi laduja sie w szczelinie, na mobie laduje sie klucz",
+    "dangerous": "t",
+    "boss": "t"
+  },
+  {
+    "roomVnum": 33068,
+    "mob": "Groslug",
+    "region": "Arras",
+    "class": "Mag",
+    "spells": [
+      "brainwash", "reflect spell III", "absolute magic protection", "resist weapon"
+    ],
+    "notes": "Ksiega Magii Wysokiej: Ksiegi laduja sie w szczelinie, na mobie laduje sie klucz",
     "dangerous": "t",
     "boss": "t"
   },
@@ -963,7 +975,40 @@
     "region": "Nowy Kontynent",
     "class": "Mag",
     "spells": [
-      "shadow swarm", "energy strike", "absolute magic protection", "orb of entropy", "revive"
+      "master of piercing sight", "enchant artefact", "absolute magic protection", "summon", "revive"
+    ],
+    "dangerous": "t",
+    "boss": "t"
+  },
+  {
+    "roomVnum": 41221,
+    "mob": "Antyczny czerwony smok",
+    "region": "Nowy Kontynent",
+    "class": "Kleryk",
+    "spells": [
+      "mass resist negative", "life transfer", "create healing water", "mass cure critical"
+    ],
+    "dangerous": "t",
+    "boss": "t"
+  },
+  {
+    "roomVnum": 41221,
+    "mob": "Antyczny czerwony smok",
+    "region": "Nowy Kontynent",
+    "class": "Paladyn",
+    "spells": [
+      "holy weapons", "greater cure poison", "aura of improved healing", "aura of precision", "aura of endurance"
+    ],
+    "dangerous": "t",
+    "boss": "t"
+  },
+  {
+    "roomVnum": 41221,
+    "mob": "Antyczny czerwony smok",
+    "region": "Nowy Kontynent",
+    "class": "Druid",
+    "spells": [
+     "mass refresh", "mass luck", "healing ring", "blade barrier"
     ],
     "dangerous": "t",
     "boss": "t"
@@ -1013,5 +1058,17 @@
     "spells": [
       "charm monster", "summon flying creature", "cone of cold", "mass fly"
     ]
+  },
+  {
+    "roomVnum": 22795,
+    "mob": "Arcymag",
+    "region": "Nowy Kontynent",
+    "class": "Mag",
+    "spells": [
+      "nexus", "portal", "master of piercing sight", "enchant artefact", "lightingshield"
+    ],
+    "dangerous": "t",
+    "boss": "t"
   }
+
 ]

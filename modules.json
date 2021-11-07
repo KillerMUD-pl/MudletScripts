@@ -36,7 +36,7 @@
     "shortDesc": "Moduł czatu (wersja testowa)"
   },
   "kbase": {
-    "version": 5,
+    "version": 6,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kbase.zip",
     "commands": [ "lookup" ],
     "shortDesc": "Moduł informacji o świecie"

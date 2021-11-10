@@ -1,5 +1,5 @@
 module("template", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 template = template or {}
 template.enabled = false

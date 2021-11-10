@@ -1,10 +1,10 @@
 module("kinstall/mapper", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 -- globalne zmienne
 kmapper = kmapper or {}
 kmapper.previousRoom = kmapper.previousRoom or {}
-kmapper.previousRoom.num = 0;
+kmapper.previousRoom.num = 0
 kmapper.ids = kmapper.ids or {}
 kmapper.mapping = false
 kmapper.cmdQueue = {}
@@ -164,7 +164,7 @@ function kmapper:createNewRoom()
     end
   end
   
-  selectedDir = utf8.lower(kmapper.originatingExit.dir);
+  selectedDir = utf8.lower(kmapper.originatingExit.dir)
   if selectedDir == 'u' or selectedDir == 'd' then
     selectedDir = kmapper.selectedDir or 'nw'
   end
@@ -234,7 +234,7 @@ function kmapper:checkIfMoveCommandWasExecuted()
   kmap:centerView(kmapper.targetRoomId)
   kmapper.targetRoomId = nil
 
-  local typ = strip_accents(gmcp.Room.Info.sector);
+  local typ = strip_accents(gmcp.Room.Info.sector)
 
   kmap.vnumToRoomIdCache[gmcp.Room.Info.num] = getPlayerRoom()
   
@@ -515,9 +515,9 @@ function kmapper:findExits(mapRoomId)
       '\nGMCP Data: ' .. yajl.to_string(gmcp.Room.Info) .. '\n'
     )
     echo('\n')
-    cecho('<yellow>****************************************\n');
-    cecho('<yellow>**        Meh, sie pojebało!          **\n');
-    cecho('<yellow>****************************************\n');
+    cecho('<yellow>****************************************\n')
+    cecho('<yellow>**        Meh, sie pojebało!          **\n')
+    cecho('<yellow>****************************************\n')
     cecho(errors)
     echo('\n')
   end
@@ -670,7 +670,7 @@ kmapper.ids.roomInfoEvent = tempRegexTrigger("^\\[Wyj.cia:.*", [[ kmapper:receiv
 --
 function kmapper:mapStart()
   if kmapper.mapping == true then
-    cecho('\n<red>Mapowanie jest już włączone\n');
+    cecho('\n<red>Mapowanie jest już włączone\n')
   else
     openMapWidget()
     kmap:vnumCacheRebuild()
@@ -678,23 +678,23 @@ function kmapper:mapStart()
     kmapper.mapping = true
     kmapper.runningCmd = false
     kmapper:startCmdCapture()
-    cecho('\n<red>**************************************************\n');
-    cecho('<red>**         WŁĄCZONO TRYB TWORZENIA MAPY         **\n');
-    cecho('<red>**************************************************\n');
-    cecho('<red>** Ten tryb służy wyłącznie do pracy nad mapą.  **\n');
-    cecho('<red>** NIE używaj go do normalnej gry.              **\n');
-    cecho('<red>** Ten tryb BLOKUJE wszystkie komendy oprócz    **\n');
-    cecho('<red>** tych potrzebnych do poruszania się.          **\n');
-    cecho('<red>**                                              **\n');
-    cecho('<red>** Dozwolone komendy                            **\n');
-    cecho('<red>** - kierunki                                   **\n');
-    cecho('<red>** - look lub l                                 **\n');
-    cecho('<red>** - open (pelna komenda)                       **\n');
-    cecho('<red>** - close (pelna komenda)                      **\n');
-    cecho('<red>**                                              **\n');
-    cecho('<red>** Aby wyłączyć tryb mapowania wpisz:           **\n');
-    cecho('<red>** <yellow>map stop<red>                                     **\n');
-    cecho('<red>**************************************************\n\n');
+    cecho('\n<red>**************************************************\n')
+    cecho('<red>**         WŁĄCZONO TRYB TWORZENIA MAPY         **\n')
+    cecho('<red>**************************************************\n')
+    cecho('<red>** Ten tryb służy wyłącznie do pracy nad mapą.  **\n')
+    cecho('<red>** NIE używaj go do normalnej gry.              **\n')
+    cecho('<red>** Ten tryb BLOKUJE wszystkie komendy oprócz    **\n')
+    cecho('<red>** tych potrzebnych do poruszania się.          **\n')
+    cecho('<red>**                                              **\n')
+    cecho('<red>** Dozwolone komendy                            **\n')
+    cecho('<red>** - kierunki                                   **\n')
+    cecho('<red>** - look lub l                                 **\n')
+    cecho('<red>** - open (pelna komenda)                       **\n')
+    cecho('<red>** - close (pelna komenda)                      **\n')
+    cecho('<red>**                                              **\n')
+    cecho('<red>** Aby wyłączyć tryb mapowania wpisz:           **\n')
+    cecho('<red>** <yellow>map stop<red>                                     **\n')
+    cecho('<red>**************************************************\n\n')
   end
 end
 
@@ -710,11 +710,11 @@ function kmapper:mapStop(showInfo)
     return
   end
   if kmapper.mapping == false then
-    cecho('\n<green>Mapowanie jest już wyłączone\n');
+    cecho('\n<green>Mapowanie jest już wyłączone\n')
   else
-    cecho('\n<green>****************************************\n');
-    cecho('<green>**   WYŁĄCZONO TRYB TWORZENIA MAPY    **\n');
-    cecho('<green>****************************************\n');
+    cecho('\n<green>****************************************\n')
+    cecho('<green>**   WYŁĄCZONO TRYB TWORZENIA MAPY    **\n')
+    cecho('<green>****************************************\n')
   end
 end
 
@@ -764,16 +764,16 @@ end
 -- importowanie mapy
 --
 function kmapper:mapLoad()
-  cecho('\n<red>*******************************************\n');
-  cecho('<red>** UWAGA!! To nadpisze CAŁĄ twoją pracę! **\n');
-  cecho('<red>** Mozesz kiknąć "Anuluj" w okienku      **\n');
-  cecho('<red>** wyboru pliku aby nie nadpisywać mapy  **\n');
-  cecho('<red>**                                       **\n');
-  cecho('<red>** czy nie chciałeś przypadkiem użyć     **\n');
-  cecho('<red>** <yellow>map import<red>                            **\n');
-  cecho('<red>** by "zaimportować" coś do istniejącej  **\n');
-  cecho('<red>** już mapy?                             **\n');
-  cecho('<red>*******************************************\n');
+  cecho('\n<red>*******************************************\n')
+  cecho('<red>** UWAGA!! To nadpisze CAŁĄ twoją pracę! **\n')
+  cecho('<red>** Mozesz kiknąć "Anuluj" w okienku      **\n')
+  cecho('<red>** wyboru pliku aby nie nadpisywać mapy  **\n')
+  cecho('<red>**                                       **\n')
+  cecho('<red>** czy nie chciałeś przypadkiem użyć     **\n')
+  cecho('<red>** <yellow>map import<red>                            **\n')
+  cecho('<red>** by "zaimportować" coś do istniejącej  **\n')
+  cecho('<red>** już mapy?                             **\n')
+  cecho('<red>*******************************************\n')
   local path = invokeFileDialog(true, "Wybierz NOWY PLIK mapy do załadowania")
   if path == "" then
     cecho('<yellow>Anulowano ładowanie nowej mapy.')
@@ -945,9 +945,9 @@ function kmapper:exportArea(areaId)
 
 
   echo('\n')
-  cecho('<green>****************************************\n');
-  cecho('<green>** Wybierz FOLDER do zapisania pliku  **\n');
-  cecho('<green>****************************************\n');
+  cecho('<green>****************************************\n')
+  cecho('<green>** Wybierz FOLDER do zapisania pliku  **\n')
+  cecho('<green>****************************************\n')
     
   local path = invokeFileDialog(false, "Wybierz miejsce do zapisania krainki")
   if path == "" then
@@ -961,14 +961,14 @@ function kmapper:exportArea(areaId)
   file:write(yajl.to_string(areaRooms))
   file:close()
   
-  cecho('\n<green>Wyksportowano krainkę do pliku '.. fileName ..'\n');
+  cecho('\n<green>Wyksportowano krainkę do pliku '.. fileName ..'\n')
 end
 
 function kmapper:importArea()
   echo('\n')
-  cecho('<green>****************************************\n');
-  cecho('<green>**   Wybierz PLIK do zaimportowania   **\n');
-  cecho('<green>****************************************\n');
+  cecho('<green>****************************************\n')
+  cecho('<green>**   Wybierz PLIK do zaimportowania   **\n')
+  cecho('<green>****************************************\n')
 
   local path = invokeFileDialog(true, "Wybierz plik mapy do zaimportowania")
   if path == "" then
@@ -1143,9 +1143,9 @@ end
 
 function kmapper:mapLog()
   echo('\n')
-  cecho('<green>*******************************************\n');
-  cecho('<green>** Wybierz FOLDER do zapisania loga mapy **\n');
-  cecho('<green>*******************************************\n');
+  cecho('<green>*******************************************\n')
+  cecho('<green>** Wybierz FOLDER do zapisania loga mapy **\n')
+  cecho('<green>*******************************************\n')
 
   local path = invokeFileDialog(false, "Wybierz folder do zapisania loga mapy")
   if path == "" then
@@ -1220,7 +1220,7 @@ function kmapper:mapInfo(fromMapper)
       return
     end
   end
-  cecho('\n<green>Informacje o roomie:\n');
+  cecho('\n<green>Informacje o roomie:\n')
   echo('Id roomu: ' .. roomId .. '\n')
   echo('W area: ' .. getRoomAreaName(getRoomArea(getPlayerRoom())) .. '\n')
   echo('Meta:\n')

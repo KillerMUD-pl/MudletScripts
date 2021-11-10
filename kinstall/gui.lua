@@ -1,5 +1,5 @@
 module("kinstall/gui", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 kgui = kgui or {}
 kgui.ui = {}
@@ -37,7 +37,7 @@ function kgui:init()
       y=-1,
       width="100%",
       height=0,
-    });
+    })
 
   kgui.mainRight = kgui.mainRight or
     Geyser.Container:new({
@@ -46,7 +46,7 @@ function kgui:init()
       y="0px",
       width=widthRight,
       height="100%",
-    });
+    })
 
   kgui.mainLeft = kgui.mainLeft or
     Geyser.Container:new({
@@ -55,7 +55,7 @@ function kgui:init()
       y="0px",
       width=widthLeft,
       height="100%",
-    });
+    })
 
   kgui.mainRightContainer = kgui.mainRightContainer or
     Geyser.Container:new({
@@ -64,7 +64,7 @@ function kgui:init()
       y="2px",
       width="100%-10px",
       height="100%-2px",
-    }, kgui.mainRight);
+    }, kgui.mainRight)
 
   kgui.mainLeftContainer = kgui.mainLeftContainer or
     Geyser.Container:new({
@@ -73,7 +73,7 @@ function kgui:init()
       y="2px",
       width="100%-20px",
       height="100%-2px",
-    }, kgui.mainLeft);
+    }, kgui.mainLeft)
 
   -- prawy pasek do przesuwania
   kgui.mainRightDrag = kgui.mainRightDrag or Geyser.Label:new({
@@ -150,7 +150,7 @@ end
 function kgui:addBox(name, height, title, commandName)
   kgui.ui[name] = {}
   kgui.uiState[name] = kgui.uiState[name] or {}
-  local wrapperHeight = kgui.uiState[name].height or height;
+  local wrapperHeight = kgui.uiState[name].height or height
   if wrapperHeight < kgui.baseFontHeightPx + 10 then
     wrapperHeight = kgui.baseFontHeightPx + 10
   end
@@ -272,7 +272,7 @@ function kgui:addBox(name, height, title, commandName)
   ]])
   kgui.ui[name]['close']:setFontSize(kgui.baseFontHeight)
   kgui.ui[name]['close']:setCursor("PointingHand")
-  kgui.ui[name]['close']:rawEcho("<center>×</center>");
+  kgui.ui[name]['close']:rawEcho("<center>×</center>")
   kgui.ui[name]['close']:setClickCallback(function()
     kinstall:runCmd('-', commandName, false)
   end)
@@ -303,7 +303,7 @@ function kgui:addBox(name, height, title, commandName)
     ]])
     kgui.ui[name]['min']:setFontSize(kgui.baseFontHeight)
     kgui.ui[name]['min']:setCursor("PointingHand")
-    kgui.ui[name]['min']:rawEcho("<center>-</center>");
+    kgui.ui[name]['min']:rawEcho("<center>-</center>")
     kgui.ui[name]['min']:setClickCallback(function()
       if kgui.uiState[name].minimized == true then
         kgui:unminimize(name)
@@ -342,7 +342,7 @@ function kgui:addBox(name, height, title, commandName)
     ]])
     kgui.ui[name]['leftright']:setFontSize(kgui.baseFontHeight)
     kgui.ui[name]['leftright']:setCursor("PointingHand")
-    kgui.ui[name]['leftright']:rawEcho("<center>" .. labelka .. "</center>");
+    kgui.ui[name]['leftright']:rawEcho("<center>" .. labelka .. "</center>")
     kgui.ui[name]['leftright']:setClickCallback(function()
       kgui:moveLeftRight(name, commandName)
     end)
@@ -377,7 +377,7 @@ function kgui:addBox(name, height, title, commandName)
     ]])
     kgui.ui[name]['topbottom']:setFontSize(kgui.baseFontHeight)
     kgui.ui[name]['topbottom']:setCursor("PointingHand")
-    kgui.ui[name]['topbottom']:rawEcho("<center>" .. labelkaUpDown .. "</center>");
+    kgui.ui[name]['topbottom']:rawEcho("<center>" .. labelkaUpDown .. "</center>")
     kgui.ui[name]['topbottom']:setClickCallback(function()
       kgui:moveTopBottom(name, commandName)
     end)
@@ -416,7 +416,7 @@ function kgui:addBox(name, height, title, commandName)
     ]])
     kgui.ui[name]['bottombarbtn']:setFontSize(kgui.baseFontHeight)
     kgui.ui[name]['bottombarbtn']:setCursor("PointingHand")
-    kgui.ui[name]['bottombarbtn']:rawEcho("<center>" .. labelkaBottomBar .. "</center>");
+    kgui.ui[name]['bottombarbtn']:rawEcho("<center>" .. labelkaBottomBar .. "</center>")
     kgui.ui[name]['bottombarbtn']:setClickCallback(function()
       kgui:moveToBottomBar(name, commandName)
     end)
@@ -606,7 +606,7 @@ function kgui:updateWrapperSize(name)
   local height = 0
   if kgui:isMinimized(name) == false then
     if kgui.ui[name]['content'] == nil then
-      height = kgui.ui[name]['wrapper'].get_height();
+      height = kgui.ui[name]['wrapper'].get_height()
     end
     if kgui.ui[name]['content'] ~= nil and kgui.ui[name]['content'].hidden == false then
       if kgui.ui[name]['content'].contentHeight == nil then

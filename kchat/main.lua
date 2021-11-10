@@ -1,11 +1,11 @@
 module("kchat", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 kchat = kchat or {}
 kchat.enabled = false
 kchat.colors = kchat.colors or {}
-kchat.box = nil;
-kchat.console = nil;
+kchat.box = nil
+kchat.console = nil
 
 function kchat:doChat()
   local param = kinstall.params[1]

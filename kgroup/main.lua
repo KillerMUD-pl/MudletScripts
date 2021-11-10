@@ -1,5 +1,5 @@
 module("kgroup", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 kgroup = kgroup or {}
 kgroup.enabled = false

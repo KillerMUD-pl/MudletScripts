@@ -100,7 +100,7 @@ function kinstall:installedModules()
     local moduleFile = kinstall:loadJsonFile(getMudletHomeDir() .. '/' .. moduleName .. '/module.json')
     cecho('- <gold>' .. moduleFile.name .. ' - <gray>' .. moduleFile.shortDesc)
     cecho('<DimGrey>, wersja: ' .. moduleFile.version .. ', komendy:')
-    local cmds = '';
+    local cmds = ''
     for _, cmd in ipairs(moduleFile.commands) do
       cmds = cmds .. ', ' .. cmd
     end
@@ -117,7 +117,7 @@ function kinstall:availableModules()
       count = count + 1
       cecho('- <gold>' .. moduleName .. ' - <gray>' .. data.shortDesc .. ' ')
       cecho('<DimGrey>wersja: ' .. data.version .. ', komendy:')
-      local cmds = '';
+      local cmds = ''
       for _, cmd in ipairs(data.commands) do
         cmds = cmds .. '<gray>, <cyan>+' .. cmd
       end
@@ -314,10 +314,10 @@ end
 
 function kinstall:doReset()
   cecho('\n<gold>Resetuje ustawienia\n\n')
-  local poi = kinstall:getConfig('poi', nil);
+  local poi = kinstall:getConfig('poi', nil)
   os.remove(kinstall.configFile)
   os.remove(kgui.settingsFile)
-  kinstall:setConfig('poi', poi);
+  kinstall:setConfig('poi', poi)
   raiseEvent("kinstallInit")
 end
 
@@ -475,7 +475,7 @@ kinstall.sysUnzipErrorId = registerAnonymousEventHandler("sysUnzipError", "kinst
 function kinstall:restartGmcpWatch()
   if kinstall.receivingGmcpTimer ~= nil then killTimer(kinstall.receivingGmcpTimer) end
   kinstall.receivingGmcpTimer = tempTimer(3, function()
-    kinstall.receivingGmcp = false;
+    kinstall.receivingGmcp = false
   end)
 end
 

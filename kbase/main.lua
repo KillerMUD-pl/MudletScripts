@@ -1,5 +1,5 @@
 module("kbase", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 kbase = kbase or {}
 local open = io.open
@@ -294,6 +294,10 @@ function kbase:applySpellFilter(item)
 end
 
 function kbase:speedwalkToVnum(vnum)
+  if kmap == nil then
+    cecho('<gold>Nie używasz modułu mapy. Wpisz <green>+map</green> by go zainstalować.\n')
+    return
+  end
   local roomId = kmap.vnumToRoomIdCache[tonumber(vnum)]
   if roomId == nil then
     return
@@ -385,7 +389,10 @@ end
 
 function kbase:values(t)
   local i = 0
-  return function() i = i + 1; return t[i] end
+  return function()
+    i = i + 1
+    return t[i]
+  end
 end
 
 function kbase:isEmpty(t)

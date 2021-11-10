@@ -1,5 +1,5 @@
 module("kinstall/adjustable2", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 --Adjustable2 Container
 

@@ -1,5 +1,5 @@
 module("kmem", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 kmem = kmem or {}
 kmem.enabled = false

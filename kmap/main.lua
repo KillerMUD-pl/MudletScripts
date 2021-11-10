@@ -1,12 +1,13 @@
 module("kmap", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
+
+kmap = kmap or {}
 
 kinstall:require('kmap/mapper')
 kinstall:require('kmap/speedwalk')
 
 mudlet.mapper_script = true
 
-kmap = kmap or {}
 kmap.mapperBox = kmap.mapperBox or {}
 kmap.messageBox = kmap.messageBox or {}
 kmap.immoMap = kmap.immoMap or false
@@ -142,7 +143,7 @@ function kmap:doMap()
   if param ~= "silent" then
     cecho('<gold>Włączam mapę\n')
   end
-  kmap:delayedmapLoad();
+  kmap:delayedmapLoad()
   kinstall:setConfig('mapa', 't')
 end
 
@@ -245,7 +246,7 @@ function kmap:unregister()
 end
 
 function kmap:showHelp()
-  cecho('<gold>POMOC MODUŁU MAPY')
+  cechoLink("<gold>Kliknij by otworzyć stronę z helpem.", [[openUrl("https://github.com/KillerMUD-pl/MudletScripts#mapa")]], nil, true)
 end
 
 --
@@ -342,7 +343,7 @@ function kmap:mapLocate()
   if gmcp.Room == nil then
     return
   end
-  local cachedRoomId = kmap.vnumToRoomIdCache[gmcp.Room.Info.num];
+  local cachedRoomId = kmap.vnumToRoomIdCache[gmcp.Room.Info.num]
   if cachedRoomId ~= nil and not roomExists(cachedRoomId) then
     kmap:vnumCacheRebuild()
     kmap:mapLocate()
@@ -367,7 +368,7 @@ function kmap:deleteImageLabels()
       labels = {}
     end
     for id, text in pairs(labels) do
-      if id ~= -1 and ( text == "" or text == "no text") then
+      if id ~= -1 and ( text == "" or text == "no text" or text == "brak tekstu") then
         deleteMapLabel(areaId, id)
       end
     end
@@ -508,6 +509,7 @@ end
 -- usuwanie obrazkow przed zapisaniem mapy
 --
 function kmap:sysExitEvent()
+  cecho('<gold>Czyszczenie mapy przed zapisem...')
   kmap:deleteImageLabels()
 end
 
@@ -687,7 +689,7 @@ function kmap:jumpTo()
     cecho('\n<red>Najpierw zaznacz room na mapie!\n')
     return
   end
-  local roomId = selectedRooms[1];
+  local roomId = selectedRooms[1]
   local vnum = getRoomUserData(roomId, "vnum")
   send('goto ' .. vnum .. '\n')
   kmap:centerView(roomId)

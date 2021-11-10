@@ -10,7 +10,6 @@ node_modules
 !/tools
 !/kinstall/
 /kinstall/tmp
-!/dist/
 !/kmap/
 /kmap/backup
 !/kinfo/

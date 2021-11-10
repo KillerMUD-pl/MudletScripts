@@ -1,5 +1,5 @@
 module("kinfo", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 kinfo = kinfo or {}
 kinfo.enabled = false
@@ -248,7 +248,7 @@ function kinfo:charInfoEventHandler()
       if customColor ~= nil then color = 'rgb(' .. customColor[1] .. ',' .. customColor[2] .. ',' .. customColor[3] .. ')' end
       local desc = utf8.gsub(kgui:transliterate(rawAff.desc), ' ', '&nbsp;')
       if type(rawAff.extraValue) == 'string' or type(rawAff.extraValue) == 'number' then desc = '(' .. utf8.gsub(rawAff.extraValue, ' ', '&nbsp;' ) .. ') ' .. desc end
-      local bgColor = 'rgba(0,0,0,0)';
+      local bgColor = 'rgba(0,0,0,0)'
       if rawAff.ending ~= nil and rawAff.ending == true then bgColor = 'rgba(80,0,0,255)' end
       txt = txt .. '<div style="line-height:' .. infoFontSize .. 'px;background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'.. color ..'">' .. desc .. '</div>'
     end
@@ -264,7 +264,7 @@ function kinfo:charInfoEventHandler()
         if customColor ~= nil then color = 'rgb(' .. customColor[1] .. ',' .. customColor[2] .. ',' .. customColor[3] .. ')' end
         local affName = utf8.gsub(kgui:transliterate(aff.name), ' ', '&nbsp;')
         if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then affName = '(' .. utf8.gsub(aff.extraValue, ' ', '&nbsp;') .. ') ' .. affName end
-        local bgColor = 'rgba(0,0,0,0)';
+        local bgColor = 'rgba(0,0,0,0)'
         if aff.ending ~= nil and aff.ending == true then bgColor = 'rgba(80,0,0,255)' end
         table.insert(list, '<span style="background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'..color..'">'..affName..'</span>')
       end
@@ -288,7 +288,7 @@ function kinfo:charInfoEventHandler()
       if customColor ~= nil then color = 'rgb(' .. customColor[1] .. ',' .. customColor[2] .. ',' .. customColor[3] .. ')' end
       local desc = utf8.gsub(kgui:transliterate(aff.desc), ' ', '&nbsp;')
       if type(aff.extraValue) == 'string' or type(aff.extraValue) == 'number' then desc = '(' .. utf8.gsub(aff.extraValue, ' ', '&nbsp;') .. ') ' .. desc end
-      local bgColor = 'rgba(0,0,0,0)';
+      local bgColor = 'rgba(0,0,0,0)'
       if aff.ending ~= nil and aff.ending == true then bgColor = 'rgba(80,0,0,255)' end
       txt = txt .. '<div style="line-height:'..infoFontSize..'px;background-color:'..bgColor..';font-size:'..infoFontSize..'px;color:'.. color ..'">' .. desc .. '</div>'
     end

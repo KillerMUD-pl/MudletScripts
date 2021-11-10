@@ -1,5 +1,5 @@
 module("kinstall/speedwalk", package.seeall)
-setfenv(1, getfenv(2));
+setfenv(1, getfenv(2))
 
 -- globalne zmienne
 kspeedwalk = kspeedwalk or {}
@@ -176,7 +176,7 @@ function kspeedwalk:findExit(fromRoomId, toRoomId, toDir)
   local roomExits = getRoomExits(fromRoomId)
   local namedDir = kmapper.swapDirTable[toDir]
   local normalExit = roomExits[namedDir]
-  local specialExit = roomData[toDir];
+  local specialExit = roomData[toDir]
 
   local command = nil
   if normalExit ~= nil and normalExit == toRoomId then
@@ -233,11 +233,11 @@ end
 
 function kspeedwalk:poiAdd(param)
   if param == "save" then
-    kspeedwalk:savePoi();
+    kspeedwalk:savePoi()
     return nil
   end
   if param == "load" then
-    kspeedwalk:loadPoi();
+    kspeedwalk:loadPoi()
     return nil
   end
   if param == "auto" then

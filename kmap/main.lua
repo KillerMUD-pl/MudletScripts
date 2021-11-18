@@ -12,6 +12,7 @@ kmap.mapperBox = kmap.mapperBox or {}
 kmap.messageBox = kmap.messageBox or {}
 kmap.immoMap = kmap.immoMap or false
 kmap.editMap = kmap.editMap or false
+kmap.hideGroup = kmap.hideGroup or false
 
 function kmap:doMap()
   local param = kinstall.params[1]
@@ -117,6 +118,7 @@ function kmap:doMap()
     end
     return
   end
+
   if param == 'edit' then
     kmap.editMap = kinstall:getConfig('editMap')
     if kmap.editMap == 'y' then
@@ -136,6 +138,21 @@ function kmap:doMap()
     kmapper:mapBackup()
     return
   end
+
+  if param == 'group' then
+    kmap.hideGroup = kinstall:getConfig('mapHideGroup')
+    if kmap.hideGroup == 'y' then
+      cecho('<gold>Włączono wyświetlanie grupy na mapie.\n\n')
+      kinstall:setConfig('mapHideGroup', 'n')
+      kmap.hideGroup = 'n'
+    else
+      cecho('<gold>Wyłączono wyświetlanie grupy na mapie.\n\n')
+      kinstall:setConfig('mapHideGroup', 'y')
+      kmap.hideGroup = 'y'
+    end
+    return
+  end
+
   if param == 'restore' then
     kmapper:mapRestore(kinstall.params[2])
     return
@@ -536,6 +553,10 @@ end
 --
 function kmap:drawGroup()
   kmap:removeGroup()
+
+  if kmap.hideGroup == "y" then
+    return
+  end
 
   if gmcp.Room == nil or gmcp.Room.Info == nil then return end
 

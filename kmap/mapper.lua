@@ -943,7 +943,6 @@ function kmapper:exportArea(areaId)
       table.insert(areaRooms.rooms, roomInfo)
   end
 
-
   echo('\n')
   cecho('<green>****************************************\n')
   cecho('<green>** Wybierz FOLDER do zapisania pliku  **\n')
@@ -956,11 +955,11 @@ function kmapper:exportArea(areaId)
   end
 
   local areas = getAreaTableSwap()
-  local fileName = path .. "/" .. areas[areaId] .. ".json"
+  local fileName = path .. "/" .. db:safe_name(areas[areaId]) .. ".json"
   file = io.open (fileName, "w+")
   file:write(yajl.to_string(areaRooms))
   file:close()
-  
+
   cecho('\n<green>Wyksportowano krainkę do pliku '.. fileName ..'\n')
 end
 

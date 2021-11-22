@@ -30,7 +30,7 @@
     "shortDesc": "Moduł informacji o zapamiętywanych czarach"
   },
   "kchat": {
-    "version": 3,
+    "version": 4,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kchat.zip",
     "commands": [ "chat" ],
     "shortDesc": "Moduł czatu (wersja testowa)"

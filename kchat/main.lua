@@ -6,11 +6,25 @@ kchat.enabled = false
 kchat.colors = kchat.colors or {}
 kchat.box = nil
 kchat.console = nil
+kchat.silent = kchat.silent or 'n'
 
 function kchat:doChat()
   local param = kinstall.params[1]
   if param ~= "silent" then
     cecho('<gold>Włączam panel czatu\n')
+  end
+  if param == 'silent' then
+    kchat.silent = kinstall:getConfig('chatSilent')
+    if kchat.silent == 'y' then
+      cecho('<gold>Włączono powiadamianie o nowych wiadomościach.\n\n')
+      kinstall:setConfig('chatSilent', 'n')
+      kchat.silent = 'n'
+    else
+      cecho('<gold>Wyłączono powiadamianie o nowych wiadomościach.\n\n')
+      kinstall:setConfig('chatSilent', 'y')
+      kchat.silent = 'y'
+    end
+    return
   end
   kchat:addBox()
   kinstall:setConfig('chat', 't')
@@ -103,7 +117,7 @@ function kchat:chatTriggerHandler()
     return
   end
 
-  if not hasFocus() then
+  if kchat.silent ~= 'y' and not hasFocus() then
     alert(5)
   end
 

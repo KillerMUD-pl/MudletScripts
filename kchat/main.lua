@@ -13,7 +13,7 @@ function kchat:doChat()
   if param ~= "silent" then
     cecho('<gold>Włączam panel czatu\n')
   end
-  if param == 'silent' then
+  if param == 'quiet' then
     kchat.silent = kinstall:getConfig('chatSilent')
     if kchat.silent == 'y' then
       cecho('<gold>Włączono powiadamianie o nowych wiadomościach.\n\n')

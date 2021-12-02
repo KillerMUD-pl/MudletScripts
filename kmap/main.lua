@@ -13,6 +13,8 @@ kmap.messageBox = kmap.messageBox or {}
 kmap.immoMap = kmap.immoMap or false
 kmap.editMap = kmap.editMap or false
 kmap.hideGroup = kmap.hideGroup or false
+kmap.ids = kmap.ids or {}
+kmap.vnumToRoomIdCache = {}
 
 function kmap:doMap()
   local param = kinstall.params[1]
@@ -198,9 +200,6 @@ function kmap:doUninstall()
 end
 
 function kmap:doInstall()
-  cecho('<gold>Odinstalowywanie domyślnego skryptu mappera... ')
-  uninstallPackage('generic_mapper')
-  uninstallModule('generic_mapper')
   if map ~= nil then
     map.eventHandler = function() end
   end
@@ -220,9 +219,9 @@ function kmap:doInstall()
     cecho('<orange>W przypadku problemów z załadowaniem się, lub działaniem mapy spróbuj wpisać\n')
     cecho('<orange><cyan>+map redraw <orange>(przerysowanie obrazków/etykiet) lub <cyan>+map reload <orange>(ponownie załadowanie mapy z dysku)\n\n')
     cecho('<orange>Zalecane ustawienia mapki:\n')
-    cecho('<orange> - na panelu na dole mapki odznacz "Info"\n')
     cecho('<orange> - zmień cyfrę przy "Rooms" na 8\n')
-    cecho('<orange> - kliknij poziomy pasek ze znaczkiem "^" żeby schować panel ustawień\n\n')
+    cecho('<orange> - kliknij poziomy pasek ze znaczkiem "^" żeby schować panel ustawień\n')
+    cecho('<orange> - w ustawieniach Mudleta, zakładka Mapper, odznaczyć "Show room borders"\n\n')
   end
   kinstall:setConfig('mapaInfo', 't')
 end
@@ -244,8 +243,6 @@ end
 --
 --
 
-kmap.ids = kmap.ids or {}
-kmap.vnumToRoomIdCache = {}
 
 function kmap:register()
   kmap:unregister()
@@ -470,13 +467,46 @@ end
 -- nasluchiwanie komunikatow gmcp.Char.Group
 --
 function kmap:charGroupEventHandler()
-  if kmap.mapperBox ~= nil and kgui.ui.mapper ~= nil and kgui.ui.mapper.wrapper.hidden ~= true then
+  if kmap.mapperBox ~= nil
+  and kgui.ui.mapper ~= nil
+  and kgui.ui.mapper.wrapper ~= nil
+  and kgui.ui.mapper.wrapper.hidden ~= true then
     kmap:drawGroup()
     if kmapper.mapping ~= true then
       kmap:mapLocate()
     end
   end
   kspeedwalk:step()
+end
+
+--
+-- Infobox mapy
+--
+function kmap:addInfoBox()
+  disableMapInfo("Short")
+  disableMapInfo("Full")
+  disableMapInfo("Killer")
+  killMapInfo("Killer")
+  registerMapInfo("Killer", function (roomId, selectionSize)
+    if selectionSize == 1 then
+      local nazwa = getRoomName(roomId)
+      local dane = {}
+      local vnum = getRoomUserData(roomId, "vnum")
+      if vnum ~= nil and vnum ~= "" then
+        table.insert(dane, vnum)
+      end
+      local sector = getRoomUserData(roomId, "sector")
+      if sector ~= nil and sector ~= "" then
+        table.insert(dane, sector)
+      end
+      if table.size(dane) > 0 then
+        return " (" .. table.concat(dane, ", ") .. ")", true
+      end
+      return nazwa, true;
+    end
+    return ""
+  end)
+  enableMapInfo("Killer")
 end
 
 --
@@ -512,9 +542,14 @@ function kmap:mapLoad(forceReload)
     kmap:unsetImmoMap()
   end
   updateMap()
+  kmap:addInfoBox()
 end
 
 function kmap:delayedmapLoad()
+  maptype = getMapUserData("type");
+  if maptype ~= nil and maptype ==  "KillerMUD" then
+    kmap:deleteImageLabels()
+  end
   closeMapWidget()
   kmap:addBox()
   tempTimer(0, function()

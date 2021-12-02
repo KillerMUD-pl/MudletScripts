@@ -1,6 +1,6 @@
 {
   "name": "kinstall",
-  "version": 31,
-  "commands": [ "install", "remove", "update", "gui", "reset" ],
+  "version": 32,
+  "commands": [ "install", "remove", "update", "gui", "config", "reset" ],
   "shortDesc": "Instalator modułów KillerMUDScripts"
 }

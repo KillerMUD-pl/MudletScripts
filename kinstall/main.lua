@@ -8,11 +8,14 @@ kinstall.cmdCache = {}
 kinstall.autoUpdate = kinstall.autoUpdate or 'y'
 kinstall.repoName = 'https://github.com/KillerMUD-pl/MudletScripts'
 kinstall.repoPath = 'https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/'
+kinstall.readmeLink = "https://github.com/KillerMUD-pl/MudletScripts#komendy"
 kinstall.configFile = getMudletHomeDir() .. '/kinstall.config.json'
 kinstall.receivingGmcpTimer = kinstall.receivingGmcpTimer or nil
 kinstall.receivingGmcp = false
 kinstall.gmcpHandler = kinstall.gmcpHandler or nil
 kinstall.params = {}
+kinstall.duringConfig = false
+kinstall.firstGmcpWatch = nil
 
 -- pobiera plik z wersjami pakietow
 function kinstall:fetchVersions()
@@ -32,7 +35,7 @@ function kinstall:welcomeScreen()
   cecho('Skrypty do Killer MUD rozwijane na:\n')
   echoLink(kinstall.repoName, [[ openWebPage(kinstall.repoName) ]], 'Kliknij by otworzyć')
   echo('\n\n')
-  cecho('Wpisz <cyan>+install <grey>by zobaczyć dostępne moduły.\n')
+  cecho('Wpisz <cyan>+config <grey>aby skonfigurować wymagane przez skrypty opcje w grze (musisz być zalogowany/a)\n')
   echo('\n\n')
 end
 
@@ -142,8 +145,8 @@ end
 
 -- sprawdzanie systemu
 function kinstall:checkSystem()
-  if mudletOlderThan(4, 10, 1) then
-    cecho('<red>Twoja wersja Mudleta jest starsza niż 4.10.1.\n')
+  if mudletOlderThan(4, 13) then
+    cecho('\n<red>Twoja wersja Mudleta jest starsza niż 4.13.\n')
     cecho('<red>Aby używać skryptów KillerMUDScripts musz zaktualizować Mudleta.\n')
     cecho('<red>Strona z aktualną wersją Mudleta: ')
     echoLink('https://www.mudlet.org/download/', [[ openWebPage('https://www.mudlet.org/download/') ]], 'Kliknij by otworzyć')
@@ -155,8 +158,9 @@ end
 
 -- instalowanie czcionek
 function kinstall:installFonts()
-  unzipAsync(getMudletHomeDir() .. '/kinstall/fonts/Marcellus-Regular.ttf.zip', getMudletHomeDir() .. '/../../fonts')
-  cecho('<gold>Zainstalowano nowe czcinki do Mudleta! Polecany jest <orange>restart<gold> Mudleta.')
+  if io.exists(getMudletHomeDir() .. '/../../fonts/Marcellus-Regular.ttf') == false then
+    unzipAsync(getMudletHomeDir() .. '/kinstall/fonts/Marcellus-Regular.ttf.zip', getMudletHomeDir() .. '/../../fonts')
+  end
 end
 
 -- update z repozytorium
@@ -289,6 +293,54 @@ function kinstall:doRemove()
   cecho('<gold>Usunięto moduł ' .. param .. '.\n\n')
 end
 
+function kinstall:setMudletEncodingIso()
+  tempTimer(0.9, [[ cecho('\n<gold>Ustawiam kodowanie ISO-8859-2 w Mudlecie.\n\n') ]])
+  setServerEncoding('ISO 8859-2')
+end
+
+function kinstall:setMudletEncodingWin()
+  tempTimer(0.9, [[ cecho('\n<gold>Ustawiam kodowanie WINDOWS-1250 w Mudlecie.\n\n' ]])
+  setServerEncoding('WINDOWS-1250')
+end
+
+function kinstall:welcomePartTwo()
+  cecho('\n<gold>Wszystko powinno już działać jak należy!\n\n')
+  cecho('Wpisz <cyan>+gui <grey>aby włączyć wszystkie dostępne panele.\n\n')
+  cecho('<dim_gray>Panele można przesuwać, niektóre z nich obsługują także zmianę rozmiaru.\n')
+  cecho('<dim_gray>Dostępne są prawy i lewy slot, oraz przyciąganie do góry lub do dołu. Użyj ikonek na pasku panelu by dostosować ich położenie.\n')
+  cecho('<dim_gray>Niektóre panele można też przypinać do dolnego slotu, tuż nad linią poleceń, służy do tego ikonka z symbolem "podkreślnika".\n')
+  cecho('<dim_gray>Panele można także zamknąć. Mudlet będzie pamiętał ustawienie paneli.".\n\n')
+  cecho('<dim_gray>Jeżeli coś pójdzie nie tak, użyj komendy <gray>+gui reset<dim_gray> by zresetować ułożenie okien.\n\n')
+  cecho('<dim_gray>Pełna lista instrukcji i możliwości poszczególnych paneli dostępna jest tutaj:\n')
+  cechoLink('<gray>' .. kinstall.readmeLink, [[ openWebPage(kinstall.readmeLink) ]], 'Kliknij by otworzyć')
+  echo('\n\n')
+end
+
+function kinstall:doConfig()
+  local param = kinstall.params[1]
+  if param ~= "tak" and string.starts(line, '<') == false then
+    cecho('\n<gold>Wygląda na to że nie jesteś zalogowany do gry. Zaloguj się i poczekaj aż skrypt automatycznie wykona komendę "config"\n')
+    cecho('<dim_gray>Jeżeli jesteś zalogowany, a po prostu nie udało mi się wykryć Twojego prompta, wpisz <gray>+config tak\n')
+    cecho('<dim_gray>Zalecane jest używanie < jako pierwszego znaku prompta, bez tego niektóre funkcje którą wymagają wykrywania prompta mogą nie działać poprawnie\n\n')
+    echo(line .. '\n')
+    tempRegexTrigger("^<", kinstall.doConfig, 1)
+    return
+  end
+  tempRegexTrigger('^gmcp\\s+\\[-\\]', [[ send('config gmcp') ]], 1)
+  tempRegexTrigger('^Standard kodowania polskich liter: ISO-8859-2\\.', kinstall.setMudletEncodingIso, 1)
+  tempRegexTrigger('^Standard kodowania polskich liter: CP-1250 \\(Windows\\)\\.', kinstall.setMudletEncodingWin, 1)
+  if kinstall.receivingGmcp == false then
+    if kinstall.firstGmcpWatch then killAnonymousEventHandler(kinstall.firstGmcpWatch) end
+    kinstall.firstGmcpWatch = registerAnonymousEventHandler("gmcp.Char", function()
+      tempTimer(1.1, [[ kinstall:welcomePartTwo() ]])
+      killAnonymousEventHandler(kinstall.firstGmcpWatch)
+    end)
+  else
+    tempTimer(0.5, [[ kinstall:welcomePartTwo() ]])
+  end
+  send('config')
+end
+
 function kinstall:doGui()
   local param = kinstall.params[1]
   if param == 'font' then
@@ -303,10 +355,12 @@ function kinstall:doGui()
   tempTimer(0.5, function() kinstall:runCmd('+', 'map', true) end)
   tempTimer(0.6, function() kinstall:runCmd('+', 'info', true) end)
   tempTimer(0.7, function() kinstall:runCmd('+', 'group', true) end)
+  tempTimer(0.8, function() kinstall:runCmd('+', 'chat', true) end)
 end
 
 function kinstall:undoGui()
   cecho('<gold>Wyłaczam GUI\n\n')
+  tempTimer(0.4, function() kinstall:runCmd('-', 'chat', true) end)
   tempTimer(0.5, function() kinstall:runCmd('-', 'group', true) end)
   tempTimer(0.6, function() kinstall:runCmd('-', 'info', true) end)
   tempTimer(0.7, function() kinstall:runCmd('-', 'map', true) end)
@@ -318,6 +372,7 @@ function kinstall:doReset()
   os.remove(kinstall.configFile)
   os.remove(kgui.settingsFile)
   kinstall:setConfig('poi', poi)
+  resetProfile()
   raiseEvent("kinstallInit")
 end
 
@@ -348,7 +403,6 @@ function kinstall:runCmd(mode, cmd, isAutoRun)
     end
     kgui:saveState()
   else
-    if isAutoRun == true then return end
     local foundModule = nil
     for name, data in pairs(kinstall.versions) do
       if table.contains(data.commands, params[1]) then
@@ -377,13 +431,18 @@ function kinstall:kinstallLoaded(_, filename)
     if kinstall:getConfig('welcomed') ~= true then
       kinstall:setConfig('welcomed', true)
       kinstall:welcomeScreen()
-      kinstall:doGui()
     else
       cecho('<goldenrod>[ KILLER ] - Sprawdzanie aktualizacji w tle.\n')
     end
     if kinstall:getConfig('fontsInstalled') ~= true then
       kinstall:setConfig('fontsInstalled', true)
       kinstall:installFonts()
+    end
+    if table.contains(getModules(),"generic_mapper") then
+      uninstallModule('generic_mapper')
+    end
+    if table.contains(getPackages(),"generic_mapper") then
+      uninstallPackage('generic_mapper')
     end
     kinstall:fetchVersions()
     -- załącza kod od gui

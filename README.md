@@ -2,6 +2,14 @@
 
 ![Screenshot](https://github.com/KillerMUD-pl/MudletScripts/blob/master/screenshot.png?raw=true)
 
+## Instalacja
+
+**UWAGA! wymagana wersja Mudleta to 4.13+**
+
+Ściągnij plik [kinstall.zip](https://github.com/KillerMUD-pl/MudletScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.
+
+### Komendy
+
 Aktualnie posiadana funkcjonalność:
 #### Mapa
 - Automatyczne podążanie za graczem.
@@ -77,12 +85,6 @@ Komendy:
 #### Inne
 - `+reset` - resetuje wszystkie ustawienia, oprócz zapisanych punktów POI. Przydatne jeśli coś się popsuje z ustawieniem okienek itp.
 - `+gui font <wielkosc>` - ustawia rozmiar czcionki używanej w okienkach
-
-## Instalacja
-
-**UWAGA! wymagana wersja Mudleta to 4.12+**
-
-Ściągnij plik [kinstall.zip](https://github.com/KillerMUD-pl/MudletScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.
 
 # Instrukcja używania "mappera"
 ### Czyli instrukcji do edycji mapy.

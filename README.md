@@ -8,7 +8,7 @@
 
 Ściągnij plik [kinstall.zip](https://github.com/KillerMUD-pl/MudletScripts/raw/master/dist/kinstall.zip) i przeciągnij go na okno Mudleta.
 
-### Komendy
+## Komendy
 
 Aktualnie posiadana funkcjonalność:
 #### Mapa

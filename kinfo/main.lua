@@ -150,7 +150,7 @@ function kinfo:charInfoEventHandler()
   txt = txt .. '<span style="font-size:' .. fontSize .. 'px;">, ' .. sex .. ', lev. ' .. vitals.level .. '</span></span>\n'
   local list = {}
   local height = titleFontSizePx
-  local posText = kinfo:translatePos(vitals.pos)
+  local posText = kgui:translatePos(vitals.pos)
   table.insert(list, '<span style="font-size:' .. infoFontSize .. 'px;">' .. posText .. '</span>')
   if cond.smoking == true then
     local s = "ćmisz&nbsp;fajkę"
@@ -296,19 +296,6 @@ function kinfo:charInfoEventHandler()
 
   kgui:setBoxContent('info', txt, height)
   kgui:update()
-end
-
-function kinfo:translatePos(text)
-  if text == "dead" then return '<span style="color:#ff0000">martwy</span>' end
-  if text == "mortally wounded" then return '<span style="color:#ff0000">umierający</span>' end
-  if text == "incapacitated" then return '<span style="color:#ff0000">unieruchomiony</span>' end
-  if text == "stunned" then return '<span style="color:#ff8800">oszołomiony</span>' end
-  if text == "sleeping" then return '<span style="color:#cccc00">śpisz</span>' end
-  if text == "resting" then return '<span style="color:#00cc00">odpoczywasz</span>' end
-  if text == "sitting" then return '<span style="color:#ffff00">siedzisz</span>' end
-  if text == "fighting" then return '<span style="color:#ff8800">walczysz</span>' end
-  if text == "standing" then return '<span style="color:#00cc00">stoisz</span>' end
-  return text
 end
 
 function kinfo:calculateTextHeight(txt, maxWidth, fontSize, lineHeight)

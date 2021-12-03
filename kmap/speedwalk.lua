@@ -44,7 +44,7 @@ function kspeedwalk:prepare()
   kspeedwalk.roomIdQueue = speedWalkPath
   kspeedwalk.lastRoomId = nil
   local targetRoomId = kspeedwalk.roomIdQueue[#kspeedwalk.roomIdQueue]
-  local targetRoomName = getRoomUserData(targetRoomId, 'name')
+  local targetRoomName = getRoomName(targetRoomId)
   local success, cost = getPath(getPlayerRoom(), targetRoomId)
   if success ~= true then
     cecho('\n<red>Nie znaleziono ścieżki do tego miejsca')
@@ -280,7 +280,7 @@ function kspeedwalk:poiAdd(param)
       end
       phrase = param
     end
-    local name = getRoomUserData(roomId, 'name')
+    local name = getRoomName(roomId)
     if name == nil then
       cecho('\n<red>Lokacja o vnumie '.. vnum ..' nie jest poprawnie zmapowana, brakuje jej nazwy.\n')
       return nil

@@ -17,6 +17,13 @@ kmap.ids = kmap.ids or {}
 kmap.vnumToRoomIdCache = {}
 
 function kmap:doMap()
+  if setMapWindowTitle('WYŁĄCZ OKNO MAPPERA I UŻYJ KOMENDY +map') == true then
+    cecho('\n<red>!!! Masz, lub miałeś, włączone okno mapy. Niestety, musisz upewnić się że jest wyłączone i zrestartować Mudleta !!!\n')
+    cecho('\n<dim_gray>Skrypty killera rysują własne okno mapy jako panel. Jeżeli przed instalacją skryptów używałeś okna Mapy, Mudlet nadal trzyma je w pamięci. Zamknij mapę jeśli jest otwarta. Ponowne uruchomienie Mudleta usunie ją z pamięci i skrypty będą mogły się poprawnie uruchomić.\n\n')
+    cecho('\nNie używaj już przycisku "Map" mudleta, od tej pory mapę włącza się komendą <gray>+map<dim_gray>\na wyłącza komendą <gray>-map\n\n')
+    return
+  end
+
   local param = kinstall.params[1]
   if param == 'reload' then
     kmap:mapLoad(true)
@@ -488,8 +495,18 @@ function kmap:addInfoBox()
   disableMapInfo("Killer")
   killMapInfo("Killer")
   registerMapInfo("Killer", function (roomId, selectionSize)
-    if selectionSize == 1 then
-      local nazwa = getRoomName(roomId)
+    if selectionSize < 2 then
+      local nazwa = ""
+      if selectionSize == 1 then
+        nazwa = "(zaznaczenie)"
+      end
+      if selectionSize == 0 then
+        roomId = getPlayerRoom()
+      end
+      if roomId == nil or roomId == 0 or roomId == "" then
+        return "";
+      end
+      nazwa = nazwa .. " " .. getRoomName(roomId)
       local dane = {}
       local vnum = getRoomUserData(roomId, "vnum")
       if vnum ~= nil and vnum ~= "" then
@@ -500,9 +517,9 @@ function kmap:addInfoBox()
         table.insert(dane, sector)
       end
       if table.size(dane) > 0 then
-        return " (" .. table.concat(dane, ", ") .. ")", true
+        return nazwa .. " [" .. table.concat(dane, ", ") .. "]", true, false, 240, 240, 240
       end
-      return nazwa, true;
+      return nazwa, true, false, 240, 240, 240;
     end
     return ""
   end)
@@ -520,7 +537,6 @@ function kmap:mapLoad(forceReload)
   if forceReload or mapVersion ~= moduleVersion then
     cecho('<gold>Ładuje mapę z dysku\n')
     loadJsonMap(getMudletHomeDir() .. '/kmap/mapa.json')
-    setMapUserData("version", tostring(moduleVersion))
   end
   kmap:vnumCacheRebuild()
   if gmcp.Room == nil then
@@ -547,7 +563,7 @@ end
 
 function kmap:delayedmapLoad()
   maptype = getMapUserData("type");
-  if maptype ~= nil and maptype ==  "KillerMUD" then
+  if maptype ~= nil and maptype ==  "killermud" then
     kmap:deleteImageLabels()
   end
   closeMapWidget()
@@ -756,5 +772,19 @@ end
 --
 
 function doSpeedWalk()
+  if kmap.immoMap == "y" then
+    local roomId = speedWalkPath[#speedWalkPath]
+    if roomId == nil or roomId == 0 or roomId == "" then
+      kspeedwalk:start()
+      return
+    end
+    local vnum = getRoomUserData(roomId, "vnum")
+    if roomId == nil or roomId == 0 or roomId == "" then
+      kspeedwalk:start()
+      return
+    end
+    send('goto ' .. vnum)
+    return
+  end
   kspeedwalk:start()
 end

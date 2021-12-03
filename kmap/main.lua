@@ -13,8 +13,17 @@ kmap.messageBox = kmap.messageBox or {}
 kmap.immoMap = kmap.immoMap or false
 kmap.editMap = kmap.editMap or false
 kmap.hideGroup = kmap.hideGroup or false
+kmap.ids = kmap.ids or {}
+kmap.vnumToRoomIdCache = {}
 
 function kmap:doMap()
+  if setMapWindowTitle('WYŁĄCZ OKNO MAPPERA I UŻYJ KOMENDY +map') == true then
+    cecho('\n<red>!!! Masz, lub miałeś, włączone okno mapy. Niestety, musisz upewnić się że jest wyłączone i zrestartować Mudleta !!!\n')
+    cecho('\n<dim_gray>Skrypty killera rysują własne okno mapy jako panel. Jeżeli przed instalacją skryptów używałeś okna Mapy, Mudlet nadal trzyma je w pamięci. Zamknij mapę jeśli jest otwarta. Ponowne uruchomienie Mudleta usunie ją z pamięci i skrypty będą mogły się poprawnie uruchomić.\n\n')
+    cecho('\nNie używaj już przycisku "Map" mudleta, od tej pory mapę włącza się komendą <gray>+map<dim_gray>\na wyłącza komendą <gray>-map\n\n')
+    return
+  end
+
   local param = kinstall.params[1]
   if param == 'reload' then
     kmap:mapLoad(true)
@@ -198,9 +207,6 @@ function kmap:doUninstall()
 end
 
 function kmap:doInstall()
-  cecho('<gold>Odinstalowywanie domyślnego skryptu mappera... ')
-  uninstallPackage('generic_mapper')
-  uninstallModule('generic_mapper')
   if map ~= nil then
     map.eventHandler = function() end
   end
@@ -220,9 +226,9 @@ function kmap:doInstall()
     cecho('<orange>W przypadku problemów z załadowaniem się, lub działaniem mapy spróbuj wpisać\n')
     cecho('<orange><cyan>+map redraw <orange>(przerysowanie obrazków/etykiet) lub <cyan>+map reload <orange>(ponownie załadowanie mapy z dysku)\n\n')
     cecho('<orange>Zalecane ustawienia mapki:\n')
-    cecho('<orange> - na panelu na dole mapki odznacz "Info"\n')
     cecho('<orange> - zmień cyfrę przy "Rooms" na 8\n')
-    cecho('<orange> - kliknij poziomy pasek ze znaczkiem "^" żeby schować panel ustawień\n\n')
+    cecho('<orange> - kliknij poziomy pasek ze znaczkiem "^" żeby schować panel ustawień\n')
+    cecho('<orange> - w ustawieniach Mudleta, zakładka Mapper, odznaczyć "Show room borders"\n\n')
   end
   kinstall:setConfig('mapaInfo', 't')
 end
@@ -244,8 +250,6 @@ end
 --
 --
 
-kmap.ids = kmap.ids or {}
-kmap.vnumToRoomIdCache = {}
 
 function kmap:register()
   kmap:unregister()
@@ -470,13 +474,56 @@ end
 -- nasluchiwanie komunikatow gmcp.Char.Group
 --
 function kmap:charGroupEventHandler()
-  if kmap.mapperBox ~= nil and kgui.ui.mapper ~= nil and kgui.ui.mapper.wrapper.hidden ~= true then
+  if kmap.mapperBox ~= nil
+  and kgui.ui.mapper ~= nil
+  and kgui.ui.mapper.wrapper ~= nil
+  and kgui.ui.mapper.wrapper.hidden ~= true then
     kmap:drawGroup()
     if kmapper.mapping ~= true then
       kmap:mapLocate()
     end
   end
   kspeedwalk:step()
+end
+
+--
+-- Infobox mapy
+--
+function kmap:addInfoBox()
+  disableMapInfo("Short")
+  disableMapInfo("Full")
+  disableMapInfo("Killer")
+  killMapInfo("Killer")
+  registerMapInfo("Killer", function (roomId, selectionSize)
+    if selectionSize < 2 then
+      local nazwa = ""
+      if selectionSize == 1 then
+        nazwa = "(zaznaczenie)"
+      end
+      if selectionSize == 0 then
+        roomId = getPlayerRoom()
+      end
+      if roomId == nil or roomId == 0 or roomId == "" then
+        return "";
+      end
+      nazwa = nazwa .. " " .. getRoomName(roomId)
+      local dane = {}
+      local vnum = getRoomUserData(roomId, "vnum")
+      if vnum ~= nil and vnum ~= "" then
+        table.insert(dane, vnum)
+      end
+      local sector = getRoomUserData(roomId, "sector")
+      if sector ~= nil and sector ~= "" then
+        table.insert(dane, sector)
+      end
+      if table.size(dane) > 0 then
+        return nazwa .. " [" .. table.concat(dane, ", ") .. "]", true, false, 240, 240, 240
+      end
+      return nazwa, true, false, 240, 240, 240;
+    end
+    return ""
+  end)
+  enableMapInfo("Killer")
 end
 
 --
@@ -490,7 +537,6 @@ function kmap:mapLoad(forceReload)
   if forceReload or mapVersion ~= moduleVersion then
     cecho('<gold>Ładuje mapę z dysku\n')
     loadJsonMap(getMudletHomeDir() .. '/kmap/mapa.json')
-    setMapUserData("version", tostring(moduleVersion))
   end
   kmap:vnumCacheRebuild()
   if gmcp.Room == nil then
@@ -512,9 +558,14 @@ function kmap:mapLoad(forceReload)
     kmap:unsetImmoMap()
   end
   updateMap()
+  kmap:addInfoBox()
 end
 
 function kmap:delayedmapLoad()
+  maptype = getMapUserData("type");
+  if maptype ~= nil and maptype ==  "killermud" then
+    kmap:deleteImageLabels()
+  end
   closeMapWidget()
   kmap:addBox()
   tempTimer(0, function()
@@ -721,5 +772,19 @@ end
 --
 
 function doSpeedWalk()
+  if kmap.immoMap == "y" then
+    local roomId = speedWalkPath[#speedWalkPath]
+    if roomId == nil or roomId == 0 or roomId == "" then
+      kspeedwalk:start()
+      return
+    end
+    local vnum = getRoomUserData(roomId, "vnum")
+    if roomId == nil or roomId == 0 or roomId == "" then
+      kspeedwalk:start()
+      return
+    end
+    send('goto ' .. vnum)
+    return
+  end
   kspeedwalk:start()
 end

@@ -1,6 +1,6 @@
 # Skrypty do Killer MUDa.
 
-![Screenshot](https://github.com/KillerMUD-pl/MudletScripts/blob/master/screenshot.png?raw=true)
+<img width="1440" alt="Screenshot 2021-12-03 at 11 34 54" src="https://user-images.githubusercontent.com/79473394/144588906-87a7b68b-973a-4139-81e8-7d5cb590e93e.png">
 
 ## Instalacja
 

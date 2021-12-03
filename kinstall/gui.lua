@@ -1003,3 +1003,29 @@ function kgui:calculateSizes()
   kgui.baseFontHeightPx = h
   kgui.boxPadding = math.ceil(kgui.baseFontHeightPx/2)
 end
+
+function kgui:translatePos(text)
+  -- info
+  if text == "dead" then return '<span style="color:#ff0000">martwy</span>' end
+  if text == "mortally wounded" then return '<span style="color:#ff0000">umierający</span>' end
+  if text == "incapacitated" then return '<span style="color:#ff0000">unieruchomiony</span>' end
+  if text == "stunned" then return '<span style="color:#ff8800">oszołomiony</span>' end
+  if text == "sleeping" then return '<span style="color:#cccc00">śpisz</span>' end
+  if text == "resting" then return '<span style="color:#00cc00">odpoczywasz</span>' end
+  if text == "sitting" then return '<span style="color:#ffff00">siedzisz</span>' end
+  if text == "fighting" then return '<span style="color:#ff8800">walczysz</span>' end
+  if text == "standing" then return '<span style="color:#00cc00">stoisz</span>' end
+
+  -- grupa
+  if text == "śpi" then return '<span style="color:#cccc00">śpisz</span>' end
+  if text == "recuperate" then return '<span style="color:#00ff00">recuperate</span>' end
+  if text == "medytuje" then return '<span style="color:#00ff00">medytuje</span>' end
+  if text == "memuje" then return '<span style="color:#00ff00">memuje</span>' end
+  if text == "odpoczywa" then return '<span style="color:#00cc00">odpoczywa</span>' end
+  if text == "siedzi" then return '<span style="color:#ffff00">siedzi</span>' end
+  if text == "walczy" then return '<span style="color:#ff0000">walczy</span>' end
+  if text == "stoi" then return '<span style="color:#00cc00">stoi</span>' end
+  if text == "lewituje" then return '<span style="color:#00cc99">lewituje</span>' end
+  if text == "lata" then return '<span style="color:#00cccc">lata</span>' end
+  return text
+end

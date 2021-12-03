@@ -1221,6 +1221,7 @@ function kmapper:mapInfo(fromMapper)
   end
   cecho('\n<green>Informacje o roomie:\n')
   echo('Id roomu: ' .. roomId .. '\n')
+  echo('Nazwa: ' .. getRoomName(roomId) .. '\n')
   echo('W area: ' .. getRoomAreaName(getRoomArea(getPlayerRoom())) .. '\n')
   echo('Meta:\n')
   display(getAllRoomUserData(roomId))

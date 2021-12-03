@@ -160,7 +160,33 @@ function kgroup:charInfoEventHandler()
     -- MV
     txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">mv: <span style="line-height:' .. lineHeight .. 'px;font-family:Arial">&nbsp;' .. kgroup:mvBar(kgroup:translateMv(kgroup:normalize(ch.mv))) .. '</span>&nbsp;</td>'
     -- POS
-    txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. kgui:transliterate(ch.pos) .. '</span>&nbsp;</td>'
+    if kgui:transliterate(ch.pos) == "walczy" then
+      local enemies = {}
+      if gmcp ~= nil and gmcp.Room ~= nil and gmcp.Room.People ~= nil  then
+        for _, person in ipairs(gmcp.Room.People) do
+          local enemyName = kgui:transliterate(person.enemy);
+          if enemyName == kgui:transliterate(ch.name) then
+            local enemyName = ""
+            local words = string.split(string.trim(person.name), " ")
+            if table.size(words) > 1 then
+              for _, word in ipairs(words) do
+                enemyName = enemyName .. utf8.upper(utf8.sub(string.trim(word), 1, 1))
+              end
+            else
+              enemyName = utf8.title(utf8.sub(string.trim(person.name), 1 , 2))
+            end
+            table.insert(enemies, enemyName)
+          end
+        end
+      end
+      local fight = ""
+      if table.size(enemies) > 0 then
+        fight =  ' <span style="color:#ff0000">[' .. table.concat(enemies, " ") .. "]</span>"
+      end
+      txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. kgui:translatePos(kgui:transliterate(ch.pos)) .. fight .. '</span>&nbsp;</td>'
+    else
+      txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;"><span style="font-size:' .. fontSize .. 'px">' .. kgui:translatePos(kgui:transliterate(ch.pos)) .. '</span>&nbsp;</td>'
+    end
     -- MEM
     if ch.mem > 0 then
       txt = txt .. '<td height="' .. lineHeight .. '" valign="center" style="line-height:' .. lineHeight .. 'px;white-space:nowrap;">&nbsp;' .. ch.mem .. ' mem&nbsp;</td>'

@@ -422,7 +422,7 @@ function kmap:mapRedraw(forceReload)
     local areaLabels = getMapLabels(areaId)
     if areaLabels == nil or type(areaLabels) ~= 'table' then areaLabels = {} end
     for id, txt in pairs(areaLabels) do
-      if id ~= -1 and (txt == "" or txt == "no text") then
+      if id ~= -1 and (txt == "" or txt == "no text" or txt == "brak tekstu") then
         local existing = getMapLabel(areaId, id)
         local label = imageHashes[string.format("%.3f", existing.Width) .. string.format("%.3f", existing.Height)]
         if label ~= nil then
@@ -438,7 +438,7 @@ function kmap:mapRedraw(forceReload)
   if totalLabelsFromJsonCount ~= usedLabelsFromJsonCount then
     shouldRepaint = 1
   end
-  
+
   if shouldRepaint == 0 then
     return
   end
@@ -537,6 +537,8 @@ function kmap:mapLoad(forceReload)
   if forceReload or mapVersion ~= moduleVersion then
     cecho('<gold>Ładuje mapę z dysku\n')
     loadJsonMap(getMudletHomeDir() .. '/kmap/mapa.json')
+    setMapUserData("version", tostring(moduleVersion))
+    setMapUserData("type", "killermud")
   end
   kmap:vnumCacheRebuild()
   if gmcp.Room == nil then

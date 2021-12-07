@@ -242,7 +242,7 @@ function kmapper:checkIfMoveCommandWasExecuted()
   
   setRoomUserData(getPlayerRoom(), 'vnum', gmcp.Room.Info.num)
   setRoomUserData(getPlayerRoom(), 'sector', typ)
-  setRoomUserData(getPlayerRoom(), 'name', strip_accents(gmcp.Room.Info.name))
+  setRoomName(getPlayerRoom(), strip_accents(gmcp.Room.Info.name))
   
   -- dopisywanie drzwi do mapy
   for _, value in ipairs(gmcp.Room.Info.exits) do

@@ -345,6 +345,10 @@ function kinstall:doGui()
   local param = kinstall.params[1]
   if param == 'font' then
     local size = kinstall.params[2]
+    if tonumber(size) < 10 then
+      cecho('<red>Czcionka używana w skryptach nie obsługuje rozmiarów mniejszych niż 10\n')
+      return
+    end
     kinstall:setConfig('fontSize', tonumber(size))
     kgui:init()
     kinstall:checkVersions()

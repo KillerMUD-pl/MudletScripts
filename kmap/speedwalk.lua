@@ -82,6 +82,43 @@ function kspeedwalk:walk(param)
     cecho('\n<gold>Wyłączono automatyczne rozpoczynanie podróży po dwu-kliku na mapie\n')
     return nil
   end
+  if param == "leader" then
+    cecho('\n<gold>Nawiguję do lidera grupy\n')
+    if gmcp == nil or  gmcp.Char == nil or gmcp.Char.Group == nil or gmcp.Char.Group.leader == nil 
+    or gmcp.Char.Vitals == nil or gmcp.Char.Group.members == nil then
+      cecho('\n<red>Nie wiem nic na temat twojej grupy...\n')
+      return nil
+    end
+    if gmcp.Char.Group.leader == gmcp.Char.Vitals.name then
+      cecho('\n<red>Chcesz nawigować sam do siebie?\n')
+      return nil
+    end
+    local leader = nil
+    for _, person in ipairs(gmcp.Char.Group.members) do
+      if person.name == gmcp.Char.Group.leader then
+        leader = person
+      end
+    end
+    if leader == nil then
+      cecho('\n<red>Brak informacji o grupie...\n')
+      return nil
+    end
+    roomId = tonumber(kmap.vnumToRoomIdCache[leader.room])
+    if roomId == nil then
+      cecho('\n<red>Nie mogę znaleźć lidera na mapie.\n')
+      return nil
+    end
+    getPath(getPlayerRoom(), roomId)
+    if #speedWalkPath == 0 then
+      cecho('\n<red>Uh... ciężka sprawa, nie wiem jak tam dojść z miejsca w którym się znajdujesz...\n')
+      return nil
+    end
+    kspeedwalk:prepare()
+    kspeedwalk.walking = true
+    kspeedwalk.lastRoomId = nil
+    kspeedwalk:step()
+    return nil
+  end
   if param == "" then
     if #kspeedwalk.roomIdQueue == 0 then
       cecho('\n<red>Chciałbyś gdzieś podróżować, tylko gdzie?')
@@ -89,6 +126,7 @@ function kspeedwalk:walk(param)
       return nil
     end
     cecho('\n<gold>Rozpoczęto podróż.\n')
+    kspeedwalk:prepare()
     kspeedwalk.walking = true
     kspeedwalk.lastRoomId = nil
     kspeedwalk:step()
@@ -242,6 +280,10 @@ function kspeedwalk:poiAdd(param)
   end
   if param == "auto" then
     cecho('\n<red>Sorki, nie możesz dodać poi o nazwie "auto"\n')
+    return nil
+  end
+  if param == "leader" then
+    cecho('\n<red>Sorki, nie możesz dodać poi o nazwie "leader"\n')
     return nil
   end
   if param == "" then

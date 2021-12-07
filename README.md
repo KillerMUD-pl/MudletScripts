@@ -24,7 +24,7 @@ Komendy:
 - `-poi <nazwa>` - usuwa zapisaną lokalizację
 - `+poi save` - zapisuje POI do pliku JSON
 - `+poi load` - ładuje POI z pliku JSON, dodaje je do istniejących (nie nadpisuje istniejącycj)
-- `+pol vunm <vnum> <nazwa>` - dodaje poi o nazwie <nazwa> na podstawie <vnum> roomu. Skrypt sam znajdzie room na mapie.
+- `+pol vnum <vnum> <nazwa>` - dodaje poi o nazwie <nazwa> na podstawie <vnum> roomu. Skrypt sam znajdzie room na mapie.
 - `+walk <nazwa>` - idzie do zapisanej lokacji
 - `+walk` - rozpoczyna podróż do lokacji po dwukliku na room na mapie. Jeżeli już masz wyznaczoną trasę, i naprzykład na chwilę usiadłeś, komenda `+walk` wznawia podróż.
 - `+walk auto` - włącza/wyłącza automatyczne rozpoczęcie podróży po dwu-kliku na mapie
@@ -65,6 +65,7 @@ Komendy:
 Komendy:
 - `+chat` - włącza panel czata
 - `-chat` - wyłącza panel czata
+- `+chat quiet` - wyłącza/włącza powiadomienia systemowe o nowej wiadomości
 
 ### Moduł Bazodanowy (kbase)
 - Pozwala wyszukiwać nauczycieli danego skilla

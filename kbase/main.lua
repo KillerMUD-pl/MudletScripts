@@ -5,6 +5,7 @@ kbase = kbase or {}
 local open = io.open
 local spells = nil
 local teachers = nil
+local tricks = nil
 local regions = { }
 local classes = { }
 
@@ -48,6 +49,11 @@ function kbase:doLookup()
     return
   end
 
+  if string.trim(param) == 'trick' then
+    kbase:searchTricks(phrase)
+    return
+  end
+
   if string.trim(param) == 'region' then
     kbase:setRegionFilter(phrase)
     return
@@ -57,6 +63,8 @@ function kbase:doLookup()
     kbase:setClassFilter(phrase)
     return
   end
+
+
 
   -- W przypadku, gdyby wyszukiwać po innym kluczu niż dopuszczalne można wyświetlić helpa
   kbase:printLookupHelp()
@@ -118,6 +126,8 @@ function kbase:printLookupHelp()
   cecho('<cyan>+lookup skill <nazwa skilla>   <grey>- wyszukuje nauczycieli danego skilla.\n')
   cecho('<cyan>+lookup spell <nazwa spella>   <grey>- wyszukuje księgi z danym czarem.\n')
   cecho('<cyan>+lookup spell all              <grey>- pokazuje wszystkie moby z księgami.\n')
+  cecho('<cyan>+lookup trick <nazwa tricka>   <grey>- wyszukuje moba który uczy danego tricka.\n')
+  cecho('<cyan>+lookup trick all              <grey>- pokazuje wszystkie moby uczące tricków.\n')
   cecho('<cyan>+lookup region <nazwa regionu> <grey>- dodaje region do listy filtrów.\n')
   cecho('<cyan>+lookup region <all/clear>     <grey>- czyści filtr regionów.\n')
   cecho('<cyan>+lookup class <nazwa klasy>    <grey>- dodaje klasę do listy filtrów.\n')
@@ -133,6 +143,43 @@ function kbase:printLookupHelp()
   cecho(string.format('<cyan>%s - Mob chodzi po krainie lub wielu krainach, nawigacja prowadzi do krainy\n', icon_roaming))
   cecho(string.format('<DimGrey>%s<cyan>  - Dodatkowe informacje wyświetlające się w toolipie po najechaniu na moba\n', icon_notes))
 end
+
+function kbase:decodeTricks()
+  local text = kbase:read_file(getMudletHomeDir() .. '/kbase/tricks.json', "r")
+  tricks = yajl.to_value(text)
+end
+
+function kbase:searchTricks(phrase)
+
+  if tricks == nil then
+    kbase:decodeTricks()
+  end
+
+  local fphrase = '(^| )'..string.lower(phrase)
+
+  cecho(string.format('<gold>Wyszukiwanie nauczyciela tricka: <cyan>%s\n', phrase))
+  kbase:echoFilterInfo()
+
+  for value in kbase:values(tricks) do
+    local text = kbase:formatTrickEntry(value)
+    if phrase == 'all' then
+      kbase:printEntry(value, text, fphrase)
+    else
+      local i, j = rex.find(string.lower(value.name), fphrase)
+      if i then
+        kbase:printEntry(value, text, fphrase)
+      end
+    end
+  end
+end
+
+  function kbase:formatTrickEntry(entry)
+    local text = ""
+    for requirement in kbase:values(entry.requirements) do
+      text = text .. string.format("[%s: %s%%] ", requirement[1], tostring(requirement[2]))
+    end
+    return string.format("<green>%s<white>: %s - wymaga: %s", entry.name, entry.mob, text)
+  end
 
 function kbase:decodeSpells()
   local text = kbase:read_file(getMudletHomeDir() .. '/kbase/spells.json', "r")
@@ -211,26 +258,31 @@ function kbase:searchTeachers(phrase)
 end
 
 function kbase:printEntry(item, text, fphrase)
+
     local notes, dangerous, boss, locked, roaming, fullNotes
+
     if item.notes ~= nil then
       notes = icon_notes
-      fullNotes = item.notes
+      fullNotes = item.notes .. "\n"
+      if (item.cost ~= nil) then fullNotes = fullNotes .. string.format("Cena nauki: %s miedzi\n", item.cost) end
+      if (item.chance ~= nil) then fullNotes = fullNotes .. string.format("Szansa nauczenia się: %s%%\n", item.chance) end
     else notes = '' end
+
     if item.dangerous ~= nil then dangerous = icon_dungerous else dangerous = '' end
     if item.boss ~= nil then boss = icon_boss else boss = '' end
     if item.locked ~= nil then locked = icon_locked else locked = '' end
     if item.roaming ~= nil then roaming = icon_roaming else roaming = '' end
 
     if notes ~= '' or dangerous ~= '' or boss ~= '' or locked ~= '' or roaming ~= '' then
-      text = text .. string.format(' <DimGrey>[%s%s%s%s%s]', notes, dangerous, boss, locked, roaming)
+      text = text .. string.format(' <DimGrey>%s%s%s%s%s', notes, boss, locked, roaming, dangerous)
     end
 
     if fphrase then
-      text, _, _ = rex.gsub(text, fphrase, '<cyan>%0<white>')
+      text = rex.gsub(text, fphrase, '<cyan>%0<grey>')
     end
 
     local tooltip = ''
-    if fullNotes ~= nil then tooltip = string.format('%s %s\n', icon_notes, fullNotes) end
+    if fullNotes ~= nil then tooltip = string.format('%s %s', icon_notes, fullNotes) end
     tooltip = tooltip .. string.format("Kliknij by wyznaczyć ściężke do: %s!", item.mob)
 
     if item.roomVnum ~= nil then
@@ -283,7 +335,11 @@ function kbase:printSpellsTable(tbl)
 end
 
 function kbase:formatSpellEntry(entry)
-  return string.format("<green>%s<white>: %s - %s", entry.class, entry.mob, kbase:printSpellsTable(entry.spells))
+  if entry.difficulty ~= nil then
+    return string.format("<white>(<green>%s<white>) %s(%s):<grey> %s", entry.class, entry.mob, tostring(entry.difficulty), kbase:printSpellsTable(entry.spells))
+  end
+
+  return string.format("<white>(<green>%s<white>) %s:<grey> %s", entry.class, entry.mob, kbase:printSpellsTable(entry.spells))
 end
 
 function kbase:applySpellFilter(item)

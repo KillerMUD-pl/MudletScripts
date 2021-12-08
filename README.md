@@ -77,6 +77,8 @@ Komendy:
 - `+lookup skill <nazwa skilla>`    - wyszukuje nauczycieli danego skilla lub spella
 - `+lookup spell <nazwa spella>`    - wyszukuje księgi z danym czarem
 - `+lookup spell all`               - pokazuje wszystkie moby z księgami
+- `+lookup trick <nazwa tricka>`    - wyszukuje moba który uczy danego tricka
+- `+lookup trick all`               - pokazuje wszystkie moby uczące tricków
 - `+lookup region <nazwa regionu>`  - dodaje region do listy filtrów
 - `+lookup region <all/clear>`      - czyści filtr regionów
 - `+lookup class <nazwa klasy>`     - dodaje klasę do listy filtrów

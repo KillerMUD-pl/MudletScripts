@@ -1,0 +1,246 @@
+[
+  {
+    "name": "Vertical kick",
+    "requirements": [
+      ["kick", 85]
+    ],
+    "mob": "Mnich Keredel",
+    "cost": 5000,
+    "chance": 25,
+    "roomVnum": 1335,
+    "notes": "4,5% przy użyciu skilla kick, max. raz na 7 ticków"
+  },
+  {
+    "name": "Staff Swirl",
+    "requirements": [
+      ["staff", 75],
+      ["twohanded weapon", 75]
+    ],
+    "mob": "Mnich Keredel",
+    "cost": 5250,
+    "chance": 23,
+    "roomVnum": 1335,
+    "notes": "6% na każdą runde walki uzywajac dwuręcznego kija (staff)"
+  },
+  {
+    "name": "Etwine",
+    "requirements": [
+      ["whip", 80]
+    ],
+    "mob": "Drowi instruktor",
+    "cost": 8000 ,
+    "chance": 20,
+    "roomVnum": 27617,
+    "notes": "4,5% na każde trafienie batem (whip)"
+  },
+  {
+    "name": "Weapon Wrench",
+    "requirements": [
+      ["whip mastery", 75],
+      ["disarm ", 75]
+    ],
+    "mob": "Drowi instruktor",
+    "cost": 9000,
+    "chance": 23,
+    "roomVnum": 27617,
+    "notes": "2,5% na przy zwykłym ciosie, 25% na jak ktoś próbuje parowac (parry) kogoś z tym trikiem. \nZamiast whip mastery, możne też być nomadowe weapon mastery."
+  },
+  {
+    "name": "Riposte",
+    "requirements": [
+      ["parry ", 85]
+    ],
+    "mob": "Kapral Ordalys",
+    "cost": 11000,
+    "chance": 19,
+    "roomVnum": 27629,
+    "notes": "5,3% na każde udane parowanie (parry)"
+  },
+  {
+    "name": "Cyclone",
+    "requirements": [
+      ["dualwield style", 85]
+    ],
+    "mob": "Wielki półogr Haghburg",
+    "cost": 7500,
+    "chance": 18,
+    "roomVnum": 6651,
+    "notes": "1,5% na każdą rundę walki walcząc dwoma brońmi"
+  },
+  {
+    "name": "Flabbergast",
+    "requirements": [
+      ["bash", 75]
+    ],
+    "mob": "Zbrojmistrz garnizonu",
+    "cost": 3700,
+    "chance": 12,
+    "roomVnum": 6180,
+    "notes": "9,5% na każde udane powalenie (bash)"
+  },
+  {
+    "name": "Dragon Strike",
+    "requirements": [
+      ["spear", 91],
+      ["twohanded weapon", 91]
+    ],
+    "mob": "Mistrz Moran",
+    "cost": 10000,
+    "chance": 16,
+    "roomVnum": 6455,
+    "notes": "2% na każdą rundę walki używając dwuręcznej włóczni (spear) - zamiast rundy walki uruchamia specjalny atak"
+  },
+  {
+    "name": "Glorious Impale",
+    "requirements": [
+      ["spear", 82],
+      ["twohanded weapon", 82]
+    ],
+    "mob": "Mistrz Moran",
+    "cost": 8188,
+    "chance": 16,
+    "roomVnum": 6455,
+    "notes": "1,6% na każdy trafiony cios dwuręczną włócznią (spear)"
+  },
+  {
+    "name": "Decapitation",
+    "requirements": [
+      ["axe", 91],
+      ["critical strike", 91]
+    ],
+    "mob": "Oprawca",
+    "cost": 6000,
+    "chance": 11,
+    "roomVnum": 28621,
+    "notes": "1% przy udanym trafionym critical strike jakimkolwiek toporem"
+  },
+  {
+    "name": "Thundering Whack",
+    "requirements": [
+      ["stun", 85]
+    ],
+    "mob": "uwolniona dusza starożytnego paladyna",
+    "cost": 7450,
+    "chance": 18,
+    "roomVnum": 10959,
+    "notes": "4% przy jakimkolwiek ogłuszeniu (stun)"
+  },
+  {
+    "name": "Strucking Wallop",
+    "requirements": [
+      ["charge", 85],
+      ["mighty blow", 85]
+    ],
+    "mob": "Stary barbarzyński mistrz",
+    "cost": 7111,
+    "chance": 19,
+    "roomVnum": 17995,
+    "notes": "7,5% przy szarzy wywracajacej"
+  },
+  {
+    "name": "Shove",
+    "requirements": [
+      ["dodge", 75],
+      ["trip", 75]
+    ],
+    "mob": "Pirat Tankartez",
+    "cost": 5900,
+    "chance": 35,
+    "roomVnum": 16628,
+    "notes": "7% przy udanym uniku (dodge)"
+  },
+  {
+    "name": "Thigh Jab",
+    "requirements": [
+      [
+        "dagger",
+        80
+      ]
+    ],
+    "mob": "Pirat Tankartez",
+    "cost": 6666,
+    "chance": 25,
+    "roomVnum": 16628,
+    "notes": "1,8% przy każdym trafieniu sztyletem (dagger)"
+  },
+  {
+    "name": "Bleed (Sword)",
+    "requirements": [
+      ["sword", 80]
+    ],
+    "mob": "mistrz Gregor",
+    "cost": 7878,
+    "chance": 21,
+    "roomVnum": 4522,
+    "notes": "1,8% przy każdym trafieniu mieczem (sword) lub krótkim mieczem (short-sword)"
+  },
+  {
+    "name": "Bleed (Short-sword",
+    "requirements": [
+      ["short-sword", 80]
+    ],
+    "mob": "mistrz Gregor",
+    "cost": 7878,
+    "chance": 21,
+    "roomVnum": 4522,
+    "notes": "1,8% przy każdym trafieniu mieczem (sword) lub krótkim mieczem (short-sword)"
+  },
+  {
+    "name": "Ravaging Orb",
+    "requirements": [
+      ["flail", 80],
+      ["twohanded weapon", 80]
+    ],
+    "mob": "stary śnieżny troll",
+    "cost": 8000,
+    "chance": 23,
+    "roomVnum": 43932,
+    "notes": "2,5% na każdą rundę walki dwuręcznym korbaczem (flail) - zamiast rundy walki uruchamia specjalny atak"
+  },
+  {
+    "name": "Crushing Mace",
+    "requirements": [
+      ["mace", 80],
+      ["mace mastery", 80]
+    ],
+    "mob": "paladyn Marteg",
+    "cost": 6543,
+    "chance": 25,
+    "roomVnum": 40325,
+    "notes": "2% przy zwykłym ciosie obuchem (mace)"
+  },
+  {
+    "name": "Thousandslayer",
+    "requirements": [
+      ["cleave", 75],
+      ["overwhelming strike", 75]
+    ],
+    "mob": "władca mroku",
+    "cost": 8765,
+    "chance": 21,
+    "roomVnum": 33073,
+    "notes": "15% przy cleave"
+  },
+  {
+    "name": "Divine Impact (Smite Good)",
+    "requirements": [
+      ["smite good", 75]
+    ],
+    "mob": "władca mroku",
+    "cost": 7240,
+    "chance": 15,
+    "roomVnum": 33073,
+    "notes": "4,8% przy smite good"
+  },
+  {
+    "name": "Divine Impact (Smite Evil)",
+    "requirements": [
+      ["smite evil", 75]
+    ],
+    "mob": "paladyn Federmel ev Kenrah",
+    "cost": 7250,
+    "chance": 15,
+    "roomVnum": 929,
+    "notes": "4,8% przy smite good"
+  }
+]

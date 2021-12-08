@@ -549,7 +549,8 @@
     "class": "Mag",
     "spells": [
       "Change sex", "Dismiss insect", "Fox Cunning", "hardiness"
-    ]
+    ],
+    "difficulty": 1
   },
   {
     "roomVnum": 10847,
@@ -594,7 +595,7 @@
     "region": "",
     "class": "Mag",
     "spells": [
-      "Fox cunning", "Lightning bolt", "invisbility", "Maze"
+      "Fox cunning", "Lightning bolt", "invisibility", "Maze"
     ],
     "notes": "Wędruje",
     "roaming": "t"
@@ -616,7 +617,8 @@
     "class": "Mag",
     "spells": [
       "Dismiss monster", "Lightning bolt", "lower resistance", "Acid Arrow"
-    ]
+    ],
+    "difficulty": 3
   },
   {
     "roomVnum": 14034,
@@ -626,7 +628,8 @@
     "spells": [
       "vampiric touch", "perfect senses", "hallucinations", "bull strength", "animate dead"
     ],
-    "dangerous": "t"
+    "dangerous": "t",
+    "difficulty": 4
   },
   {
     "roomVnum": 28828,
@@ -639,7 +642,7 @@
     "dangerous": "t"
   },
   {
-    "roomVnum": 45628,
+    "roomVnum": 45550,
     "mob": "Ork Czarodziej",
     "region": "Carrallak",
     "class": "Mag",
@@ -674,7 +677,8 @@
       "Animate Dead", "Ghoul touch", "Embalm", "Ethereal armor"
     ],
     "notes": "Ksiega niewidzialna, dwa chodzą po pustyni",
-    "dangerous": "t"
+    "dangerous": "t",
+    "difficulty": 5
   },
   {
     "roomVnum": 16619,
@@ -693,7 +697,8 @@
     "class": "Mag",
     "spells": [
       "Fly", "force missiles", "confusion shell", "hallucinations"
-    ]
+    ],
+    "difficulty": 5
   },
   {
     "roomVnum": 4519,
@@ -741,7 +746,8 @@
     "class": "Mag",
     "spells": [
       "hold person", "reflect spell I", "Iceshield", "Charm person"
-    ]
+    ],
+    "difficulty": 6
   },
   {
     "roomVnum": 15942,
@@ -772,7 +778,8 @@
     "spells": [
       "Force field", "protection from summon", "antimagic manacles", "hold monster"
     ],
-    "dangerous": "t"
+    "dangerous": "t",
+    "difficulty": 7
   },
   {
     "roomVnum": 9317,
@@ -782,7 +789,8 @@
     "spells": [
       "resist normal weapon", "reflect spell I", "resist elements", "dimension door"
     ],
-    "dangerous": "t"
+    "dangerous": "t",
+    "difficulty": 7
   },
   {
     "roomVnum": 11148,
@@ -793,7 +801,8 @@
       "raise zombie", "iceshield", "decay", "rasie ghoul"
     ],
     "notes": "Niewidzialny",
-    "dangerous": "t"
+    "dangerous": "t",
+    "difficulty": 5
   },
   {
     "roomVnum": 42348,
@@ -814,7 +823,8 @@
       "stone skin", "change staff", "draconic wisdom", "major haste", "giant strength"
     ],
     "dangerous": "t",
-    "boss": "t"
+    "boss": "t",
+    "difficulty": 8
   },
   {
     "roomVnum": 17972,
@@ -852,6 +862,18 @@
     "boss": "t"
   },
   {
+    "roomVnum": 25670,
+    "mob": "Nekromanta Gregzagg",
+    "region": "Forteca",
+    "class": "Mag",
+    "spells": [
+      "raise ghast", "horrid wilting", "power word stun", "unholy fury"
+    ],
+    "dangerous": "t",
+    "boss": "t",
+    "difficulty": 5
+  },
+  {
     "roomVnum": 33068,
     "mob": "Groslug",
     "region": "Arras",
@@ -880,7 +902,8 @@
     "class": "Mag",
     "spells": [
       "force missiles", "acid blast", "hold person", "maze"
-    ]
+    ],
+    "difficulty": 4
   },
   {
     "roomVnum": 1761,
@@ -902,7 +925,8 @@
     "spells": [
       "inspire", "fetch", "loop", "psychic scream", "blink"
     ],
-    "boss": "t"
+    "boss": "t",
+    "difficulty": 10
   },
   {
     "roomVnum": 17965,
@@ -934,7 +958,8 @@
       "unholy fury", "horrid wilthing", "cone of cold", "power word blind", "Mend golem"
     ],
     "dangerous": "t",
-    "boss": "t"
+    "boss": "t",
+    "difficulty": 7
   },
   {
     "roomVnum": 2899,
@@ -1020,7 +1045,8 @@
     "class": "Mag",
     "spells": [
       "Wall of mist", "Flame arrow", "Spirit armor", "hold person"
-    ]
+    ],
+    "notes": "upadły kapłan u duergarów dropi ciemnoszarą księge ze spirit armorem, moze to ta"
   },
   {
     "roomVnum": 5118,
@@ -1029,7 +1055,8 @@
     "class": "Mag",
     "spells": [
       "decay", "minor globe of invulnerability", "raise ghoul", "ghoul touch"
-    ]
+    ],
+    "difficulty": 6
   },
   {
     "roomVnum": 5771,

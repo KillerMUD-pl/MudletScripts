@@ -6,7 +6,7 @@
     "shortDesc": "Instalator modułów"
   },
   "kmap": {
-    "version": 45,
+    "version": 46,
     "url": "https://raw.githubusercontent.com/KillerMUD-pl/MudletScripts/main/dist/kmap.zip",
     "commands": [ "map" ],
     "shortDesc": "Moduł mapy"

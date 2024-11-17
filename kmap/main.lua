@@ -723,9 +723,9 @@ function kmap:drawGroup()
         14,
         true,
         true,
-        nil,
-        nil,
-        nil,
+        'Marcellus',
+        255,
+        50,
         true -- set label as temporary
       )
     end

@@ -1002,8 +1002,8 @@ function kmapper:importArea()
       false,
       false,
       'Marcellus',
-      nil,
-      nil,
+      255,
+      50,
       true -- set label as temporary
     )
   end
@@ -1348,8 +1348,8 @@ function kmapper:mapLabel(label)
     false,
     false,
     'Marcellus'
-    nil,
-    nil,
+    255,
+    50,
     true -- set label as temporary
 )
 end

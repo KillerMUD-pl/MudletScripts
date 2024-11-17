@@ -1001,7 +1001,10 @@ function kmapper:importArea()
       12, 
       false,
       false,
-      'Marcellus'
+      'Marcellus',
+      nil,
+      nil,
+      true -- set label as temporary
     )
   end
   
@@ -1328,7 +1331,27 @@ function kmapper:mapLabel(label)
   local roomId = getPlayerRoom()
   local areaId = getRoomArea(roomId)
   local x,y,z = getRoomCoordinates(roomId)
-  createMapLabel(areaId, label, x+0.5, y+1.3, z, 230,230,230, 0,0,0, 30, size, false, false, 'Marcellus')
+  createMapLabel(
+    areaId,
+    label,
+    x+0.5,
+    y+1.3,
+    z,
+    230,
+    230,
+    230,
+    0,
+    0,
+    0,
+    30,
+    size,
+    false,
+    false,
+    'Marcellus'
+    nil,
+    nil,
+    true -- set label as temporary
+)
 end
 
 function kmapper:setupColors()

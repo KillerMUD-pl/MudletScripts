@@ -458,7 +458,8 @@ function kmap:mapRedraw(forceReload)
         label.Width,
         label.Height,
         50,
-        false
+        false,
+        true -- set label as temporary
       )
     end
   end
@@ -706,7 +707,27 @@ function kmap:drawGroup()
         deltaX = fontW * symbolCount / 20
       end
       local roomX, roomY, roomZ = getRoomCoordinates(roomId)
-      createMapLabel(getRoomArea(roomId), label, roomX - deltaX, roomY + 1, roomZ, 240, 240, 240, 0, 0, 0, 30, 14, true, true)
+      createMapLabel(
+        getRoomArea(roomId),
+        label,
+        roomX - deltaX,
+        roomY + 1,
+        roomZ,
+        240,
+        240,
+        240,
+        0,
+        0,
+        0,
+        30,
+        14,
+        true,
+        true,
+        'Marcellus',
+        255,
+        50,
+        true -- set label as temporary
+      )
     end
   end
 

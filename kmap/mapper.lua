@@ -1347,7 +1347,7 @@ function kmapper:mapLabel(label)
     size,
     false,
     false,
-    'Marcellus'
+    'Marcellus',
     255,
     50,
     true -- set label as temporary
